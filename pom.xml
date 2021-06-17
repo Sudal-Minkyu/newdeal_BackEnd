@@ -9,10 +9,10 @@
     <relativePath/>
 </parent>
 <groupId>com.broadwave.backend</groupId>
-<artifactId>infraBackend</artifactId>
+<artifactId>NewDealBackend</artifactId>
 <version>1.0.0</version>
-<name>infraBackend</name>
-<description>infraBackend Server</description>
+<name>NewDealBackend</name>
+<description>NewDealBackend Server</description>
 
 <properties>
     <java.version>11</java.version>

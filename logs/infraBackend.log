@@ -2,3 +2,59 @@
 2021-06-17 10:05:25.951  INFO 3068 --- [Thread-2] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
 2021-06-17 10:05:25.969  INFO 3068 --- [Thread-2] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
 2021-06-17 10:05:25.974  INFO 3068 --- [Thread-2] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2021-06-17 10:27:39.536  INFO 44090 --- [main] c.b.backend.NewDealBackendApplication    : Starting NewDealBackendApplication on gimmingyuui-MacBookPro.local with PID 44090 (/Users/broadwave/Downloads/project/newdeal-backend/target/classes started by broadwave in /Users/broadwave/Downloads/project/newdeal-backend)
+2021-06-17 10:27:39.540  INFO 44090 --- [main] c.b.backend.NewDealBackendApplication    : No active profile set, falling back to default profiles: default
+2021-06-17 10:27:40.414  INFO 44090 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data repositories in DEFAULT mode.
+2021-06-17 10:27:40.532  INFO 44090 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 108ms. Found 2 repository interfaces.
+2021-06-17 10:27:40.807  INFO 44090 --- [main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.transaction.annotation.ProxyTransactionManagementConfiguration' of type [org.springframework.transaction.annotation.ProxyTransactionManagementConfiguration$$EnhancerBySpringCGLIB$$a7d11cea] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2021-06-17 10:27:41.099  INFO 44090 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8011 (http)
+2021-06-17 10:27:41.122  INFO 44090 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2021-06-17 10:27:41.122  INFO 44090 --- [main] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.16]
+2021-06-17 10:27:41.127  INFO 44090 --- [main] o.a.catalina.core.AprLifecycleListener   : The APR based Apache Tomcat Native library which allows optimal performance in production environments was not found on the java.library.path: [/Users/broadwave/Library/Java/Extensions:/Library/Java/Extensions:/Network/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java:.]
+2021-06-17 10:27:41.229  INFO 44090 --- [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2021-06-17 10:27:41.229  INFO 44090 --- [main] o.s.web.context.ContextLoader            : Root WebApplicationContext: initialization completed in 1653 ms
+2021-06-17 10:27:41.336  INFO 44090 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2021-06-17 10:27:41.385  INFO 44090 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2021-06-17 10:27:41.417  INFO 44090 --- [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [
+	name: default
+	...]
+2021-06-17 10:27:41.449  INFO 44090 --- [main] org.hibernate.Version                    : HHH000412: Hibernate Core {5.3.7.Final}
+2021-06-17 10:27:41.450  INFO 44090 --- [main] org.hibernate.cfg.Environment            : HHH000206: hibernate.properties not found
+2021-06-17 10:27:41.523  INFO 44090 --- [main] o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Commons Annotations {5.0.4.Final}
+2021-06-17 10:27:41.609  INFO 44090 --- [main] org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+2021-06-17 10:27:42.141  INFO 44090 --- [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2021-06-17 10:27:42.521  INFO 44090 --- [main] c.b.b.teams.teamfile.TeamFileService     : PATH :: /Users/broadwave/Downloads/project/testFile/
+2021-06-17 10:27:42.824  INFO 44090 --- [main] o.s.s.concurrent.ThreadPoolTaskExecutor  : Initializing ExecutorService 'applicationTaskExecutor'
+2021-06-17 10:27:42.860  WARN 44090 --- [main] aWebConfiguration$JpaWebMvcConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2021-06-17 10:27:43.002  INFO 44090 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8011 (http) with context path ''
+2021-06-17 10:27:43.005  INFO 44090 --- [main] c.b.backend.NewDealBackendApplication    : Started NewDealBackendApplication in 3.776 seconds (JVM running for 4.404)
+2021-06-17 10:44:31.515  INFO 44090 --- [Thread-2] o.s.s.concurrent.ThreadPoolTaskExecutor  : Shutting down ExecutorService 'applicationTaskExecutor'
+2021-06-17 10:44:31.518  INFO 44090 --- [Thread-2] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2021-06-17 10:44:31.524  INFO 44090 --- [Thread-2] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2021-06-17 10:44:31.534  INFO 44090 --- [Thread-2] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2021-06-17 10:44:36.130  INFO 44805 --- [main] c.b.backend.NewDealBackendApplication    : Starting NewDealBackendApplication on gimmingyuui-MacBookPro.local with PID 44805 (/Users/broadwave/Downloads/project/newdeal-backend/target/classes started by broadwave in /Users/broadwave/Downloads/project/newdeal-backend)
+2021-06-17 10:44:36.134  INFO 44805 --- [main] c.b.backend.NewDealBackendApplication    : No active profile set, falling back to default profiles: default
+2021-06-17 10:44:37.266  INFO 44805 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data repositories in DEFAULT mode.
+2021-06-17 10:44:37.510  INFO 44805 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 225ms. Found 2 repository interfaces.
+2021-06-17 10:44:38.841  INFO 44805 --- [main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.transaction.annotation.ProxyTransactionManagementConfiguration' of type [org.springframework.transaction.annotation.ProxyTransactionManagementConfiguration$$EnhancerBySpringCGLIB$$23e0b8c8] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2021-06-17 10:44:39.726  INFO 44805 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8011 (http)
+2021-06-17 10:44:39.762  INFO 44805 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2021-06-17 10:44:39.763  INFO 44805 --- [main] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.16]
+2021-06-17 10:44:39.772  INFO 44805 --- [main] o.a.catalina.core.AprLifecycleListener   : The APR based Apache Tomcat Native library which allows optimal performance in production environments was not found on the java.library.path: [/Users/broadwave/Library/Java/Extensions:/Library/Java/Extensions:/Network/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java:.]
+2021-06-17 10:44:39.964  INFO 44805 --- [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2021-06-17 10:44:39.965  INFO 44805 --- [main] o.s.web.context.ContextLoader            : Root WebApplicationContext: initialization completed in 3790 ms
+2021-06-17 10:44:40.101  INFO 44805 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2021-06-17 10:44:40.293  INFO 44805 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2021-06-17 10:44:40.332  INFO 44805 --- [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [
+	name: default
+	...]
+2021-06-17 10:44:40.382  INFO 44805 --- [main] org.hibernate.Version                    : HHH000412: Hibernate Core {5.3.7.Final}
+2021-06-17 10:44:40.383  INFO 44805 --- [main] org.hibernate.cfg.Environment            : HHH000206: hibernate.properties not found
+2021-06-17 10:44:40.492  INFO 44805 --- [main] o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Commons Annotations {5.0.4.Final}
+2021-06-17 10:44:40.634  INFO 44805 --- [main] org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+2021-06-17 10:44:41.477  INFO 44805 --- [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2021-06-17 10:44:41.868  INFO 44805 --- [main] c.b.b.teams.teamfile.TeamFileService     : PATH :: /Users/broadwave/Downloads/project/testFile/
+2021-06-17 10:44:42.117  INFO 44805 --- [main] o.s.s.concurrent.ThreadPoolTaskExecutor  : Initializing ExecutorService 'applicationTaskExecutor'
+2021-06-17 10:44:42.148  WARN 44805 --- [main] aWebConfiguration$JpaWebMvcConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2021-06-17 10:44:42.283  INFO 44805 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8011 (http) with context path ''
+2021-06-17 10:44:42.287  INFO 44805 --- [main] c.b.backend.NewDealBackendApplication    : Started NewDealBackendApplication in 6.557 seconds (JVM running for 8.065)

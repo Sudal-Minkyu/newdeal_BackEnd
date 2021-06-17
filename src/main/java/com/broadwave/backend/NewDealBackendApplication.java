@@ -6,8 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @Slf4j
 @SpringBootApplication
-public class InfraBackendApplication {
+public class NewDealBackendApplication {
     public static void main(String[] args) {
-        SpringApplication.run(InfraBackendApplication.class, args);
+        SpringApplication.run(NewDealBackendApplication.class, args);
     }
 }
