@@ -6,10 +6,10 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 /**
- * @author InSeok
- * Date : 2019-03-26
- * Time : 10:07
- * Remark : Team 클래스
+ * @author Minkyu
+ * Date : 2021-06-17
+ * Time : 15:09
+ * Remark : 뉴딜 Team 클래스
  */
 @Entity
 @Getter
@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "bs_team")
+@Table(name = "nd_bs_team")
 public class Team {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
