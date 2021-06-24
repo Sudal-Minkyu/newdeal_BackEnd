@@ -9,9 +9,11 @@ import org.springframework.ui.Model;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author InSeok
@@ -49,41 +51,50 @@ public abstract class CommonUtils {
         if (ip == null) {
             ip = request.getRemoteAddr();
         }
+
         log.info(">>>> Result : IP Address : "+ip);
+
         return ip;
+
     }
 
-    //Pages 형태의 조회 API 반환 함수
-    public static ResponseEntity ResponseEntityPage(Page pages ){
-        log.info("Pages 형태의 조회 API 반환 함수 공통 함수 호출");
+//    //Pages 형태의 조회 API 반환 함수
 
-        AjaxResponse res = new AjaxResponse();
-        HashMap<String, Object> data = new HashMap<>();
-
-        if(pages.getTotalElements()> 0 ){
-
-            data.clear();
-            data.put("datalist",pages.getContent());
-            data.put("total_page",pages.getTotalPages());
-            data.put("current_page",pages.getNumber() + 1);
-            data.put("total_rows",pages.getTotalElements());
-            data.put("current_rows",pages.getNumberOfElements());
-
-            res.addResponse("data",data);
-
-        }else{
-            data.clear();
-            data.put("total_page",pages.getTotalPages());
-            data.put("current_page",pages.getNumber() + 1);
-            data.put("total_rows",pages.getTotalElements());
-            data.put("current_rows",pages.getNumberOfElements());
-
-            res.addResponse("data",data);
-
-        }
-
-        return ResponseEntity.ok(res.success());
-    }
+//    public static ResponseEntity ResponseEntityPage(Page pages ){
+//        log.info("Pages 형태의 조회 API 반환 함수 공통 함수 호출");
+//
+//        Map<String, Object> res = new HashMap<>();
+////        HashMap<String, Object> data = new HashMap<>();
+//
+//        log.info("pages.getTotalPages() : "+pages.getTotalPages());
+//        log.info("pages.getNumber() : "+pages.getNumber()+1);
+//        log.info("total_rows : "+pages.getTotalElements());
+//        log.info("current_rows : "+pages.getNumberOfElements());
+//
+//        res.put("status",200);
+//        res.put("timestamp", new Timestamp(System.currentTimeMillis()));
+//        res.put("message", "SUCCESS");
+//        res.put("err_code", "");
+//        res.put("err_msg", "");
+//
+//        if(pages.getTotalElements()> 0 ){
+//            log.info("출력1");
+//            res.put("datalist",pages.getContent());
+//            res.put("total_page",pages.getTotalPages());
+//            res.put("current_page",pages.getNumber() + 1);
+//            res.put("total_rows",pages.getTotalElements());
+//            res.put("current_rows",pages.getNumberOfElements());
+////            res.addResponse("data",data);
+//        }else{
+//            log.info("출력2");
+//            res.put("total_page",pages.getTotalPages());
+//            res.put("current_page",pages.getNumber() + 1);
+//            res.put("total_rows",pages.getTotalElements());
+//            res.put("current_rows",pages.getNumberOfElements());
+////            res.addResponse("data",data);
+//        }
+//        return ResponseEntity.ok(res);
+//    }
 
     public static String getCurrentuser(HttpServletRequest request){
         log.info("현재 접속 유저 정보 가져오기 공통 함수 호출");
@@ -93,7 +104,6 @@ public abstract class CommonUtils {
         //String currentuserid = (String) session.getAttribute("userid");
         String currentuserid = "system";
         Principal userPrincipal = request.getUserPrincipal();
-        log.info("userPrincipal : "+userPrincipal);
         if (userPrincipal != null) {
             currentuserid = userPrincipal.getName();
             if (currentuserid == null || currentuserid.equals("")) {
@@ -109,7 +119,7 @@ public abstract class CommonUtils {
         log.info("엑셀다운버튼 클릭시 최종 다운로드 처리하는 공통 함수 호출");
 
         List<List<String>> excelData  = new ArrayList<>();
-        excelDtos.stream().forEach(e-> excelData.add(e.toArray()));
+        excelDtos.forEach(e-> excelData.add(e.toArray()));
 
         model.addAttribute(ExcelConstant.FILE_NAME, filename);
         model.addAttribute(ExcelConstant.HEAD, header);
@@ -117,7 +127,7 @@ public abstract class CommonUtils {
 
     }
     public static String GetZeroToNullString(String str){
-        //log.info("문자열을받아 0.0 0.00 이면 null 문자를 반환하는 공통 함수 호출");
+        log.info("문자열을받아 0.0 0.00 이면 null 문자를 반환하는 공통 함수 호출");
         if (str.equals("0.0") || str.equals("0.00")){
             return "null";
         }else{

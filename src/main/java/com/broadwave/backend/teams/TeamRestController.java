@@ -20,6 +20,12 @@ import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.*;
 
+/**
+ * @author Minkyu
+ * Date : 2021-06-01
+ * Time :
+ * Remark : NewDeal Team
+ */
 @Slf4j
 @RestController
 @RequestMapping("/api/team")
@@ -45,7 +51,6 @@ public class TeamRestController {
                                   HttpServletRequest request) throws Exception {
 
         AjaxResponse res = new AjaxResponse();
-        HashMap<String, Object> data = new HashMap<>();
 
         Team team = modelMapper.map(teamMapperDto, Team.class);
 
@@ -85,19 +90,23 @@ public class TeamRestController {
 
     }
 
-    // 부서목록
     @GetMapping("list")
     public ResponseEntity<Map<String,Object>> teamlist(@RequestParam (value="teamcode", defaultValue="") String teamcode,
-                                                       @RequestParam (value="teamname", defaultValue="") String teamname ,
-                                                       @PageableDefault Pageable pageable){
+                                                                                    @RequestParam (value="teamname", defaultValue="") String teamname ,
+                                                                                    @PageableDefault Pageable pageable,
+                                                                                    HttpServletRequest request){
+        AjaxResponse res = new AjaxResponse();
+
+        String JWT_AccessToken = request.getHeader("JWT_AccessToken");
+        log.info("JWT_AccessToken : "+JWT_AccessToken);
 
         log.info("부서 리스트 조회 / 조회조건 : teamcode / '" + teamcode + "', teamname / '" + teamname + "'");
         Page<TeamDto> teams = teamService.findAllBySearchStrings(teamcode,teamname, pageable);
 
-        return CommonUtils.ResponseEntityPage(teams);
+        return ResponseEntity.ok(res.ResponseEntityPage(teams));
     }
 
-    @PostMapping ("team")
+    @GetMapping ("team")
     public ResponseEntity<Map<String,Object>> team(@RequestParam (value="teamcode", defaultValue="") String teamcode){
 
         AjaxResponse res = new AjaxResponse();
@@ -106,14 +115,14 @@ public class TeamRestController {
         log.info("단일부서조회  / teamcode: '" + teamcode +"'");
         Optional<Team> optionalTeam = teamService.findByTeamcode(teamcode);
 
-        Team team = optionalTeam.get();
-
-        data.put("datarow",team);
-        res.addResponse("data",data);
+        if(optionalTeam.isPresent()){
+            Team team = optionalTeam.get();
+            data.put("sendTeamData",team);
+        }
 
         log.info("단일부서 조회 성공");
 
-        return ResponseEntity.ok(res.success());
+        return ResponseEntity.ok(res.dataSendSuccess(data));
     }
 
     @PostMapping("del")
