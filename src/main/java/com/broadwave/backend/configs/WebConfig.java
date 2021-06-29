@@ -10,16 +10,16 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
-//    // 호스트링크주입
-//    @Value("${link}")
-//    private String link;
+    // 호스트링크주입
+    @Value("${newdeal.api.front_url}")
+    private String link;
 
     //  CORS에러 No 'Access-Control-Allow-Origin' header is present on the requested resource. 해결
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/**")
-//                .allowedOrigins("http://localhost:8010","http://192.168.0.144:8010") // 허용 url
-                .allowedOrigins("http://localhost:8010","http://192.168.0.144:8010") // 허용 url
+//                .allowedOrigins(link) // 허용 url
+                .allowedOrigins("http://192.168.0.144:8010",link) // 허용 url
                 .allowedHeaders("JWT_AccessToken","insert_id");
     }
 

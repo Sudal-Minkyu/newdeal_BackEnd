@@ -50,17 +50,6 @@ public class AjaxResponse {
         return this.res;
     }
 
-    // 보낼데이터가 없다고하면 해당함수 사용
-    public Map<String, Object> success() {
-        res.clear();
-        res.put("status",200);
-        res.put("timestamp", new Timestamp(System.currentTimeMillis()));
-        res.put("message", "SUCCESS");
-        res.put("err_code", "");
-        res.put("err_msg", "");
-        return this.res;
-    }
-
     // 프론트에게 데이터를 보내야하면 해당 함수를 사용
     public Map<String, Object> dataSendSuccess(HashMap<String,Object> sendData) {
         res.put("sendData",sendData);
@@ -72,6 +61,18 @@ public class AjaxResponse {
         return this.res;
     }
 
+    // 보낼데이터가 없고 호출이 성공할시 해당함수 사용
+    public Map<String, Object> success() {
+        res.clear();
+        res.put("status",200);
+        res.put("timestamp", new Timestamp(System.currentTimeMillis()));
+        res.put("message", "SUCCESS");
+        res.put("err_code", "");
+        res.put("err_msg", "");
+        return this.res;
+    }
+
+    // 보낼데이터가 없고 호출이 실패할시 해당함수 사용
     public Map<String, Object> fail(String err_code,String err_msg,String err_code2,String err_msg2) {
 
         res.clear();
@@ -82,7 +83,6 @@ public class AjaxResponse {
         res.put("err_msg", err_msg);
         res.put("err_code2", err_code2);
         res.put("err_msg2", err_msg2);
-
         return this.res;
     }
 }

@@ -165,7 +165,7 @@ public class AccountRestController {
         Optional<Account> optionalAccount = accountService.findByUserid(userid);
 
         //정보가있는지 체크
-        if (!optionalAccount.isPresent()){
+        if (optionalAccount.isEmpty()){
             log.info("사용자삭제실패 : 삭제할 데이터가 존재하지않음 , 삭제대상 userid : '" + userid + "'");
             return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE006.getCode(),ResponseErrorCode.NDE006.getDesc(),null,null));
         }else{
