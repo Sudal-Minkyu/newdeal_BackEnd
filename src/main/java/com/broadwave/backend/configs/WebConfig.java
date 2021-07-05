@@ -19,7 +19,7 @@ public class WebConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/**")
 //                .allowedOrigins(link) // 허용 url
-                .allowedOrigins("http://192.168.0.144:8010",link) // 허용 url
+                .allowedOrigins("http://localhost:8010",link) // 허용 url
                 .allowedHeaders("JWT_AccessToken","insert_id");
     }
 
