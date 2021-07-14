@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -32,13 +33,15 @@ public class AccountRestController {
     private final AccountService accountService;
     private final TeamService teamService;
     private final ModelMapper modelMapper;
+    private final PasswordEncoder passwordEncoder;
 //    private final LoginlogService loginlogService;
 
     @Autowired
-    public AccountRestController(ModelMapper modelMapper, TeamService teamService, AccountService accountService) {
+    public AccountRestController(ModelMapper modelMapper, TeamService teamService, AccountService accountService,PasswordEncoder passwordEncoder) {
         this.modelMapper = modelMapper;
         this.teamService = teamService;
         this.accountService = accountService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     // AccountSave API
@@ -180,6 +183,58 @@ public class AccountRestController {
         return ResponseEntity.ok(res.success());
     }
 
+    //  AccountModifyPassword API(비밀번호 변경)
+    @PostMapping("modifypassword")
+    public ResponseEntity<Map<String,Object>> accountSavepassword(@RequestParam(value="userid", defaultValue="") String userid,
+                                              @RequestParam(value="oldPassword", defaultValue="") String oldPassword,
+                                              @RequestParam(value="changePassword", defaultValue="") String changePassword,
+                                              @RequestParam(value="confirmPassword", defaultValue="") String confirmPassword){
+
+        Account account = new Account();
+
+        AjaxResponse res = new AjaxResponse();
+
+        //아이디를 입력하세요.
+        if (userid == null || userid.equals("")){
+            return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE008.getCode(), ResponseErrorCode.NDE008.getDesc(),ResponseErrorCode.NDE009.getCode(), ResponseErrorCode.NDE009.getDesc()));
+        }
+
+        Optional<Account> optionalAccount = accountService.findByUserid(userid);
+
+        //수정일때
+        if(optionalAccount.isEmpty()){
+            log.info("사용자정보(이메일)수정실패 : 사용자아이디: '" + userid + "'");
+            return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE006.getCode(), ResponseErrorCode.NDE006.getDesc(),null,null));
+        }else{
+
+            //현재암호비교
+            if (!passwordEncoder.matches(oldPassword,optionalAccount.get().getPassword())){
+                log.info("현재 비밀번호가 일치하지 않습니다.");
+                return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE010.getCode(),ResponseErrorCode.NDE010.getDesc(),null,null));
+            }
+            //암호검토
+            if( !changePassword.equals(confirmPassword) ){
+                log.info("변경하려는 비밀번호와 검토비밀번호와 일치하지 않습니다.");
+                return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE011.getCode(),ResponseErrorCode.NDE011.getDesc(),null,null));
+            }
+
+            account.setId(optionalAccount.get().getId());
+            account.setInsert_id(optionalAccount.get().getInsert_id());
+            account.setInsertDateTime(optionalAccount.get().getInsertDateTime());
+            account.setEmail(optionalAccount.get().getEmail());
+            account.setTeam(optionalAccount.get().getTeam());
+            account.setRole(optionalAccount.get().getRole());
+            account.setUsername(optionalAccount.get().getUsername());
+            account.setUserid(userid);
+            account.setPassword(changePassword);
+        }
+
+        account.setModify_id(userid);
+        account.setModifyDateTime(LocalDateTime.now());
+
+        accountService.saveAccount(account);
+        return ResponseEntity.ok(res.success());
+    }
 
 //    @PostMapping("modifyemail")
 //    public ResponseEntity accountSaveEmail(@ModelAttribute AccountMapperDtoModify accountMapperDto, HttpServletRequest request){
@@ -228,65 +283,8 @@ public class AccountRestController {
 //
 //    }
 //
-//    @PostMapping("modifypassword")
-//    public ResponseEntity accountSavepassword(@ModelAttribute AccountMapperDtoModify accountMapperDto, HttpServletRequest request){
-//
-//
-//        Account account = modelMapper.map(accountMapperDto, Account.class);
-//
-//
-//
-//        //아이디를 입력하세요.
-//        if (accountMapperDto.getUserid() == null || accountMapperDto.getUserid() ==""){
-//            log.info(ResponseErrorCode.E009.getDesc());
-//            return ResponseEntity.ok(res.fail(ResponseErrorCode.E009.getCode(), ResponseErrorCode.E009.getDesc()));
-//        }
-//
-//
-//        Optional<Account> optionalAccount = accountService.findByUserid(account.getUserid());
-//
-//        String currentuserid = CommonUtils.getCurrentuser(request);
-//
-//
-//
-//        //수정일때
-//        if(!optionalAccount.isPresent()){
-//            log.info("사용자정보(이메일)수정실패 : 사용자아이디: '" + account.getUserid() + "'");
-//            return ResponseEntity.ok(res.fail(ResponseErrorCode.E004.getCode(), ResponseErrorCode.E004.getDesc()));
-//        }else{
-//            //현재암호비교
-//            if (!passwordEncoder.matches(accountMapperDto.getOldpassword(),optionalAccount.get().getPassword())){
-//                return ResponseEntity.ok(res.fail(ResponseErrorCode.E010.getCode(), ResponseErrorCode.E010.getDesc()));
-//            }
-//            if( !accountMapperDto.getPassword().equals(accountMapperDto.getPasswordconfirm()) ){
-//                return ResponseEntity.ok(res.fail(ResponseErrorCode.E011.getCode(), ResponseErrorCode.E011.getDesc()));
-//            }
-//
-//            account.setId(optionalAccount.get().getId());
-//            account.setInsert_id(optionalAccount.get().getInsert_id());
-//            account.setInsertDateTime(optionalAccount.get().getInsertDateTime());
-//            account.setEmail(optionalAccount.get().getEmail());
-//            account.setTeam(optionalAccount.get().getTeam());
-//            account.setRole(optionalAccount.get().getRole());
-//            account.setUsername(optionalAccount.get().getUsername());
-//
-//        }
-//        account.setModify_id(currentuserid);
-//        account.setModifyDateTime(LocalDateTime.now());
-//
-//
-//
-//
-//        Account accountSave =  this.accountService.saveAccount(account);
-//
-//
-//        log.info("사용자 저장 성공 : id '" + account.getUserid() + "'");
-//        return ResponseEntity.ok(res.success());
-//
-//    }
-//
-//
-//
+
+
 
 
 

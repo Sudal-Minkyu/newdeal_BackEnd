@@ -2,8 +2,16 @@ package com.broadwave.backend.teams;
 
 import com.broadwave.backend.common.AjaxResponse;
 import com.broadwave.backend.common.CommonUtils;
+import com.broadwave.backend.common.ResponseErrorCode;
+import com.broadwave.backend.excel.ExcelData;
 import com.broadwave.backend.teams.teamfile.TeamFileService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -17,6 +25,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -156,5 +165,53 @@ public class TeamRestController {
         log.info("부서 리스트 엑셀 다운로드 ( loginID : '" + CommonUtils.getCurrentuser(request) +"', IP : '" + CommonUtils.getIp(request) + "' )" );
         return "excelDownXls";
     }
+
+    @PostMapping("/excelRead")
+    public ResponseEntity<Map<String,Object>> readExcel(@RequestParam("excelfile") MultipartFile excelfile, Model model) throws IOException {
+
+        log.info("ExcelRead 호출성공");
+
+        AjaxResponse res = new AjaxResponse();
+
+        List<ExcelData> dataList = new ArrayList<>();
+
+        String extension = FilenameUtils.getExtension(excelfile.getOriginalFilename());
+        log.info("확장자 : "+extension);
+
+        if (!extension.equals("xlsx") && !extension.equals("xls")) {
+            log.info("1. 엑셀데이터가 아닙니다.");
+            return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE012.getCode(), ResponseErrorCode.NDE012.getDesc(),null,null));
+        }
+
+        Workbook workbook = null;
+
+        if (extension.equals("xlsx")) {
+            workbook = new XSSFWorkbook(excelfile.getInputStream());  // -> .xlsx
+        } else {
+            workbook = new HSSFWorkbook(excelfile.getInputStream());  // -> .xls
+        }
+
+        Sheet worksheet = workbook.getSheetAt(0); // 0번째 시트
+        for (int i = 1; i < worksheet.getPhysicalNumberOfRows(); i++) { // 4
+
+            Row row = worksheet.getRow(i);
+
+            ExcelData data = new ExcelData();
+
+            data.setNum((int) row.getCell(0).getNumericCellValue());
+            data.setName(row.getCell(1).getStringCellValue());
+            data.setEmail(row.getCell(2).getStringCellValue());
+            log.info("getNum : "+data.getNum());
+            log.info("getName : "+data.getName());
+            log.info("getEmail : "+data.getEmail());
+
+            dataList.add(data);
+        }
+//        model.addAttribute("datas", dataList); // 5
+
+//        return "excelList";
+        return ResponseEntity.ok(res.success());
+    }
+
 
 }

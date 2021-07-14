@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.sql.Timestamp;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -61,6 +62,17 @@ public class AjaxResponse {
         return this.res;
     }
 
+//    // 엑셀 아웃풋용
+//    public Map<String, Object> dataSendExecl(List<Object> sendData) {
+//        resList.put("sendData",sendData);
+////        res.put("status",200);
+////        res.put("timestamp", new Timestamp(System.currentTimeMillis()));
+////        res.put("message", "SUCCESS");
+////        res.put("err_code", "");
+////        res.put("err_msg", "");
+//        return resList;
+//    }
+
     // 보낼데이터가 없고 호출이 성공할시 해당함수 사용
     public Map<String, Object> success() {
         res.clear();
@@ -74,7 +86,6 @@ public class AjaxResponse {
 
     // 보낼데이터가 없고 호출이 실패할시 해당함수 사용
     public Map<String, Object> fail(String err_code,String err_msg,String err_code2,String err_msg2) {
-
         res.clear();
         res.put("status",500);
         res.put("timestamp", new Timestamp(System.currentTimeMillis()));
@@ -85,4 +96,5 @@ public class AjaxResponse {
         res.put("err_msg2", err_msg2);
         return this.res;
     }
+
 }
