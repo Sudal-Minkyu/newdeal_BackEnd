@@ -306,8 +306,8 @@ public class PerformanceRestController {
         log.info("성능개선 평가등급 리스트 : " + technicality_rankList);
         log.info("성능개선 종합점수 : " + technicality_allScore);
         log.info("성능개선 종합등급 : " + technicality_allRank);
+        log.info("테스트");
 
-        
 
 
 
