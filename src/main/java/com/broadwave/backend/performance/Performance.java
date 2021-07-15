@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 /**
  * @author Minkyu
  * Date : 2021-07-07
- * Time : 1
+ * Time :
  * Remark : 뉴딜 성능개선사업평가 관련 테이블(한대석박사)
  */
 @Entity
