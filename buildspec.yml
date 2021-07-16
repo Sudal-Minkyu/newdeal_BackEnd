@@ -16,18 +16,18 @@ phases:
       - echo Started build phase..
       - mvn clean package
       - echo Building the Docker image...
-      - docker build -t newdeal-security .
-      - docker tag newdeal-security:latest 093272453328.dkr.ecr.ap-northeast-2.amazonaws.com/newdeal-security:$CODEBUILD_RESOLVED_SOURCE_VERSION
+      - docker build -t newdeal-backend .
+      - docker tag newdeal-backend:latest 093272453328.dkr.ecr.ap-northeast-2.amazonaws.com/newdeal-backend:$CODEBUILD_RESOLVED_SOURCE_VERSION
   post_build:
     commands:
       - echo Build completed on `date`
       - echo Pushing the Docker image...
       - echo Image_Version - $CODEBUILD_RESOLVED_SOURCE_VERSION
-      - docker push 093272453328.dkr.ecr.ap-northeast-2.amazonaws.com/newdeal-security:$CODEBUILD_RESOLVED_SOURCE_VERSION
+      - docker push 093272453328.dkr.ecr.ap-northeast-2.amazonaws.com/newdeal-backend:$CODEBUILD_RESOLVED_SOURCE_VERSION
       - echo List directory
       - ls -la
       - echo Push the latest image to cluster
-      - REPOSITORY_URI=093272453328.dkr.ecr.ap-northeast-2.amazonaws.com/newdeal-security
+      - REPOSITORY_URI=093272453328.dkr.ecr.ap-northeast-2.amazonaws.com/newdeal-backend
       - sed -i 's@CONTAINER_IMAGE_TAG@'"$REPOSITORY_URI:$CODEBUILD_RESOLVED_SOURCE_VERSION"'@' k8s-deploy.yaml
       - DB_URL=${NEWDEAL_DATASOURCE_HOST}
       - sed -i 's@NEWDEAL_DATASOURCE_HOST_TAG@'"$DB_URL"'@' k8s-deploy.yaml
