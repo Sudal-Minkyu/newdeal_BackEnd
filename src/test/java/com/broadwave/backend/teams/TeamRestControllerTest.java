@@ -13,6 +13,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.Optional;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -45,17 +46,18 @@ public class TeamRestControllerTest {
                 .andExpect(status().isOk());
 
         // 저장된 부서의 코드이름을 통한 조회 테스트
-        mockMvc.perform(post("/api/team/team")
+        mockMvc.perform(get("/api/team/team")
                 .param("teamcode","Test001")
                 )
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("data.datarow").exists())
-                .andExpect(jsonPath("data.datarow.teamcode").exists())
-                .andExpect(jsonPath("data.datarow.teamcode").value("Test001"));
+                .andExpect(jsonPath("sendData.sendTeamData").exists())
+                .andExpect(jsonPath("sendData.sendTeamData.teamcode").exists())
+                .andExpect(jsonPath("sendData.sendTeamData.teamcode").value("Test001"));
 
         Optional<Team> optionalTeam = teamService.findByTeamcode("Test001");
         assertThat(optionalTeam.isPresent()).isEqualTo(true);
+
         if(optionalTeam.isPresent()){
             Team team = optionalTeam.get();
             assertThat(team.getTeamcode()).isEqualTo("Test001");

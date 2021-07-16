@@ -56,7 +56,7 @@ public class TeamRestController {
     // 부서등록 저장
     @PostMapping ("reg")
     public ResponseEntity<Map<String,Object>> teamreg(@ModelAttribute TeamMapperDto teamMapperDto,
-                                  MultipartHttpServletRequest multi,
+//                                  MultipartHttpServletRequest multi,
                                   HttpServletRequest request) throws Exception {
 
         AjaxResponse res = new AjaxResponse();
@@ -84,16 +84,16 @@ public class TeamRestController {
 
         log.info("부서저장 성공");
 
-        Iterator<String> files = multi.getFileNames();
-        while(files.hasNext()) {
-            String temaFileUpload = files.next();
-            MultipartFile mFile = multi.getFile(temaFileUpload);
-            assert mFile != null;
-            if (!mFile.isEmpty()) {
-                log.info("저장할 파일이 존재합니다.");
-                teamFileService.store(mFile, teamSave);
-            }
-        }
+//        Iterator<String> files = multi.getFileNames();
+//        while(files.hasNext()) {
+//            String temaFileUpload = files.next();
+//            MultipartFile mFile = multi.getFile(temaFileUpload);
+//            assert mFile != null;
+//            if (!mFile.isEmpty()) {
+//                log.info("저장할 파일이 존재합니다.");
+//                teamFileService.store(mFile, teamSave);
+//            }
+//        }
 
         return ResponseEntity.ok(res.success());
 
@@ -128,7 +128,6 @@ public class TeamRestController {
             Team team = optionalTeam.get();
             data.put("sendTeamData",team);
         }
-
         log.info("단일부서 조회 성공");
 
         return ResponseEntity.ok(res.dataSendSuccess(data));
@@ -165,53 +164,5 @@ public class TeamRestController {
         log.info("부서 리스트 엑셀 다운로드 ( loginID : '" + CommonUtils.getCurrentuser(request) +"', IP : '" + CommonUtils.getIp(request) + "' )" );
         return "excelDownXls";
     }
-
-    @PostMapping("/excelRead")
-    public ResponseEntity<Map<String,Object>> readExcel(@RequestParam("excelfile") MultipartFile excelfile, Model model) throws IOException {
-
-        log.info("ExcelRead 호출성공");
-
-        AjaxResponse res = new AjaxResponse();
-
-        List<ExcelData> dataList = new ArrayList<>();
-
-        String extension = FilenameUtils.getExtension(excelfile.getOriginalFilename());
-        log.info("확장자 : "+extension);
-
-        if (!extension.equals("xlsx") && !extension.equals("xls")) {
-            log.info("1. 엑셀데이터가 아닙니다.");
-            return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE012.getCode(), ResponseErrorCode.NDE012.getDesc(),null,null));
-        }
-
-        Workbook workbook = null;
-
-        if (extension.equals("xlsx")) {
-            workbook = new XSSFWorkbook(excelfile.getInputStream());  // -> .xlsx
-        } else {
-            workbook = new HSSFWorkbook(excelfile.getInputStream());  // -> .xls
-        }
-
-        Sheet worksheet = workbook.getSheetAt(0); // 0번째 시트
-        for (int i = 1; i < worksheet.getPhysicalNumberOfRows(); i++) { // 4
-
-            Row row = worksheet.getRow(i);
-
-            ExcelData data = new ExcelData();
-
-            data.setNum((int) row.getCell(0).getNumericCellValue());
-            data.setName(row.getCell(1).getStringCellValue());
-            data.setEmail(row.getCell(2).getStringCellValue());
-            log.info("getNum : "+data.getNum());
-            log.info("getName : "+data.getName());
-            log.info("getEmail : "+data.getEmail());
-
-            dataList.add(data);
-        }
-//        model.addAttribute("datas", dataList); // 5
-
-//        return "excelList";
-        return ResponseEntity.ok(res.success());
-    }
-
 
 }
