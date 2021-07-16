@@ -302,11 +302,15 @@ public class PerformanceRestController {
         Double technicality_allScore = performanceFunction.allScore(technicality_scroeList,technicality_weigh);
         // 기술성 종합랭크
         String technicality_allRank = performanceFunction.allRank(technicality_allScore);
+        technicality_scroeList.add(String.valueOf(technicality_allScore));
+        technicality_rankList.add(technicality_allRank);
+        log.info("*******************************************************************************************************");
+        log.info("노후화_기술성");
         log.info("성능개선 평가점수 리스트 : " + technicality_scroeList);
         log.info("성능개선 평가등급 리스트 : " + technicality_rankList);
         log.info("성능개선 종합점수 : " + technicality_allScore);
         log.info("성능개선 종합등급 : " + technicality_allRank);
-        log.info("테스트");
+        log.info("*******************************************************************************************************");
 
 
 
