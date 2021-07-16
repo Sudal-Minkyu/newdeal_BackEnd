@@ -1,9 +1,7 @@
-FROM openjdk:8-jdk-alpine
+FROM openjdk:11-jre-slim
 RUN echo "Asia/Seoul" > /etc/timezone
 VOLUME /tmp
 ARG JAR_FILE
-COPY ./target/infraBackend-1.0.0.jar  app.jar
-COPY ./scouter/scouter.agent.jar  scouter.agent.jar
-COPY ./scouter/scouter.conf scouter.conf
+COPY ./target/NewDealBackend-1.0.0.jar app.jar
 
-ENTRYPOINT ["java","-javaagent:/scouter.agent.jar","-Dscouter.config=/scouter.conf","-Djava.net.preferIPv4Stack=true -Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
+ENTRYPOINT ["java","-Djava.net.preferIPv4Stack=true -Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
