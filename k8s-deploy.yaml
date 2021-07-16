@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: newdeal-backend-deployment
+  labels:
+    app: newdeal-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: newdeal-backend
+  template:
+    metadata:
+      labels:
+        app: newdeal-backend
+    spec:
+      containers:
+        - name: newdeal-backend
+          image: CONTAINER_IMAGE_TAG
+          ports:
+            - containerPort: 8011
+              name: backend-port
+              protocol: TCP
+          resources:
+            requests:
+              memory: "1"
+              cpu: "0.5"
+          env:
+            - name: NEWDEAL_DATASOURCE_HOST
+              value: NEWDEAL_DATASOURCE_HOST_TAG
+            - name: NEWDEAL_DATASOURCE_PORT
+              value: "NEWDEAL_DATASOURCE_PORT_TAG"
+            - name: NEWDEAL_DATASOURCE_DBNAME
+              value: NEWDEAL_DATASOURCE_DBNAME_TAG
+            - name: NEWDEAL_DATASOURCE_USERNAME
+              value: NEWDEAL_DATASOURCE_USERNAME_TAG
+            - name: NEWDEAL_DATASOURCE_PASSWORD
+              value: NEWDEAL_DATASOURCE_PASSWORD_TAG
+            - name: NEWDEAL_API_FRONT_URL
+              value: NEWDEAL_API_FRONT_URL_TAG
+            - name: NEWDEAL_API_SECURITY_URL
+              value: NEWDEAL_API_SECURITY_URL_TAG
+            - name: NEWDEAL_API_BACKEND_URL
+              value: NEWDEAL_API_BACKEND_URL_TAG
