@@ -1,0 +1,33 @@
+package com.broadwave.backend.performance;
+
+import lombok.*;
+
+import javax.persistence.Column;
+
+/**
+ * @author Minkyu
+ * Date : 2021-07-19
+ * Time :
+ * Remark : 뉴딜 성능개선사업평가 관련 PerformanceMiddleDataDto
+ */
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
+@Setter
+@Getter
+public class PerformanceMiddleDataDto {
+    private String piFacilityType; // 시설유형(NOTNULL)
+    private String piFacilityName; // 시설유형(NULL)
+    private String piKind; // 종별구분(NOTNULL)
+    private Double piCompletionYear; // 준공연도(NOTNULL)
+    private Double piPublicYear; // 공용연수(NOTNULL)
+    private String piType; // 형식구분(NULL)
+    private Long piErectionCost; // 취득원가(NOTNULL)
+    private String piSafetyLevel; // 안전등급(NOTNULL)
+    private String piGoalLevel; // 목표등급(NOTNULL)
+    private Double piMaintenanceDelay;  // 유지보수기간(NOTNULL)
+    private String piManagement; // 관리주체(NULL)
+    private String piAgency; // 관리감독기관(NULL)
+    private Double piAADT; // 연평균일교통량(AADT)
+}

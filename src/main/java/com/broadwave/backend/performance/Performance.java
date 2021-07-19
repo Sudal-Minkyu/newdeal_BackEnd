@@ -119,6 +119,12 @@ public class Performance {
     @Column(name="pi_input_count")
     private Integer piInputCount; //대안카운트(NULL)
 
+    @Column(name="pi_input_great")
+    private Integer piInputGreat; //우수대안인지 0 or 1(NULL)
+
+    @Column(name="pi_input_middle_save")
+    private Integer piInputMiddleSave; //작성완료된 글인지 0 or 1(NULL)
+
     @Column(name="insert_date")
     private LocalDateTime insertDateTime;
 

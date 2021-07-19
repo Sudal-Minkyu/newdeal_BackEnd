@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Minkyu
@@ -33,6 +34,23 @@ public class PerformanceService {
 
     public List<PerformanceDto> findByAutoNum(String autoNum) {
         return performanceRepositoryCustom.findByAutoNum(autoNum);
+    }
+
+    public PerformanceCheckDto findByInsertId(String insert_id) {
+        return performanceRepositoryCustom.findByInsertId(insert_id);
+    }
+
+    public  PerformanceMiddleDataDto findByInsertIAndAutoNum(String insert_id, String autoNum) {
+        return performanceRepositoryCustom.findByInsertIAndAutoNum(insert_id,autoNum);
+    }
+
+    public Optional<Performance> findByPiAutoNumAndInsert_id(String autoNum, String insert_id) {
+        return performanceRepository.findByPiAutoNumAndInsert_id(autoNum,insert_id);
+    }
+
+    public void delete(Performance performance) {
+        log.info("삭제성공");
+        performanceRepository.delete(performance);
     }
 
 }

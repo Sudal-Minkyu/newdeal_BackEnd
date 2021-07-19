@@ -14,11 +14,11 @@ import java.util.Map;
 */
 @Slf4j
 @Service
-public class PerformanceFunction {
+public class PerformanceFunctionService {
 
     private final Map<String, String> funRankScore;
 
-    public PerformanceFunction(Map<String, String> funRankScore) {
+    public PerformanceFunctionService(Map<String, String> funRankScore) {
         this.funRankScore = funRankScore;
     }
 

@@ -43,6 +43,8 @@ public enum ResponseErrorCode {
     NDE016("NDE016", "다시 로그인 해주세요."),
     NDE017("NDE017", "비용입력 셀에 문자가 들어가 있습니다."),
     NDE018("NDE018", "다시 확인해주시고 숫자로 바꿔주세요."),
+    NDE019("NDE019", "존재하지않은 대안입니다."),
+    NDE020("NDE020", "아니오를 누른후 새로 작성해주세요."),
     ;
 
     private String code;

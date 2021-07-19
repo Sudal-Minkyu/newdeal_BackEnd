@@ -31,7 +31,8 @@ public class WeihthRepositoryCustomImpl extends QuerydslRepositorySupport implem
                         weight.piWeightCostUtility,
                         weight.piWeightBusiness,
                         weight.piWeightComplaint,
-                        weight.piWeightBusinessEffect
+                        weight.piWeightBusinessEffect,
+                        weight.piWeightCriticalScore
                 ));
 
         if (autoNum != null && !autoNum.isEmpty()){

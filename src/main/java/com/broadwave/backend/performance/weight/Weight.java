@@ -57,6 +57,9 @@ public class Weight {
     @Column(name="pi_weight_business_effect")
     private Double piWeightBusinessEffect; // 사업효과 범용성 가중치(NOTNULL)
 
+    @Column(name="pi_weight_critical_score")
+    private Double piWeightCriticalScore; // 사업추진 임계점수(NOTNULL)
+
     @Column(name="insert_date")
     private LocalDateTime insertDateTime;
 

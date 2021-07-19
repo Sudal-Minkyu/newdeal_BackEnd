@@ -68,4 +68,55 @@ public class PerformanceRepositoryCustomImpl extends QuerydslRepositorySupport i
         return query.fetch();
     }
 
+    @Override
+    public PerformanceCheckDto findByInsertId(String insert_id){
+
+        QPerformance performance = QPerformance.performance;
+
+        JPQLQuery<PerformanceCheckDto> query = from(performance)
+                .select(Projections.constructor(PerformanceCheckDto.class,
+                        performance.piAutoNum,
+                        performance.piInputMiddleSave
+                ));
+
+        // 검색조건필터
+        if (insert_id != null && !insert_id.isEmpty()){
+            query.where(performance.insert_id.eq(insert_id));
+        }
+        query.where(performance.piInputMiddleSave.eq(0));
+        return query.fetchOne();
+    }
+
+    @Override
+    public  PerformanceMiddleDataDto findByInsertIAndAutoNum(String insert_id,String autoNum){
+
+        QPerformance performance = QPerformance.performance;
+
+        JPQLQuery<PerformanceMiddleDataDto> query = from(performance)
+                .select(Projections.constructor(PerformanceMiddleDataDto.class,
+                        performance.piFacilityType,
+                        performance.piFacilityName,
+                        performance.piKind,
+                        performance.piCompletionYear,
+                        performance.piPublicYear,
+                        performance.piType,
+                        performance.piErectionCost,
+                        performance.piSafetyLevel,
+                        performance.piGoalLevel,
+                        performance.piMaintenanceDelay,
+                        performance.piManagement,
+                        performance.piAgency,
+                        performance.piAADT
+                ));
+
+        // 검색조건필터
+        if (insert_id != null && !insert_id.isEmpty()){
+            query.where(performance.insert_id.eq(insert_id));
+        }
+        query.where(performance.piInputMiddleSave.eq(0));
+        query.where(performance.piAutoNum.eq(autoNum));
+
+        return query.fetchOne();
+    }
+
 }

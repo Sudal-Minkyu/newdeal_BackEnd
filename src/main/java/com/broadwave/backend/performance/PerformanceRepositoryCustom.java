@@ -9,4 +9,8 @@ import java.util.List;
  */
 public interface PerformanceRepositoryCustom {
     List<PerformanceDto> findByAutoNum(String autoNum);
+
+    PerformanceCheckDto findByInsertId(String insert_id);
+
+    PerformanceMiddleDataDto findByInsertIAndAutoNum(String insert_id, String autoNum);
 }

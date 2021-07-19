@@ -14,11 +14,14 @@ public class WebConfig implements WebMvcConfigurer {
     @Value("${newdeal.api.front_url}")
     private String front_url;
 
+    @Value("${newdeal.api.front_protocol}")
+    private String front_protocol;
+
     //  CORS에러 No 'Access-Control-Allow-Origin' header is present on the requested resource. 해결
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/**")
-                .allowedOrigins("http://localgost:8010","http://"+front_url,"http://192.168.0.24:8010") // 허용 url 지겸님 ip http://192.168.0.24:8010
+                .allowedOrigins(front_protocol+"://localgost:8010",front_protocol+"://"+front_url,front_protocol+"://192.168.0.24:8010") // 허용 url 지겸님 ip http://192.168.0.24:8010
                 .allowedHeaders("JWT_AccessToken","insert_id");
     }
 

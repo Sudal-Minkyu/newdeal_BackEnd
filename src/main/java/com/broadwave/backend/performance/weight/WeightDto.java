@@ -25,4 +25,5 @@ public class WeightDto {
     private Double piWeightBusiness; // 사업추진 타당성 가중치(NOTNULL)
     private Double piWeightComplaint; // 민원 및 사고 대응성 가중치(NOTNULL)
     private Double piWeightBusinessEffect; // 사업효과 범용성 가중치(NOTNULL)
+    private Double piWeightCriticalScore; // 사업추진 임계점수(NOTNULL)
 }
