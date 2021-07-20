@@ -45,6 +45,7 @@ public enum ResponseErrorCode {
     NDE018("NDE018", "다시 확인해주시고 숫자로 바꿔주세요."),
     NDE019("NDE019", "존재하지않은 대안입니다."),
     NDE020("NDE020", "아니오를 누른후 새로 작성해주세요."),
+    NDE021("NDE021", "시설물 유형을 선택해주세요."),
     ;
 
     private String code;

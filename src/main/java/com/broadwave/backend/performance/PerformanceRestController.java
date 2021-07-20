@@ -112,7 +112,6 @@ public class PerformanceRestController {
         log.info("middleDataDel 호출성공");
 
         AjaxResponse res = new AjaxResponse();
-        HashMap<String, Object> data = new HashMap<>();
 
         String JWT_AccessToken = request.getHeader("JWT_AccessToken");
         String insert_id = request.getHeader("insert_id");
@@ -129,6 +128,57 @@ public class PerformanceRestController {
         performanceService.delete(optionalPerformance.get());
 
         return ResponseEntity.ok(res.success());
+    }
+
+    // NEWDEAL 성능개선사업평가 Performance1 중간저장 세이브
+    @PostMapping("/middleSaveUpdate/{autoNum}")
+    public ResponseEntity<Map<String,Object>> middleSaveUpdate(@ModelAttribute PerformanceMiddleSaveDto performanceMiddleSaveDto,@PathVariable String autoNum, HttpServletRequest request) {
+
+        log.info("middleSaveUpdate 호출성공");
+        AjaxResponse res = new AjaxResponse();
+        HashMap<String, Object> data = new HashMap<>();
+        String JWT_AccessToken = request.getHeader("JWT_AccessToken");
+        String currentuserid = request.getHeader("insert_id");
+        log.info("JWT_AccessToken : " + JWT_AccessToken);
+
+        Performance performance = modelMapper.map(performanceMiddleSaveDto, Performance.class);
+        log.info("autoNum : " + autoNum);
+
+        String piFacilityType = performance.getPiFacilityType();
+        if(piFacilityType==null){
+            return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE021.getCode(), ResponseErrorCode.NDE021.getDesc(),null,null));
+        }
+
+        if(autoNum.equals("null")){
+            log.info("일련번호 생성");
+            Date now = new Date();
+            SimpleDateFormat yyMM = new SimpleDateFormat("yyMM");
+            String newAutoNum = keyGenerateService.keyGenerate("nd_pi_input", yyMM.format(now), currentuserid);
+
+            performance.setPiAutoNum(newAutoNum);
+            performance.setPiInputMiddleSave(0);
+            performance.setInsert_id(currentuserid);
+            performance.setInsertDateTime(LocalDateTime.now());
+            data.put("autoNum",newAutoNum);
+        }else{
+            Optional<Performance> optionalPerformance = performanceService.findByPiAutoNumAndInsert_id(autoNum,currentuserid);
+            if(optionalPerformance.isPresent()){
+                performance.setId(optionalPerformance.get().getId());
+                performance.setPiAutoNum(autoNum);
+                performance.setPiInputMiddleSave(0);
+                performance.setInsert_id(currentuserid);
+                performance.setInsertDateTime(LocalDateTime.now());
+                data.put("autoNum", autoNum);
+            }else {
+                return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE019.getCode(), ResponseErrorCode.NDE019.getDesc(),ResponseErrorCode.NDE020.getCode(), ResponseErrorCode.NDE020.getDesc()));
+            }
+        }
+
+        log.info("중간저장 performance : " + performance);
+
+        //중간저장하기
+        performanceService.save(performance);
+        return ResponseEntity.ok(res.dataSendSuccess(data));
     }
 
     // NEWDEAL 성능개선사업평가 엑셀 업로드
@@ -306,7 +356,7 @@ public class PerformanceRestController {
 
     // NEWDEAL 성능개선사업평가 Output 호출
     @PostMapping("/output")
-    public ResponseEntity<Map<String,Object>> output(@RequestParam("autoNum")String autoNum, HttpServletRequest request) throws IOException {
+    public ResponseEntity<Map<String,Object>> output(@RequestParam("autoNum")String autoNum, HttpServletRequest request) {
 
         log.info("Output 호출성공");
 

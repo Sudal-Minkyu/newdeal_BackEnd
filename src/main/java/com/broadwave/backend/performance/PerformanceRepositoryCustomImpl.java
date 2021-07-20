@@ -106,7 +106,11 @@ public class PerformanceRepositoryCustomImpl extends QuerydslRepositorySupport i
                         performance.piMaintenanceDelay,
                         performance.piManagement,
                         performance.piAgency,
-                        performance.piAADT
+                        performance.piAADT,
+                        performance.piRaterBaseYear,
+                        performance.piRater,
+                        performance.piRaterBelong,
+                        performance.piRaterPhone
                 ));
 
         // 검색조건필터

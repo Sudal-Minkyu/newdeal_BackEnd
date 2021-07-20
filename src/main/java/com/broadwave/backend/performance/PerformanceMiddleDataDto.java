@@ -2,8 +2,6 @@ package com.broadwave.backend.performance;
 
 import lombok.*;
 
-import javax.persistence.Column;
-
 /**
  * @author Minkyu
  * Date : 2021-07-19
@@ -30,4 +28,10 @@ public class PerformanceMiddleDataDto {
     private String piManagement; // 관리주체(NULL)
     private String piAgency; // 관리감독기관(NULL)
     private Double piAADT; // 연평균일교통량(AADT)
+
+    private Double piRaterBaseYear; // 평가 기준년도(NOTNULL)
+    private String piRater; // 평가자이름(NULL)
+    private String piRaterBelong; // 평자가 소속(NULL)
+    private String piRaterPhone; // 평가자 연락처(NULL)
+
 }

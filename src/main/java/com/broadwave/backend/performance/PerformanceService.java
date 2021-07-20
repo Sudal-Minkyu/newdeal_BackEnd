@@ -28,7 +28,6 @@ public class PerformanceService {
     KeyGenerateService keyGenerateService;
 
     public void save(Performance performance){
-        log.info("성능 개선 사업 평가 서비스 엑셀파일 업로드 저장");
         performanceRepository.save(performance);
     }
 
@@ -52,5 +51,4 @@ public class PerformanceService {
         log.info("삭제성공");
         performanceRepository.delete(performance);
     }
-
 }
