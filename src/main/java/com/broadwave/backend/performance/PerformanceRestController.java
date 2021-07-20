@@ -186,7 +186,7 @@ public class PerformanceRestController {
 
         // 가중치 셋팅
         Weight weight = modelMapper.map(weightMapperDto, Weight.class);
-        log.info("weight : "+weight);
+        log.info("가중치 : "+weight);
 
         ArrayList<Object> excelList = new ArrayList<>();
         List<Performance> ListPerformance = new ArrayList<>();
