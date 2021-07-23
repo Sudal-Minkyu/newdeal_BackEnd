@@ -364,7 +364,10 @@ public class PerformanceRestController {
         HashMap<String, Object> data = new HashMap<>();
 
         String JWT_AccessToken = request.getHeader("JWT_AccessToken");
-        log.info("JWT_AccessToken : " + JWT_AccessToken);
+        String insert_id = request.getHeader("insert_id");
+//        log.info("JWT_AccessToken : "+JWT_AccessToken);
+//        log.info("insert_id : "+insert_id);
+
         if (JWT_AccessToken==null) {
             return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE015.getCode(), ResponseErrorCode.NDE015.getDesc(), ResponseErrorCode.NDE016.getCode(), ResponseErrorCode.NDE016.getDesc()));
         }
@@ -402,6 +405,7 @@ public class PerformanceRestController {
         Map<Integer,List<String>> policy_rankMap = new HashMap<>();
 
         for(int i=0; i<performance.size(); i++){
+
             technicality_scroeList = new ArrayList<>();
             technicality_rankList = new ArrayList<>();
 
@@ -427,60 +431,72 @@ public class PerformanceRestController {
             Map<String,String> goal  = performanceFunctionService.goal(performance.get(i).getPiAfterSafetyRating(),performance.get(i).getPiGoalLevel());
             technicality_scroeList.add(goal.get("score"));
             technicality_rankList.add(goal.get("rank"));
-            // 기술성 - 종합점수
-            Map<String, String> allScoreRank = performanceFunctionService.technicality_allScoreRank(technicality_scroeList, weight.getPiWeightSafe(), weight.getPiWeightOld(), weight.getPiWeightUrgency(), weight.getPiWeightGoal());
-            technicality_scroeList.add(allScoreRank.get("score"));
-            technicality_rankList.add(allScoreRank.get("rank"));
+            // 기술성 - 종합점수 및 등급
+            Map<String, String> technicalityAllScoreRank = performanceFunctionService.technicality_allScoreRank(technicality_scroeList, weight.getPiWeightSafe(), weight.getPiWeightOld(), weight.getPiWeightUrgency(), weight.getPiWeightGoal());
+            technicality_scroeList.add(technicalityAllScoreRank.get("score"));
+            technicality_rankList.add(technicalityAllScoreRank.get("rank"));
 
             // 경제성 - 자산가치 개선 효율성
-//            Map<String, String> allScoreRank = performanceFunctionService.technicality_allScoreRank(technicality_scroeList, weight.getPiWeightSafe(), weight.getPiWeightOld(), weight.getPiWeightUrgency(), weight.getPiWeightGoal());
-//            technicality_scroeList.add(allScoreRank.get("score"));
-//            technicality_rankList.add(allScoreRank.get("rank"));
-
+            Map<String, String> assetValue = performanceFunctionService.assetValue(performance.get(i).getPiFacilityType(), performance.get(i).getPiErectionCost(), performance.get(i).getPiBusinessExpenses() ,performance.get(i).getPiCompletionYear(), performance.get(i).getPiRaterBaseYear(), performance.get(i).getPiBeforeSafetyRating(), performance.get(i).getPiAfterSafetyRating());
+            if(assetValue==null){
+                return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE022.getCode(), ResponseErrorCode.NDE022.getDesc(), ResponseErrorCode.NDE023.getCode(), ResponseErrorCode.NDE023.getDesc()));
+            }
+            economy_scroeList.add(assetValue.get("score"));
+            economy_rankList.add(assetValue.get("rank"));
             // 경제성 - 안전효용 개선 효율성
-//            Map<String, String> allScoreRank = performanceFunctionService.technicality_allScoreRank(technicality_scroeList, weight.getPiWeightSafe(), weight.getPiWeightOld(), weight.getPiWeightUrgency(), weight.getPiWeightGoal());
-//            technicality_scroeList.add(allScoreRank.get("score"));
-//            technicality_rankList.add(allScoreRank.get("rank"));
+            Map<String, String> safetyUtility = performanceFunctionService.safetyUtility(performance.get(i).getPiAfterSafetyRating(),performance.get(i).getPiBeforeSafetyRating(),performance.get(i).getPiAADT(),performance.get(i).getPiBusinessExpenses());
+            economy_scroeList.add(safetyUtility.get("score"));
+            economy_rankList.add(safetyUtility.get("rank"));
+            // 경제성 - 종합점수 및 등급
+            Map<String, String> economyAllScoreRank = performanceFunctionService.economy_allScoreRank(economy_scroeList,weight.getPiWeightSafeUtility(), weight.getPiWeightCostUtility());
+            economy_scroeList.add(economyAllScoreRank.get("score"));
+            economy_rankList.add(economyAllScoreRank.get("rank"));
 
             // 정책성 - 사업추진 타당성
             Map<String, String> businessFeasibility = performanceFunctionService.BusinessFeasibility(performance.get(i).getPiBusinessObligatory(), performance.get(i).getPiBusinessMandatory(), performance.get(i).getPiBusinessPlanned());
             policy_scroeList.add(businessFeasibility.get("score"));
             policy_rankList.add(businessFeasibility.get("rank"));
-
             // 정책성 - 민원 및 사고 대응성
             Map<String, String> complaintResponsiveness = performanceFunctionService.ComplaintResponsiveness(performance.get(i).getPiWhether());
             policy_scroeList.add(complaintResponsiveness.get("score"));
             policy_rankList.add(complaintResponsiveness.get("rank"));
-
             // 정책성 - 사업효과 범용성
             Map<String, String> businessEffect = performanceFunctionService.businessEffect(performance.get(i).getPiAADT());
             policy_scroeList.add(businessEffect.get("score"));
             policy_rankList.add(businessEffect.get("rank"));
-
-            // 정책성 - 사업효과 범용성
+            // 정책성 - 종합점수 및 등급
             Map<String, String> policyAllScoreRank = performanceFunctionService.policy_allScoreRank(policy_scroeList, weight.getPiWeightBusiness(), weight.getPiWeightComplaint(), weight.getPiWeightBusinessEffect());
             policy_scroeList.add(policyAllScoreRank.get("score"));
             policy_rankList.add(policyAllScoreRank.get("rank"));
 
-            log.info("technicality_scroeList : " + technicality_scroeList);
-            log.info("technicality_rankList : " + technicality_rankList);
-
-            log.info("policy_scroeList : " + policy_scroeList);
-            log.info("policy_rankList : " + policy_rankList);
+//            log.info("technicality_scroeList : " + technicality_scroeList);
+//            log.info("technicality_rankList : " + technicality_rankList);
+//
+//            log.info("economy_scroeList : " + economy_scroeList);
+//            log.info("economy_rankList : " + economy_rankList);
+//
+//            log.info("policy_scroeList : " + policy_scroeList);
+//            log.info("policy_rankList : " + policy_rankList);
 
             technicality_scroeMap.put(i,technicality_scroeList);
             technicality_rankMap.put(i,technicality_rankList);
+
+            economy_scroeMap.put(i,economy_scroeList);
+            economy_rankMap.put(i,economy_rankList);
 
             policy_scroeMap.put(i,policy_scroeList);
             policy_rankMap.put(i,policy_rankList);
 
         }
 
-        log.info("기술성 환산점수 리스트 : " + technicality_scroeMap);
-        log.info("기술성 환산등급 리스트 : " + technicality_rankMap);
-
-        log.info("정책성 환산점수 리스트 : " + policy_scroeMap);
-        log.info("정책성 환산등급 리스트 : " + policy_rankMap);
+//        log.info("기술성 환산점수 리스트 : " + technicality_scroeMap);
+//        log.info("기술성 환산등급 리스트 : " + technicality_rankMap);
+//
+//        log.info("경제성 환산점수 리스트 : " + economy_scroeMap);
+//        log.info("경제성 환산등급 리스트 : " + economy_rankMap);
+//
+//        log.info("정책성 환산점수 리스트 : " + policy_scroeMap);
+//        log.info("정책성 환산등급 리스트 : " + policy_rankMap);
 
         // 가중치, 대안리스트, 대안갯수
         data.put("weightList",weight);
@@ -491,13 +507,117 @@ public class PerformanceRestController {
         data.put("technicalityScore",technicality_scroeMap);
         data.put("technicalityRank",technicality_rankMap);
 
+        // 노후화_경제
+        data.put("economyScore",economy_scroeMap);
+        data.put("economyRank",economy_rankMap);
+
         // 노후화_정책성
         data.put("policyScore",policy_scroeMap);
         data.put("policyRank",policy_rankMap);
 
+        // 종합평가표 점수리스트, 등급리스트
+        List<String> scoreList;
+        List<Double> all_scroeList;
+        List<Double> great_scroeList = new ArrayList<>();
+        List<String> all_rankList;
+        List<String> all_businessList;
+        List<String> all_greate = new ArrayList<>();
+        Map<Integer,List<Double>> all_scroeMap = new HashMap<>();
+        Map<Integer,List<String>> all_rankMap = new HashMap<>();
+        Map<Integer,List<String>> all_businessMap = new HashMap<>();
+        int size;
+        for(int i=0; i<performance.size(); i++) {
+            scoreList = new ArrayList<>();
+            all_scroeList = new ArrayList<>();
+            all_rankList = new ArrayList<>();
+            all_businessList = new ArrayList<>();
 
+            size = technicality_scroeMap.get(i).size();
+            scoreList.add(technicality_scroeMap.get(i).get(size-1));
+            size = economy_scroeMap.get(i).size();
+            scoreList.add(economy_scroeMap.get(i).get(size-1));
+            size = policy_scroeMap.get(i).size();
+            scoreList.add(policy_scroeMap.get(i).get(size-1));
+            log.info(i+1+"번째 scoreList : "+scoreList);
 
+            // 유형별/지표별 가중치는 바뀔수있음.
+            Map<String, Object> all_ScoreRank = performanceFunctionService.all_ScoreRank(scoreList, 0.8, 0.1, 0.1, weight.getPiWeightCriticalScore());
+            all_scroeList.add(Double.parseDouble(String.valueOf(all_ScoreRank.get("score"))));
+            great_scroeList.add(Double.parseDouble(String.valueOf(all_ScoreRank.get("score"))));
+            all_rankList.add(String.valueOf(all_ScoreRank.get("rank")));
+            all_businessList.add(String.valueOf(all_ScoreRank.get("business")));
 
+            all_scroeMap.put(i,all_scroeList);
+            all_rankMap.put(i,all_rankList);
+            all_businessMap.put(i,all_businessList);
+
+            if(i+1==performance.size()){
+                Double maxVal = Collections.max(great_scroeList);
+                for (int j=0; j<great_scroeList.size(); j++) {
+                    if (great_scroeList.get(j).equals(maxVal)) {
+                        Optional<Performance> optionalPerformance = performanceService.findByPiAutoNumAndInsert_idAndPiInputCount(autoNum,insert_id,j);
+                        if(optionalPerformance.isEmpty()){
+                            return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE024.getCode(), ResponseErrorCode.NDE024.getDesc(), null, null));
+                        }else{
+                            log.info("우수대안 업데이트하기 카운트 : "+j);
+                            Performance updatePerformance = new Performance();
+                            updatePerformance.setId(optionalPerformance.get().getId());
+                            updatePerformance.setPiAutoNum(optionalPerformance.get().getPiAutoNum());
+                            updatePerformance.setPiFacilityType(optionalPerformance.get().getPiFacilityType());
+                            updatePerformance.setPiFacilityName(optionalPerformance.get().getPiFacilityName());
+                            updatePerformance.setPiKind(optionalPerformance.get().getPiKind());
+                            updatePerformance.setPiCompletionYear(optionalPerformance.get().getPiCompletionYear());
+                            updatePerformance.setPiPublicYear(optionalPerformance.get().getPiPublicYear());
+                            updatePerformance.setPiType(optionalPerformance.get().getPiType());
+                            updatePerformance.setPiErectionCost(optionalPerformance.get().getPiErectionCost());
+                            updatePerformance.setPiSafetyLevel(optionalPerformance.get().getPiSafetyLevel());
+                            updatePerformance.setPiGoalLevel(optionalPerformance.get().getPiGoalLevel());
+                            updatePerformance.setPiMaintenanceDelay(optionalPerformance.get().getPiMaintenanceDelay());
+                            updatePerformance.setPiManagement(optionalPerformance.get().getPiManagement());
+                            updatePerformance.setPiAgency(optionalPerformance.get().getPiAgency());
+                            updatePerformance.setPiAADT(optionalPerformance.get().getPiAADT());
+                            updatePerformance.setPiBusiness(optionalPerformance.get().getPiBusiness());
+                            updatePerformance.setPiBusinessType(optionalPerformance.get().getPiBusinessType());
+                            updatePerformance.setPiTargetAbsence(optionalPerformance.get().getPiTargetAbsence());
+                            updatePerformance.setPiBusinessClassification(optionalPerformance.get().getPiBusinessClassification());
+                            updatePerformance.setPiBusinessInformation(optionalPerformance.get().getPiBusinessInformation());
+                            updatePerformance.setPiBusinessExpenses(optionalPerformance.get().getPiBusinessExpenses());
+                            updatePerformance.setPiBeforeSafetyRating(optionalPerformance.get().getPiBeforeSafetyRating());
+                            updatePerformance.setPiAfterSafetyRating(optionalPerformance.get().getPiAfterSafetyRating());
+                            updatePerformance.setPiBusinessObligatory(optionalPerformance.get().getPiBusinessObligatory());
+                            updatePerformance.setPiBusinessMandatory(optionalPerformance.get().getPiBusinessMandatory());
+                            updatePerformance.setPiBusinessPlanned(optionalPerformance.get().getPiBusinessPlanned());
+                            updatePerformance.setPiWhether(optionalPerformance.get().getPiWhether());
+                            updatePerformance.setPiRaterBaseYear(optionalPerformance.get().getPiRaterBaseYear());
+                            updatePerformance.setPiRater(optionalPerformance.get().getPiRater());
+                            updatePerformance.setPiRaterBelong(optionalPerformance.get().getPiRaterBelong());
+                            updatePerformance.setPiRaterPhone(optionalPerformance.get().getPiRaterPhone());
+                            updatePerformance.setPiInputCount(optionalPerformance.get().getPiInputCount());
+                            updatePerformance.setPiInputGreat(1);
+                            updatePerformance.setPiInputMiddleSave(optionalPerformance.get().getPiInputMiddleSave());
+                            updatePerformance.setInsertDateTime(optionalPerformance.get().getInsertDateTime());
+                            updatePerformance.setInsert_id(optionalPerformance.get().getInsert_id());
+                            updatePerformance.setModifyDateTime(LocalDateTime.now());
+                            updatePerformance.setModify_id(insert_id);
+                            performanceService.save(updatePerformance);
+                        }
+                        all_greate.add("우수 대안");
+                    } else {
+                        all_greate.add("-");
+                    }
+                }
+            }
+        }
+
+//        log.info("종합평가표 환산점수 리스트 : " + all_scroeMap);
+//        log.info("종합평가표 환산등급 리스트 : " + all_rankMap);
+//        log.info("종합평가표 사업성 : " + all_businessMap);
+//        log.info("종합평가표 우수대안 : " + all_greate);
+
+        data.put("allScroeMap",all_scroeMap);
+        data.put("allRankMap",all_rankMap);
+        data.put("allBusinessMap",all_businessMap);
+        data.put("allGreate",all_greate);
 
         return ResponseEntity.ok(res.dataSendSuccess(data));
     }

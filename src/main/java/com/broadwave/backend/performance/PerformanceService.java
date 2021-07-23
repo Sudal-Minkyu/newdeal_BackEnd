@@ -47,6 +47,10 @@ public class PerformanceService {
         return performanceRepository.findByPiAutoNumAndInsert_id(autoNum,insert_id);
     }
 
+    public Optional<Performance> findByPiAutoNumAndInsert_idAndPiInputCount(String autoNum, String insert_id, Integer piInputCount) {
+        return performanceRepository.findByPiAutoNumAndInsert_idAndPiInputCount(autoNum,insert_id,piInputCount);
+    }
+
     public void delete(Performance performance) {
         log.info("삭제성공");
         performanceRepository.delete(performance);

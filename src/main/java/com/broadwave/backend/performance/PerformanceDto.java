@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @ToString
 @Setter
 public class PerformanceDto {
-    private String piFacilityType; // 시설유형(NOTNULL)\
+    private String piFacilityType; // 시설유형(NOTNULL)
     private String piFacilityName; // 시설유형(NULL)
     private String piKind; // 종별구분(NOTNULL)
     private Double piCompletionYear; // 준공연도(NOTNULL)

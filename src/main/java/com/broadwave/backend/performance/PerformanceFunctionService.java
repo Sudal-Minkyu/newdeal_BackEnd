@@ -1,8 +1,12 @@
 package com.broadwave.backend.performance;
 
+import com.broadwave.backend.performance.price.PriceDto;
+import com.broadwave.backend.performance.price.PriceService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,10 +20,15 @@ import java.util.Map;
 @Service
 public class PerformanceFunctionService {
 
+    private PriceService priceService;
     private final Map<String, String> funRankScore;
 
-    public PerformanceFunctionService(Map<String, String> funRankScore) {
+
+    @Autowired
+    public PerformanceFunctionService(PriceService priceService, Map<String, String> funRankScore) {
+        this.priceService = priceService;
         this.funRankScore = funRankScore;
+
     }
 
 //**************************** 노후화_기술성 함수 ********************************
@@ -212,57 +221,236 @@ public class PerformanceFunctionService {
 //++++++++++++++++ 노후화_경제성 함수 +++++++++++++++++++
 
     // 자산가치 개선 효율성 환산점수
-    public Map<String, String> assetValue(String piSafetyLevel) {
-        log.info("안정성 환산점수 함수호출");
+    public Map<String, String> assetValue(String piFacilityType, Long piErectionCost, Long piBusinessExpenses, Double piCompletionYear, Double piRaterBaseYear,
+                                          String piBeforeSafetyRating, String piAfterSafetyRating ) {
+        log.info("자산가치 개선 효율성 환산점수 함수호출");
         funRankScore.clear();
-        log.info("piSafetyLevel : " + piSafetyLevel);
-        switch (piSafetyLevel) {
+
+        log.info("준공연도 : " + piCompletionYear);
+        double completionExchangeRate; // 준공연도 물가배수 환산율
+        double nowExchangeRate; // 현재 물가배수 환산율
+        double priceIndex; // 조정 물가지수
+        double costRepurchase; // 재조 달원가
+        try{
+            PriceDto completionPriceDto = priceService.findByPiYearCustom((double) Math.round(piCompletionYear));
+            PriceDto nowPriceDto = priceService.findByPiYearCustom((double) Math.round(piRaterBaseYear)-1);
+//            log.info("completionPriceDto : " + completionPriceDto);
+//            log.info("nowPriceDto : " + nowPriceDto);
+            completionExchangeRate = completionPriceDto.getPiPrice(); // 준공연도 물가배수 환산율
+            nowExchangeRate = nowPriceDto.getPiPrice(); // 현재 물가배수 환산율
+        }catch (NullPointerException e){
+            log.info("기준년도의 환산율이 존재하지 않습니다. 관리자에게 문의바람.");
+            return null;
+        }
+        priceIndex = Math.round(nowExchangeRate/completionExchangeRate*100)/100.0; // 조정 물가지수
+        log.info("조정 물가지수 : "+priceIndex);
+        costRepurchase = piErectionCost*priceIndex; // 재조 달원가
+        log.info("재조 달원가 : "+costRepurchase);
+
+        log.info("*****************************************************************************************************************");
+
+        log.info("부재 : " + piFacilityType);
+        log.info("사업전 안전등급 : " + piBeforeSafetyRating);
+        log.info("사업후 안전등급 : " + piAfterSafetyRating);
+
+        double usefulLife; // 내용연수 쓰이는데가 없음.
+        if (piFacilityType.equals("교량")) {
+            usefulLife = 20.0;
+        }else if(piFacilityType.equals("보도육교")){
+            usefulLife = 20.0;
+        }else if(piFacilityType.equals("터널")){
+            usefulLife = 20.0;
+        }else if(piFacilityType.equals("지하터널")){
+            usefulLife = 20.0;
+        }else if(piFacilityType.equals("옹벽")){
+            usefulLife = 20.0;
+        }else if(piFacilityType.equals("절토사면")){
+            usefulLife = 20.0;
+        }else{
+            usefulLife = 20.0;
+        }
+
+        double beforeLifeRate; // 사업전 잔존수명률
+        double afterLifeRate; // 사업후 잔존수명률
+        switch (piBeforeSafetyRating) {
             case "A":
-                funRankScore.put("score", "100");
-                funRankScore.put("rank", "E");
+                beforeLifeRate = 95.0;
                 break;
             case "B":
-                funRankScore.put("score", "80");
-                funRankScore.put("rank", "D");
+                beforeLifeRate = 75.0;
                 break;
             case "C":
-                funRankScore.put("score", "50");
-                funRankScore.put("rank", "C");
+                beforeLifeRate = 50.0;
                 break;
             case "D":
-                funRankScore.put("score", "20");
-                funRankScore.put("rank", "B");
+                beforeLifeRate = 30.0;
                 break;
             default:
-                funRankScore.put("score", "0");
-                funRankScore.put("rank", "A");
+                beforeLifeRate = 5.0;
                 break;
         }
+        switch (piAfterSafetyRating) {
+            case "A":
+                afterLifeRate = 95.0;
+                break;
+            case "B":
+                afterLifeRate = 75.0;
+                break;
+            case "C":
+                afterLifeRate = 50.0;
+                break;
+            case "D":
+                afterLifeRate = 30.0;
+                break;
+            default:
+                afterLifeRate = 5.0;
+                break;
+        }
+
+//        double beforePublic; // 사업전 잔종공용연수 쓰이는데가 없음.
+//        double afterPublic; // 사업후 잔존공용연수 쓰이는데가 없음.
+
+//        log.info("사업전 잔존수명률 : " + beforeLifeRate);
+//        log.info("사업후 잔존수명률 : " + afterLifeRate);
+        double beforeReplacementCost  = costRepurchase*beforeLifeRate/100.0; // 사업전 상각후 대체원가
+        double afterReplacementCost  = costRepurchase*afterLifeRate/100.0; // 사업후 상각후 대체원가
+//        log.info("사업전 상각후 대체원가 : " + beforeReplacementCost);
+//        log.info("사업후 상각후 대체원가 : " + afterReplacementCost);
+
+        double assetValue = afterReplacementCost-beforeReplacementCost; // 자산가치 증가액
+//        log.info("자산가치 증가액 : " + assetValue);
+//        log.info("유지보수 사업비 : " + piBusinessExpenses);
+        double Improving = Math.round(assetValue/piBusinessExpenses*100)/100.0; // 자산가치 개선 효율성
+//        log.info("자산가치 개선 효율성 : " + Improving);
+
+        if(5<=Improving){
+            funRankScore.put("score", "100");
+            funRankScore.put("rank", "A");
+        }else if(4<=Improving){
+            funRankScore.put("score", "80");
+            funRankScore.put("rank", "B");
+        }else if(3<=Improving){
+            funRankScore.put("score", "70");
+            funRankScore.put("rank", "C");
+        }else if(2<=Improving){
+            funRankScore.put("score", "50");
+            funRankScore.put("rank", "D");
+        }else{
+            funRankScore.put("score", "30");
+            funRankScore.put("rank", "E");
+        }
+
         return funRankScore;
     }
 
     // 안전효용 개선 효율성 환산점수
-    public Map<String, String> safetyUtility(Double piPublicYear) {
-        log.info("노후도 환산점수 함수호출");
+    public Map<String, String> safetyUtility(String piAfterSafetyRating, String piBeforeSafetyRating, Double piAADT, Long piBusinessExpenses) {
+        log.info("안전효용 개선 효율성 환산점수 함수호출");
         funRankScore.clear();
-        log.info("piPublicYear : " + piPublicYear);
-        if (31 <= piPublicYear) {
+        log.info("piAfterSafetyRating : " + piAfterSafetyRating);
+        log.info("piPublicYepiBeforeSafetyRatingar : " + piBeforeSafetyRating);
+        log.info("piAADT : " + piAADT);
+
+        String safeRank = piAfterSafetyRating+piBeforeSafetyRating; // 안전효용성 등급
+        double safeScore; // 안전효용성 평가점수
+        double aadtScore; // 교통량 가중 평가점수
+        double safeIndices; // 안전효용 개선 효율성 지수
+
+        switch (safeRank) {
+            case "AE":
+                safeScore = 100.0;
+                break;
+            case "AD":
+                safeScore = 90.0;
+                break;
+            case "AC":
+            case "BE":
+                safeScore = 80.0;
+                break;
+            case "BD":
+                safeScore = 70.0;
+                break;
+            case "BC":
+            case "CE":
+                safeScore = 50.0;
+                break;
+            case "CD":
+                safeScore = 30.0;
+                break;
+            case "AB":
+                safeScore = 20.0;
+                break;
+            case "BB":
+            case "DE":
+                safeScore = 10.0;
+                break;
+            case "AA":
+                safeScore = 5.0;
+                break;
+            default:
+                safeScore = 0.0;
+                break;
+        }
+
+        if(40001 <= piAADT){
+            aadtScore = 1.0;
+        }else if(30001 <= piAADT){
+            aadtScore = 2.0;
+        }else if(20001 <= piAADT){
+            aadtScore = 3.0;
+        }else if(10001 <= piAADT){
+            aadtScore = 4.0;
+        }else{
+            aadtScore = 5.0;
+        }
+
+        log.info("safeScore : "+safeScore);
+        log.info("aadtScore : "+aadtScore);
+        log.info("piBusinessExpenses : " + piBusinessExpenses);
+
+        safeIndices = safeScore*aadtScore/(piBusinessExpenses/100000000.0);
+        log.info("safeIndices : "+safeIndices);
+
+        if (2 <= safeIndices) {
             funRankScore.put("score", "100");
             funRankScore.put("rank", "A");
-        } else if (26 <= piPublicYear) {
+        } else if (1.5 <= safeIndices) {
             funRankScore.put("score", "80");
             funRankScore.put("rank", "B");
-        } else if (21 <= piPublicYear) {
-            funRankScore.put("score", "50");
+        } else if (1 <= safeIndices) {
+            funRankScore.put("score", "70");
             funRankScore.put("rank", "C");
-        } else if (11 <= piPublicYear) {
-            funRankScore.put("score", "20");
+        } else if (0.5 <= safeIndices) {
+            funRankScore.put("score", "50");
             funRankScore.put("rank", "D");
         } else {
-            funRankScore.put("score", "0");
+            funRankScore.put("score", "30");
             funRankScore.put("rank", "E");
         }
         return funRankScore;
+    }
+
+    // 경제성 종합 환산점수,환산랭크
+    public Map<String, String> economy_allScoreRank(List<String> economy_scroeList, Double piWeightSafeUtility, Double piWeightCostUtility) {
+        log.info("경제성 종합 환산점수,환산랭크 함수호출");
+        funRankScore.clear();
+
+        double allScore;
+        String allRank;
+        try{
+            Double a = Double.parseDouble(economy_scroeList.get(0))*piWeightSafeUtility;
+            Double b = Double.parseDouble(economy_scroeList.get(1))*piWeightCostUtility;
+            allScore = a+b;
+
+            allRank = allScoreRankReturn(allScore);
+
+            funRankScore.put("score",String.valueOf(allScore));
+            funRankScore.put("rank", allRank);
+            return funRankScore;
+        }catch (Exception e){
+            log.info("경제성 종합 환산점수 예외발생 : "+e);
+            return null;
+        }
     }
 
 //+++++++++++++++++++++++++++++++++++++++++++++
@@ -356,6 +544,47 @@ public class PerformanceFunctionService {
             return funRankScore;
         }catch (Exception e){
             log.info("정책성 종합 환산점수 예외발생 : "+e);
+            return null;
+        }
+    }
+
+//=============================================
+
+//================ 종합평가표 함수 ===================
+
+    // 종합평가표 함수
+    public Map<String, Object> all_ScoreRank(List<String> all_scroeList, Double technicality, Double economy, Double policy, Double piWeightCriticalScore) {
+        log.info("종합평가표 함수호출");
+
+        Map<String, Object> allRankScore = new HashMap<>();
+
+        log.info("all_scroeList : " + all_scroeList);
+        log.info("piWeightCriticalScore : " + piWeightCriticalScore);
+
+        Double allScore;
+        String allRank;
+
+        try{
+
+            Double a = Double.parseDouble(all_scroeList.get(0))*technicality;
+            Double b = Double.parseDouble(all_scroeList.get(1))*economy;
+            Double c = Double.parseDouble(all_scroeList.get(2))*policy;
+            allScore = a+b+c;
+
+            allRank = allScoreRankReturn(allScore);
+
+            allRankScore.put("score",Math.round(allScore*1000)/1000.0);
+            allRankScore.put("rank", allRank);
+
+            if(piWeightCriticalScore<=allScore){
+                allRankScore.put("business","사업성 충족");
+            }else{
+                allRankScore.put("business","기준점수 미달");
+            }
+
+            return allRankScore;
+        }catch (Exception e){
+            log.info("종합평가표 환산점수 예외발생 : "+e);
             return null;
         }
     }
