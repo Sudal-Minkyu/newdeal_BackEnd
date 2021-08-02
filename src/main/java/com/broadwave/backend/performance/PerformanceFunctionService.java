@@ -40,19 +40,45 @@ public class PerformanceFunctionService {
         log.info("piSafetyLevel : " + piSafetyLevel);
         switch (piSafetyLevel) {
             case "A":
-                funRankScore.put("score", "100");
+                funRankScore.put("score", "10");
                 funRankScore.put("rank", "E");
                 break;
             case "B":
-                funRankScore.put("score", "80");
+                funRankScore.put("score", "50");
                 funRankScore.put("rank", "D");
                 break;
             case "C":
-                funRankScore.put("score", "50");
+                funRankScore.put("score", "70");
                 funRankScore.put("rank", "C");
                 break;
             case "D":
+                funRankScore.put("score", "90");
+                funRankScore.put("rank", "B");
+                break;
+            default:
+                funRankScore.put("score", "100");
+                funRankScore.put("rank", "A");
+                break;
+        }
+        return funRankScore;
+    }
+
+    // 사용성 환산점수
+    public Map<String, String> usabilityLevel(String piUsabilityLevel) {
+        log.info("사용성 환산점수 함수호출");
+        funRankScore.clear();
+        log.info("piUsabilityLevel : " + piUsabilityLevel);
+        switch (piUsabilityLevel) {
+            case "A":
                 funRankScore.put("score", "20");
+                funRankScore.put("rank", "A");
+                break;
+            case "B":
+                funRankScore.put("score", "50");
+                funRankScore.put("rank", "C");
+                break;
+            case "C":
+                funRankScore.put("score", "80");
                 funRankScore.put("rank", "B");
                 break;
             default:
@@ -68,20 +94,20 @@ public class PerformanceFunctionService {
         log.info("노후도 환산점수 함수호출");
         funRankScore.clear();
         log.info("piPublicYear : " + piPublicYear);
-        if (31 <= piPublicYear) {
+        if (50 <= piPublicYear) {
             funRankScore.put("score", "100");
             funRankScore.put("rank", "A");
-        } else if (26 <= piPublicYear) {
-            funRankScore.put("score", "80");
+        } else if (30 <= piPublicYear) {
+            funRankScore.put("score", "90");
             funRankScore.put("rank", "B");
-        } else if (21 <= piPublicYear) {
-            funRankScore.put("score", "50");
+        } else if (20 <= piPublicYear) {
+            funRankScore.put("score", "70");
             funRankScore.put("rank", "C");
-        } else if (11 <= piPublicYear) {
-            funRankScore.put("score", "20");
+        } else if (10 <= piPublicYear) {
+            funRankScore.put("score", "50");
             funRankScore.put("rank", "D");
         } else {
-            funRankScore.put("score", "0");
+            funRankScore.put("score", "10");
             funRankScore.put("rank", "E");
         }
         return funRankScore;
@@ -193,17 +219,28 @@ public class PerformanceFunctionService {
     }
 
     // 기술성 종합 환산점수,환산랭크
-    public Map<String, String> technicality_allScoreRank(List<String> scroeList, Double piWeightSafe, Double piWeightOld, Double piWeightUrgency, Double piWeightGoal){
+    public Map<String, String> technicality_allScoreRank(String type, List<String> scroeList, Double piWeightSafe,Double piWeightUsability, Double piWeightOld, Double piWeightUrgency, Double piWeightGoal){
         log.info("기술성 종합 환산점수 함수호출");
         funRankScore.clear();
         double allScore;
         String allRank;
         try{
-            Double a = Double.parseDouble(scroeList.get(0))*piWeightSafe;
-            Double b = Double.parseDouble(scroeList.get(1))*piWeightOld;
-            Double c = Double.parseDouble(scroeList.get(2))*piWeightUrgency;
-            Double d = Double.parseDouble(scroeList.get(3))*piWeightGoal;
-            allScore = a+b+c+d;
+            double a = Double.parseDouble(scroeList.get(0))*piWeightSafe;
+            double b;
+            double c;
+            double d;
+            double e = 0.0;
+            if(type.equals("교량") || type.equals("터널")){
+                e = Double.parseDouble(scroeList.get(1))*piWeightUsability;
+                b = Double.parseDouble(scroeList.get(2))*piWeightOld;
+                c = Double.parseDouble(scroeList.get(3))*piWeightUrgency;
+                d = Double.parseDouble(scroeList.get(4))*piWeightGoal;
+            }else{
+                b = Double.parseDouble(scroeList.get(1))*piWeightOld;
+                c = Double.parseDouble(scroeList.get(2))*piWeightUrgency;
+                d = Double.parseDouble(scroeList.get(3))*piWeightGoal;
+            }
+            allScore = a+b+c+d+e;
 
             allRank = allScoreRankReturn(allScore);
 
@@ -393,15 +430,15 @@ public class PerformanceFunctionService {
         }
 
         if(40001 <= piAADT){
-            aadtScore = 1.0;
-        }else if(30001 <= piAADT){
-            aadtScore = 2.0;
-        }else if(20001 <= piAADT){
-            aadtScore = 3.0;
-        }else if(10001 <= piAADT){
+            aadtScore = 10.0;
+        }else if(20000 <= piAADT){
+            aadtScore = 8.0;
+        }else if(10000 <= piAADT){
             aadtScore = 4.0;
+        }else if(5000 <= piAADT){
+            aadtScore = 2.0;
         }else{
-            aadtScore = 5.0;
+            aadtScore = 1.0;
         }
 
         log.info("safeScore : "+safeScore);
@@ -508,13 +545,13 @@ public class PerformanceFunctionService {
         if (40001 <= piAADT) {
             funRankScore.put("score", "100");
             funRankScore.put("rank", "A");
-        } else if (30001 <= piAADT) {
+        } else if (20000 <= piAADT) {
             funRankScore.put("score", "80");
             funRankScore.put("rank", "B");
-        } else if (20001 <= piAADT) {
+        } else if (10000 <= piAADT) {
             funRankScore.put("score", "60");
             funRankScore.put("rank", "C");
-        } else if (10001 <= piAADT) {
+        } else if (5000 <= piAADT) {
             funRankScore.put("score", "50");
             funRankScore.put("rank", "D");
         } else {

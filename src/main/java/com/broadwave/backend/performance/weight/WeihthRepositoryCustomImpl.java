@@ -24,6 +24,7 @@ public class WeihthRepositoryCustomImpl extends QuerydslRepositorySupport implem
         JPQLQuery<WeightDto> query = from(weight)
                 .select(Projections.constructor(WeightDto.class,
                         weight.piWeightSafe,
+                        weight.piWeightUsability,
                         weight.piWeightOld,
                         weight.piWeightUrgency,
                         weight.piWeightGoal,
@@ -32,7 +33,10 @@ public class WeihthRepositoryCustomImpl extends QuerydslRepositorySupport implem
                         weight.piWeightBusiness,
                         weight.piWeightComplaint,
                         weight.piWeightBusinessEffect,
-                        weight.piWeightCriticalScore
+                        weight.piWeightCriticalScore,
+                        weight.piWeightTechnicality,
+                        weight.piWeightEconomy,
+                        weight.piWeightPolicy
                 ));
 
         if (autoNum != null && !autoNum.isEmpty()){

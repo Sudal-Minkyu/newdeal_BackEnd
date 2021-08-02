@@ -4,12 +4,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface PerformanceRepository extends JpaRepository<Performance,Long> {
-    // 중간저장 데이터 삭제
-    @Query("select a from Performance a where a.piAutoNum = :autoNum and a.insert_id = :insert_id and a.piInputMiddleSave = 0")
+    // 중간저장 데이터 조회
+    @Query("select a from Performance a where a.piAutoNum = :autoNum and a.insert_id = :insert_id and a.piInputMiddleSave = 0 and a.piInputCount = 1")
     Optional<Performance> findByPiAutoNumAndInsert_id(String autoNum, String insert_id);
 
     // 우수대안 업데이트

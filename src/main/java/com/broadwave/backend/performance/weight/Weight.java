@@ -33,6 +33,9 @@ public class Weight {
     @Column(name="pi_weight_safe")
     private Double piWeightSafe; // 안정성 가중치(NOTNULL)
 
+    @Column(name="pi_weight_usability")
+    private Double piWeightUsability; // 사용성 가중치(NOTNULL)
+
     @Column(name="pi_weight_old")
     private Double piWeightOld; // 노후도 가중치(NULL)
 
@@ -59,6 +62,15 @@ public class Weight {
 
     @Column(name="pi_weight_critical_score")
     private Double piWeightCriticalScore; // 사업추진 임계점수(NOTNULL)
+
+    @Column(name="pi_weight_technicality")
+    private Double piWeightTechnicality; // 유형_기술성(NOTNULL)
+
+    @Column(name="pi_weight_economy")
+    private Double piWeightEconomy; // 유형_경제성(NOTNULL)
+
+    @Column(name="pi_weight_policy")
+    private Double piWeightPolicy; // 유형_정책성(NOTNULL)
 
     @Column(name="insert_date")
     private LocalDateTime insertDateTime;

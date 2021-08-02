@@ -12,6 +12,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.hibernate.HibernateException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -42,11 +43,7 @@ public class PerformanceRestController {
     private final KeyGenerateService keyGenerateService;
 
     @Autowired
-    public PerformanceRestController(ModelMapper modelMapper,
-                                     PerformanceService performanceService,
-                                     WeightService weightService,
-                                     PerformanceFunctionService performanceFunctionService,
-                                     KeyGenerateService keyGenerateService) {
+    public PerformanceRestController(ModelMapper modelMapper, PerformanceService performanceService, WeightService weightService, PerformanceFunctionService performanceFunctionService, KeyGenerateService keyGenerateService) {
         this.modelMapper = modelMapper;
         this.performanceService = performanceService;
         this.weightService = weightService;
@@ -69,7 +66,7 @@ public class PerformanceRestController {
         log.info("insert_id : "+insert_id);
 
         PerformanceCheckDto performance = performanceService.findByInsertId(insert_id);
-        log.info("performance : "+performance);
+        log.info("middleCheck performance : "+performance);
 
         if(performance==null){
             data.put("middleSave",0);
@@ -80,7 +77,7 @@ public class PerformanceRestController {
         return ResponseEntity.ok(res.dataSendSuccess(data));
     }
 
-    // NEWDEAL 성능개선사업평가 Input 중간저장게시물의 데이터 불러오기
+    // NEWDEAL 성능개선사업평가 Input 중간저장게시물의 첫번째 데이터 불러오기
     @PostMapping("/middleData")
     public ResponseEntity<Map<String,Object>> middleData(@RequestParam("autoNum")String autoNum,HttpServletRequest request) {
 
@@ -95,13 +92,62 @@ public class PerformanceRestController {
         log.info("insert_id : "+insert_id);
 
         PerformanceMiddleDataDto performance = performanceService.findByInsertIAndAutoNum(insert_id,autoNum);
-        log.info("performance : "+performance);
+        log.info("middleData performance : "+performance);
 
         if(performance!=null){
             data.put("performanceData",performance);
         }else{
             return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE019.getCode(), ResponseErrorCode.NDE019.getDesc(), ResponseErrorCode.NDE020.getCode(), ResponseErrorCode.NDE020.getDesc()));
         }
+        return ResponseEntity.ok(res.dataSendSuccess(data));
+    }
+
+    // NEWDEAL 성능개선사업평가 Input 중간저장게시물의 두번째 데이터 불러오기
+    @PostMapping("/middleDataBusiness")
+    public ResponseEntity<Map<String,Object>> middleDataBusiness(@RequestParam("autoNum")String autoNum,HttpServletRequest request) {
+
+        log.info("middleData 호출성공");
+
+        AjaxResponse res = new AjaxResponse();
+        HashMap<String, Object> data = new HashMap<>();
+
+        String JWT_AccessToken = request.getHeader("JWT_AccessToken");
+        String insert_id = request.getHeader("insert_id");
+        log.info("JWT_AccessToken : "+JWT_AccessToken);
+        log.info("insert_id : "+insert_id);
+
+        List<PerformanceMiddleBusinessDataDto> performance = performanceService.findByInsertIAndAutoNum2(insert_id,autoNum);
+        log.info("middleData performance : "+performance);
+
+        data.put("piBusiness",performance.get(0).getPiBusiness());
+        if(performance.get(0).getPiBusiness()!=null){
+            data.put("performance",performance);
+        }
+        data.put("size",performance.size());
+
+        return ResponseEntity.ok(res.dataSendSuccess(data));
+    }
+
+    // NEWDEAL 성능개선사업평가 유형 가져오기
+    @PostMapping("/weightBusiness")
+    public ResponseEntity<Map<String,Object>> weightBusiness(@RequestParam("autoNum")String autoNum,HttpServletRequest request) {
+
+        log.info("middleData 호출성공");
+
+        AjaxResponse res = new AjaxResponse();
+        HashMap<String, Object> data = new HashMap<>();
+
+        String JWT_AccessToken = request.getHeader("JWT_AccessToken");
+        String insert_id = request.getHeader("insert_id");
+        log.info("JWT_AccessToken : "+JWT_AccessToken);
+        log.info("insert_id : "+insert_id);
+
+        PerformancePiBusinessDto performance = performanceService.findByInsertIAndAutoNumAndCount(insert_id,autoNum,1);
+        log.info("성능개선 유형 : "+performance.getPiBusiness());
+
+        data.put("facilityType",performance.getPiFacilityType());
+        data.put("weightBusiness",performance.getPiBusiness());
+
         return ResponseEntity.ok(res.dataSendSuccess(data));
     }
 
@@ -118,14 +164,11 @@ public class PerformanceRestController {
         log.info("JWT_AccessToken : "+JWT_AccessToken);
         log.info("insert_id : "+insert_id);
 
-        Optional<Performance> optionalPerformance = performanceService.findByPiAutoNumAndInsert_id(autoNum,insert_id);
-        log.info("optionalPerformance : "+optionalPerformance);
-
-        if (optionalPerformance.isEmpty()){
-            return ResponseEntity.ok(res.fail(ResponseErrorCode.E003.getCode(), ResponseErrorCode.E003.getDesc(),null,null));
+        List<Performance> optionalPerformance = performanceService.findByPiAutoNumAndInsert_idDel(autoNum,insert_id);
+        log.info("삭제 optionalPerformance : "+optionalPerformance);
+        for(int i=0; i<optionalPerformance.size(); i++){
+            performanceService.delete(optionalPerformance.get(i));
         }
-
-        performanceService.delete(optionalPerformance.get());
 
         return ResponseEntity.ok(res.success());
     }
@@ -147,27 +190,41 @@ public class PerformanceRestController {
         String piFacilityType = performance.getPiFacilityType();
         if(piFacilityType==null){
             return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE021.getCode(), ResponseErrorCode.NDE021.getDesc(),null,null));
+        }else if(piFacilityType.equals("보도육교") || piFacilityType.equals("지하차도") || piFacilityType.equals("절토사면")|| piFacilityType.equals("옹벽")){
+            performance.setPiUsabilityLevel("기타");
         }
+
+        performance.setPiInputCount(1);
+        performance.setPiInputGreat(0);
+        performance.setPiInputMiddleSave(0);
+        performance.setInsert_id(currentuserid);
+        performance.setInsertDateTime(LocalDateTime.now());
 
         if(autoNum.equals("null")){
             log.info("일련번호 생성");
             Date now = new Date();
             SimpleDateFormat yyMM = new SimpleDateFormat("yyMM");
             String newAutoNum = keyGenerateService.keyGenerate("nd_pi_input", yyMM.format(now), currentuserid);
-
             performance.setPiAutoNum(newAutoNum);
-            performance.setPiInputMiddleSave(0);
-            performance.setInsert_id(currentuserid);
-            performance.setInsertDateTime(LocalDateTime.now());
             data.put("autoNum",newAutoNum);
         }else{
             Optional<Performance> optionalPerformance = performanceService.findByPiAutoNumAndInsert_id(autoNum,currentuserid);
+            log.info("optionalPerformance : "+optionalPerformance);
             if(optionalPerformance.isPresent()){
                 performance.setId(optionalPerformance.get().getId());
                 performance.setPiAutoNum(autoNum);
-                performance.setPiInputMiddleSave(0);
-                performance.setInsert_id(currentuserid);
-                performance.setInsertDateTime(LocalDateTime.now());
+                //여기서부터 비지니스 중간저장
+                performance.setPiBusiness(optionalPerformance.get().getPiBusiness());
+                performance.setPiBusinessType(optionalPerformance.get().getPiBusinessType());
+                performance.setPiTargetAbsence(optionalPerformance.get().getPiTargetAbsence());
+                performance.setPiBusinessClassification(optionalPerformance.get().getPiBusinessClassification());
+                performance.setPiBusinessExpenses(optionalPerformance.get().getPiBusinessExpenses());
+                performance.setPiBeforeSafetyRating(optionalPerformance.get().getPiBeforeSafetyRating());
+                performance.setPiAfterSafetyRating(optionalPerformance.get().getPiAfterSafetyRating());
+                performance.setPiBusinessObligatory(optionalPerformance.get().getPiBusinessObligatory());
+                performance.setPiBusinessMandatory(optionalPerformance.get().getPiBusinessMandatory());
+                performance.setPiBusinessPlanned(optionalPerformance.get().getPiBusinessPlanned());
+                performance.setPiWhether(optionalPerformance.get().getPiWhether());
                 data.put("autoNum", autoNum);
             }else {
                 return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE019.getCode(), ResponseErrorCode.NDE019.getDesc(),ResponseErrorCode.NDE020.getCode(), ResponseErrorCode.NDE020.getDesc()));
@@ -178,6 +235,268 @@ public class PerformanceRestController {
 
         //중간저장하기
         performanceService.save(performance);
+        return ResponseEntity.ok(res.dataSendSuccess(data));
+    }
+
+    // NEWDEAL 성능개선사업평가 Performance2 중간저장 세이브
+    @PostMapping("/middleSaveUpdateBusiness/{autoNum}")
+    public ResponseEntity<Map<String,Object>> middleSaveUpdateBusiness(@ModelAttribute PerformanceMiddleSaveBusinessDto performanceMiddleSaveBusinessDto,@PathVariable String autoNum, HttpServletRequest request) {
+
+        log.info("middleSaveUpdate 호출성공");
+        AjaxResponse res = new AjaxResponse();
+        HashMap<String, Object> data = new HashMap<>();
+        String JWT_AccessToken = request.getHeader("JWT_AccessToken");
+        String insert_id = request.getHeader("insert_id");
+        log.info("JWT_AccessToken : " + JWT_AccessToken);
+        log.info("insert_id : " + insert_id);
+
+        Performance optionalPerformance = performanceService.findByBusiness(autoNum,insert_id);
+
+        if(optionalPerformance == null ){
+            log.info("존재하지않음.");
+        }else {
+            log.info("현재 일려번호 AutoNum : " + optionalPerformance.getPiAutoNum());
+            System.out.println();
+
+            List<PerformanceMiddleBusinessDataDto> listPerformance = performanceService.findByInsertIAndAutoNum2(insert_id,autoNum);
+            log.info("List Performance : "+listPerformance);
+            log.info("List Performance.size() : "+listPerformance.size());
+            System.out.println();
+
+            log.info("optionalPerformance : " + optionalPerformance);
+            log.info("performanceMiddleSaveBusinessDto : " + performanceMiddleSaveBusinessDto);
+            System.out.println();
+
+            log.info("for문 도는 수 : " + performanceMiddleSaveBusinessDto.getBusinessCount());
+            if(performanceMiddleSaveBusinessDto.getBusinessCount()==2) {
+                log.info("*  대안이 2개일 때, 신규등록 or 업데이트 *");
+                // 대안이 2개일 때, 신규등록 or 업데이트
+                for (int i = 0; i < performanceMiddleSaveBusinessDto.getBusinessCount(); i++) {
+
+                    Performance performance = modelMapper.map(optionalPerformance, Performance.class);
+
+                    performance.setPiBusiness(performanceMiddleSaveBusinessDto.getPiBusiness());
+                    performance.setPiBusinessType(performanceMiddleSaveBusinessDto.getPiBusinessType().get(i));
+                    performance.setPiTargetAbsence(performanceMiddleSaveBusinessDto.getPiTargetAbsence().get(i));
+                    performance.setPiBusinessClassification(performanceMiddleSaveBusinessDto.getPiBusinessClassification().get(i));
+                    performance.setPiBusinessExpenses(performanceMiddleSaveBusinessDto.getPiBusinessExpenses().get(i));
+
+                    performance.setPiBeforeSafetyRating(performanceMiddleSaveBusinessDto.getPiBeforeSafetyRating().get(i));
+                    performance.setPiAfterSafetyRating(performanceMiddleSaveBusinessDto.getPiAfterSafetyRating().get(i));
+
+                    performance.setPiWhether(performanceMiddleSaveBusinessDto.getPiWhether().get(i));
+
+                    performance.setPiInputGreat(0);
+
+                    performance.setPiInputCount(i+1);
+
+                    if (i == 0 ) {
+                        performance.setId(listPerformance.get(i).getId());
+                        performance.setPiBusinessObligatory(performanceMiddleSaveBusinessDto.getPiBusinessObligatory1());
+                        performance.setPiBusinessMandatory(performanceMiddleSaveBusinessDto.getPiBusinessMandatory1());
+                        performance.setPiBusinessPlanned(performanceMiddleSaveBusinessDto.getPiBusinessPlanned1());
+
+                        // 더미데이터삭제
+                        if(3<=listPerformance.size()){
+                            Optional<Performance> garbageDataPerformance = performanceService.findById(listPerformance.get(2).getId());
+                            garbageDataPerformance.ifPresent(performanceService::delete);
+                        }
+                        if(4<=listPerformance.size()){
+                            Optional<Performance> garbageDataPerformance = performanceService.findById(listPerformance.get(3).getId());
+                            garbageDataPerformance.ifPresent(performanceService::delete);
+                        }
+                    } else if(i == 1){
+                        if(2<=listPerformance.size()){
+                            //수정일때,
+                            performance.setId(listPerformance.get(i).getId());
+                        }else{
+                            //신규일때,
+                            performance.setId(null);
+                        }
+                        performance.setPiBusinessObligatory(performanceMiddleSaveBusinessDto.getPiBusinessObligatory2());
+                        performance.setPiBusinessMandatory(performanceMiddleSaveBusinessDto.getPiBusinessMandatory2());
+                        performance.setPiBusinessPlanned(performanceMiddleSaveBusinessDto.getPiBusinessPlanned2());
+                    }
+
+                    log.info("신규 등록 "+(i+1)+"번째 대안 : " + performance);
+                    System.out.println();
+
+                    // 중간저장하기2
+                    performanceService.save(performance);
+                }
+            }else if(performanceMiddleSaveBusinessDto.getBusinessCount()==3){
+                log.info("*  대안이 3개일 때, 신규등록 or 업데이트 *");
+                // 대안이 3개일 때, 신규등록 or 업데이트
+                for (int i = 0; i < performanceMiddleSaveBusinessDto.getBusinessCount(); i++) {
+
+                    Performance performance = modelMapper.map(optionalPerformance, Performance.class);
+
+                    performance.setPiBusiness(performanceMiddleSaveBusinessDto.getPiBusiness());
+                    performance.setPiBusinessType(performanceMiddleSaveBusinessDto.getPiBusinessType().get(i));
+                    performance.setPiTargetAbsence(performanceMiddleSaveBusinessDto.getPiTargetAbsence().get(i));
+                    performance.setPiBusinessClassification(performanceMiddleSaveBusinessDto.getPiBusinessClassification().get(i));
+                    performance.setPiBusinessExpenses(performanceMiddleSaveBusinessDto.getPiBusinessExpenses().get(i));
+
+                    performance.setPiBeforeSafetyRating(performanceMiddleSaveBusinessDto.getPiBeforeSafetyRating().get(i));
+                    performance.setPiAfterSafetyRating(performanceMiddleSaveBusinessDto.getPiAfterSafetyRating().get(i));
+
+                    performance.setPiWhether(performanceMiddleSaveBusinessDto.getPiWhether().get(i));
+
+                    performance.setPiInputGreat(0);
+
+                    performance.setPiInputCount(i+1);
+
+                    if (i == 0 ) {
+                        performance.setId(listPerformance.get(i).getId());
+                        performance.setPiBusinessObligatory(performanceMiddleSaveBusinessDto.getPiBusinessObligatory1());
+                        performance.setPiBusinessMandatory(performanceMiddleSaveBusinessDto.getPiBusinessMandatory1());
+                        performance.setPiBusinessPlanned(performanceMiddleSaveBusinessDto.getPiBusinessPlanned1());
+
+                        // 더미데이터삭제
+                        if(4<=listPerformance.size()){
+                            Optional<Performance> garbageDataPerformance = performanceService.findById(listPerformance.get(3).getId());
+                            garbageDataPerformance.ifPresent(performanceService::delete);
+                        }
+
+                    } else if(i == 1){
+                        if(2<=listPerformance.size()){
+                            performance.setId(listPerformance.get(i).getId());
+                        }else{
+                            performance.setId(null);
+                        }
+                        performance.setPiBusinessObligatory(performanceMiddleSaveBusinessDto.getPiBusinessObligatory2());
+                        performance.setPiBusinessMandatory(performanceMiddleSaveBusinessDto.getPiBusinessMandatory2());
+                        performance.setPiBusinessPlanned(performanceMiddleSaveBusinessDto.getPiBusinessPlanned2());
+                    } else if(i == 2){
+                        if(3<=listPerformance.size()){
+                            performance.setId(listPerformance.get(i).getId());
+                        }else{
+                            performance.setId(null);
+                        }
+                        performance.setPiBusinessObligatory(performanceMiddleSaveBusinessDto.getPiBusinessObligatory3());
+                        performance.setPiBusinessMandatory(performanceMiddleSaveBusinessDto.getPiBusinessMandatory3());
+                        performance.setPiBusinessPlanned(performanceMiddleSaveBusinessDto.getPiBusinessPlanned3());
+                    }
+
+                    log.info("신규 등록 "+(i+1)+"번째 대안 : " + performance);
+                    System.out.println();
+
+                    // 중간저장하기
+                    performanceService.save(performance);
+                }
+            }else {
+                log.info("*  대안이 4개일 때, 신규등록 or 업데이트 *");
+                // 대안이 4개일 때, 신규등록 or 업데이트
+                for (int i = 0; i < performanceMiddleSaveBusinessDto.getBusinessCount(); i++) {
+
+                    try {
+                        Performance performance = modelMapper.map(optionalPerformance, Performance.class);
+
+                        performance.setPiBusiness(performanceMiddleSaveBusinessDto.getPiBusiness());
+                        performance.setPiBusinessType(performanceMiddleSaveBusinessDto.getPiBusinessType().get(i));
+                        performance.setPiTargetAbsence(performanceMiddleSaveBusinessDto.getPiTargetAbsence().get(i));
+                        performance.setPiBusinessClassification(performanceMiddleSaveBusinessDto.getPiBusinessClassification().get(i));
+                        performance.setPiBusinessExpenses(performanceMiddleSaveBusinessDto.getPiBusinessExpenses().get(i));
+
+                        performance.setPiBeforeSafetyRating(performanceMiddleSaveBusinessDto.getPiBeforeSafetyRating().get(i));
+                        performance.setPiAfterSafetyRating(performanceMiddleSaveBusinessDto.getPiAfterSafetyRating().get(i));
+
+                        performance.setPiWhether(performanceMiddleSaveBusinessDto.getPiWhether().get(i));
+
+                        performance.setPiInputGreat(0);
+
+                        performance.setPiInputCount(i+1);
+
+                        if (i == 0) {
+                            performance.setId(listPerformance.get(i).getId());
+                            performance.setPiBusinessObligatory(performanceMiddleSaveBusinessDto.getPiBusinessObligatory1());
+                            performance.setPiBusinessMandatory(performanceMiddleSaveBusinessDto.getPiBusinessMandatory1());
+                            performance.setPiBusinessPlanned(performanceMiddleSaveBusinessDto.getPiBusinessPlanned1());
+                        } else if(i == 1){
+                            if(2<=listPerformance.size()){
+                                performance.setId(listPerformance.get(i).getId());
+                            }else{
+                                performance.setId(null);
+                            }
+                            performance.setPiBusinessObligatory(performanceMiddleSaveBusinessDto.getPiBusinessObligatory2());
+                            performance.setPiBusinessMandatory(performanceMiddleSaveBusinessDto.getPiBusinessMandatory2());
+                            performance.setPiBusinessPlanned(performanceMiddleSaveBusinessDto.getPiBusinessPlanned2());
+                        } else if(i == 2){
+                            if(3<=listPerformance.size()){
+                                performance.setId(listPerformance.get(i).getId());
+                            }else{
+                                performance.setId(null);
+                            }
+                            performance.setPiBusinessObligatory(performanceMiddleSaveBusinessDto.getPiBusinessObligatory3());
+                            performance.setPiBusinessMandatory(performanceMiddleSaveBusinessDto.getPiBusinessMandatory3());
+                            performance.setPiBusinessPlanned(performanceMiddleSaveBusinessDto.getPiBusinessPlanned3());
+                        } else if(i == 3){
+                            if(4<=listPerformance.size()){
+                                performance.setId(listPerformance.get(i).getId());
+                            }else{
+                                performance.setId(null);
+                            }
+                            performance.setPiBusinessObligatory(performanceMiddleSaveBusinessDto.getPiBusinessObligatory4());
+                            performance.setPiBusinessMandatory(performanceMiddleSaveBusinessDto.getPiBusinessMandatory4());
+                            performance.setPiBusinessPlanned(performanceMiddleSaveBusinessDto.getPiBusinessPlanned4());
+                        }
+
+                        log.info("신규 등록 "+(i+1)+"번째 대안 : " + performance);
+                        System.out.println();
+
+                        // 중간저장하기2
+                        performanceService.save(performance);
+                    }catch (Exception e){
+                        log.info("예외발생 : "+e);
+                        data.put("again", "again");
+                    }
+
+                }
+            }
+
+        }
+
+        data.put("autoNum", autoNum);
+
+        return ResponseEntity.ok(res.dataSendSuccess(data));
+    }
+
+    // NEWDEAL 성능개선사업평가 Performance3 마지막번째 세이브
+    @PostMapping("/weightSave/{autoNum}")
+    public ResponseEntity<Map<String,Object>> weightSave(@ModelAttribute WeightMapperDto weightMapperDto,@PathVariable String autoNum, HttpServletRequest request) {
+
+        log.info("weightSave 호출성공");
+        AjaxResponse res = new AjaxResponse();
+        HashMap<String, Object> data = new HashMap<>();
+        String JWT_AccessToken = request.getHeader("JWT_AccessToken");
+        String insert_id = request.getHeader("insert_id");
+        log.info("JWT_AccessToken : " + JWT_AccessToken);
+        log.info("insert_id : " + insert_id);
+
+        log.info("일련번호 : "+autoNum);
+
+        List<Performance> performanceList = performanceService.findByPiAutoNumAndInsert_idDel(autoNum,insert_id);
+        log.info("가중치 저장하고, 업데이트할 데이터 : "+performanceList);
+        System.out.println();
+
+        for(int i=0; i<performanceList.size(); i++){
+            Performance performance = modelMapper.map(performanceList.get(i), Performance.class);
+            performance.setPiInputMiddleSave(1);
+            log.info(i+"번째 performance : "+performance);
+            System.out.println();
+            performanceService.save(performance);
+        }
+
+        // 가중치 셋팅
+        Weight weight = modelMapper.map(weightMapperDto, Weight.class);
+        weight.setPiAutoNum(autoNum);
+        weight.setInsert_id(insert_id);
+        weight.setInsertDateTime(LocalDateTime.now());
+        log.info("가중치 : "+weight);
+        weightService.save(weight);
+
+        data.put("autoNum", autoNum);
+
         return ResponseEntity.ok(res.dataSendSuccess(data));
     }
 
@@ -248,7 +567,7 @@ public class PerformanceRestController {
                 Row row = worksheet.getRow(j);
                 Cell cellData = row.getCell(i);
                 CellType ct = cellData.getCellType();
-                log.info("셀타입 : "+ct);
+                log.info(j+" 셀타입 : "+ct);
                 if (ct == CellType.BLANK) {
                     log.info("이곳은 널 입니다.");
                     break;
@@ -300,18 +619,19 @@ public class PerformanceRestController {
                 performance.setPiType(excelList.get(5).toString()); // 형식구분(NULL)
                 performance.setPiErectionCost(Long.parseLong(excelList.get(6).toString())); // 취득원가(NOTNULL)
                 performance.setPiSafetyLevel(excelList.get(7).toString()); // 안전등급(NOTNULL)
-                performance.setPiGoalLevel(excelList.get(8).toString()); // 목표등급(NOTNULL)
-                performance.setPiMaintenanceDelay(Double.parseDouble(excelList.get(9).toString())); // 유지보수기간(NOTNULL)
-                performance.setPiManagement(excelList.get(10).toString()); // 관리주체(NULL)
-                performance.setPiAgency(excelList.get(11).toString()); // 관리감독기관(NULL)
+                performance.setPiUsabilityLevel(excelList.get(8).toString()); // 사용성등급(NOTNULL)
+                performance.setPiGoalLevel(excelList.get(9).toString()); // 목표등급(NOTNULL)
+                performance.setPiMaintenanceDelay(Double.parseDouble(excelList.get(10).toString())); // 유지보수기간(NOTNULL)
+                performance.setPiManagement(excelList.get(11).toString()); // 관리주체(NULL)
+                performance.setPiAgency(excelList.get(12).toString()); // 관리감독기관(NULL)
 
-                performance.setPiAADT(Double.parseDouble(excelList.get(12).toString())); // 연평균일교통량(NOTNULL)
+                performance.setPiAADT(Double.parseDouble(excelList.get(13).toString())); // 연평균일교통량(NOTNULL)
 
-                performance.setPiBusiness(excelList.get(13).toString()); // 사업구분(NOTNULL)
+//                performance.setPiBusiness(excelList.get(14).toString()); // 사업구분(NOTNULL)
+                performance.setPiBusiness(weightMapperDto.getWeight_Category()); // 사업구분(NOTNULL)
                 performance.setPiBusinessType(excelList.get(14).toString()); // 사업유형(NOTNULL)
-                performance.setPiTargetAbsence(excelList.get(15).toString()); // 대상부재(NULL)
-                performance.setPiBusinessClassification(excelList.get(16).toString()); // 사업분류(NOTNULL)
-                performance.setPiBusinessInformation(excelList.get(17).toString()); // 사업내용(NULL)
+                performance.setPiTargetAbsence(excelList.get(16).toString()); // 대상부재(NULL)
+                performance.setPiBusinessClassification(excelList.get(17).toString()); // 사업분류(NOTNULL)
                 performance.setPiBusinessExpenses(Long.parseLong(excelList.get(18).toString())); // 사업비용(NOTNULL)
                 performance.setPiBeforeSafetyRating(excelList.get(19).toString()); // 사업전 부재 안전등급(NOTNULL)
                 performance.setPiAfterSafetyRating(excelList.get(20).toString()); // 사업후 부재 안전등급(NOTNULL)
@@ -365,8 +685,8 @@ public class PerformanceRestController {
 
         String JWT_AccessToken = request.getHeader("JWT_AccessToken");
         String insert_id = request.getHeader("insert_id");
-//        log.info("JWT_AccessToken : "+JWT_AccessToken);
-//        log.info("insert_id : "+insert_id);
+        log.info("JWT_AccessToken : "+JWT_AccessToken);
+        log.info("insert_id : "+insert_id);
 
         if (JWT_AccessToken==null) {
             return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE015.getCode(), ResponseErrorCode.NDE015.getDesc(), ResponseErrorCode.NDE016.getCode(), ResponseErrorCode.NDE016.getDesc()));
@@ -383,6 +703,7 @@ public class PerformanceRestController {
         log.info("가중치 : " + weight);
         log.info("대안리스트 : " + performance);
         log.info("대안사이즈 : " + performance.size());
+        log.info("타입 : " + performance.get(0).getPiFacilityType());
         log.info("=========================");
 
         // 기술성 점수리스트, 등급리스트
@@ -419,6 +740,13 @@ public class PerformanceRestController {
             Map<String,String> safetyLevel  = performanceFunctionService.safetyLevel(performance.get(i).getPiSafetyLevel());
             technicality_scroeList.add(safetyLevel.get("score"));
             technicality_rankList.add(safetyLevel.get("rank"));
+            String type = performance.get(i).getPiFacilityType();
+            // 기술성 - 사용성
+            if(type.equals("교량") || type.equals("터널")){
+                Map<String,String> usabilityLevel  = performanceFunctionService.usabilityLevel(performance.get(i).getPiUsabilityLevel());
+                technicality_scroeList.add(usabilityLevel.get("score"));
+                technicality_rankList.add(usabilityLevel.get("rank"));
+            }
             // 기술성 - 노후도
             Map<String,String> publicYear  = performanceFunctionService.publicYear(performance.get(i).getPiPublicYear());
             technicality_scroeList.add(publicYear.get("score"));
@@ -432,7 +760,7 @@ public class PerformanceRestController {
             technicality_scroeList.add(goal.get("score"));
             technicality_rankList.add(goal.get("rank"));
             // 기술성 - 종합점수 및 등급
-            Map<String, String> technicalityAllScoreRank = performanceFunctionService.technicality_allScoreRank(technicality_scroeList, weight.getPiWeightSafe(), weight.getPiWeightOld(), weight.getPiWeightUrgency(), weight.getPiWeightGoal());
+            Map<String, String> technicalityAllScoreRank = performanceFunctionService.technicality_allScoreRank(type,technicality_scroeList, weight.getPiWeightSafe(),weight.getPiWeightUsability(), weight.getPiWeightOld(), weight.getPiWeightUrgency(), weight.getPiWeightGoal());
             technicality_scroeList.add(technicalityAllScoreRank.get("score"));
             technicality_rankList.add(technicalityAllScoreRank.get("rank"));
 
@@ -469,14 +797,14 @@ public class PerformanceRestController {
             policy_scroeList.add(policyAllScoreRank.get("score"));
             policy_rankList.add(policyAllScoreRank.get("rank"));
 
-//            log.info("technicality_scroeList : " + technicality_scroeList);
-//            log.info("technicality_rankList : " + technicality_rankList);
-//
-//            log.info("economy_scroeList : " + economy_scroeList);
-//            log.info("economy_rankList : " + economy_rankList);
-//
-//            log.info("policy_scroeList : " + policy_scroeList);
-//            log.info("policy_rankList : " + policy_rankList);
+            log.info("technicality_scroeList : " + technicality_scroeList);
+            log.info("technicality_rankList : " + technicality_rankList);
+
+            log.info("economy_scroeList : " + economy_scroeList);
+            log.info("economy_rankList : " + economy_rankList);
+
+            log.info("policy_scroeList : " + policy_scroeList);
+            log.info("policy_rankList : " + policy_rankList);
 
             technicality_scroeMap.put(i,technicality_scroeList);
             technicality_rankMap.put(i,technicality_rankList);
@@ -489,14 +817,14 @@ public class PerformanceRestController {
 
         }
 
-//        log.info("기술성 환산점수 리스트 : " + technicality_scroeMap);
-//        log.info("기술성 환산등급 리스트 : " + technicality_rankMap);
-//
-//        log.info("경제성 환산점수 리스트 : " + economy_scroeMap);
-//        log.info("경제성 환산등급 리스트 : " + economy_rankMap);
-//
-//        log.info("정책성 환산점수 리스트 : " + policy_scroeMap);
-//        log.info("정책성 환산등급 리스트 : " + policy_rankMap);
+        log.info("기술성 환산점수 리스트 : " + technicality_scroeMap);
+        log.info("기술성 환산등급 리스트 : " + technicality_rankMap);
+
+        log.info("경제성 환산점수 리스트 : " + economy_scroeMap);
+        log.info("경제성 환산등급 리스트 : " + economy_rankMap);
+
+        log.info("정책성 환산점수 리스트 : " + policy_scroeMap);
+        log.info("정책성 환산등급 리스트 : " + policy_rankMap);
 
         // 가중치, 대안리스트, 대안갯수
         data.put("weightList",weight);
@@ -541,7 +869,7 @@ public class PerformanceRestController {
             log.info(i+1+"번째 scoreList : "+scoreList);
 
             // 유형별/지표별 가중치는 바뀔수있음.
-            Map<String, Object> all_ScoreRank = performanceFunctionService.all_ScoreRank(scoreList, 0.8, 0.1, 0.1, weight.getPiWeightCriticalScore());
+            Map<String, Object> all_ScoreRank = performanceFunctionService.all_ScoreRank(scoreList, weight.getPiWeightTechnicality(),weight.getPiWeightEconomy(),weight.getPiWeightPolicy(), weight.getPiWeightCriticalScore());
             all_scroeList.add(Double.parseDouble(String.valueOf(all_ScoreRank.get("score"))));
             great_scroeList.add(Double.parseDouble(String.valueOf(all_ScoreRank.get("score"))));
             all_rankList.add(String.valueOf(all_ScoreRank.get("rank")));
@@ -551,11 +879,12 @@ public class PerformanceRestController {
             all_rankMap.put(i,all_rankList);
             all_businessMap.put(i,all_businessList);
 
+            log.info("great_scroeList : "+great_scroeList);
             if(i+1==performance.size()){
                 Double maxVal = Collections.max(great_scroeList);
                 for (int j=0; j<great_scroeList.size(); j++) {
                     if (great_scroeList.get(j).equals(maxVal)) {
-                        Optional<Performance> optionalPerformance = performanceService.findByPiAutoNumAndInsert_idAndPiInputCount(autoNum,insert_id,j);
+                        Optional<Performance> optionalPerformance = performanceService.findByPiAutoNumAndInsert_idAndPiInputCount(autoNum,insert_id,j+1);
                         if(optionalPerformance.isEmpty()){
                             return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE024.getCode(), ResponseErrorCode.NDE024.getDesc(), null, null));
                         }else{
@@ -571,6 +900,7 @@ public class PerformanceRestController {
                             updatePerformance.setPiType(optionalPerformance.get().getPiType());
                             updatePerformance.setPiErectionCost(optionalPerformance.get().getPiErectionCost());
                             updatePerformance.setPiSafetyLevel(optionalPerformance.get().getPiSafetyLevel());
+                            updatePerformance.setPiUsabilityLevel(optionalPerformance.get().getPiUsabilityLevel());
                             updatePerformance.setPiGoalLevel(optionalPerformance.get().getPiGoalLevel());
                             updatePerformance.setPiMaintenanceDelay(optionalPerformance.get().getPiMaintenanceDelay());
                             updatePerformance.setPiManagement(optionalPerformance.get().getPiManagement());
@@ -580,7 +910,6 @@ public class PerformanceRestController {
                             updatePerformance.setPiBusinessType(optionalPerformance.get().getPiBusinessType());
                             updatePerformance.setPiTargetAbsence(optionalPerformance.get().getPiTargetAbsence());
                             updatePerformance.setPiBusinessClassification(optionalPerformance.get().getPiBusinessClassification());
-                            updatePerformance.setPiBusinessInformation(optionalPerformance.get().getPiBusinessInformation());
                             updatePerformance.setPiBusinessExpenses(optionalPerformance.get().getPiBusinessExpenses());
                             updatePerformance.setPiBeforeSafetyRating(optionalPerformance.get().getPiBeforeSafetyRating());
                             updatePerformance.setPiAfterSafetyRating(optionalPerformance.get().getPiAfterSafetyRating());
@@ -602,6 +931,7 @@ public class PerformanceRestController {
                             performanceService.save(updatePerformance);
                         }
                         all_greate.add("우수 대안");
+                        break;
                     } else {
                         all_greate.add("-");
                     }
@@ -609,11 +939,12 @@ public class PerformanceRestController {
             }
         }
 
-//        log.info("종합평가표 환산점수 리스트 : " + all_scroeMap);
-//        log.info("종합평가표 환산등급 리스트 : " + all_rankMap);
-//        log.info("종합평가표 사업성 : " + all_businessMap);
-//        log.info("종합평가표 우수대안 : " + all_greate);
+        log.info("종합평가표 환산점수 리스트 : " + all_scroeMap);
+        log.info("종합평가표 환산등급 리스트 : " + all_rankMap);
+        log.info("종합평가표 사업성 : " + all_businessMap);
+        log.info("종합평가표 우수대안 : " + all_greate);
 
+        data.put("typeName",performance.get(0).getPiFacilityType());
         data.put("allScroeMap",all_scroeMap);
         data.put("allRankMap",all_rankMap);
         data.put("allBusinessMap",all_businessMap);

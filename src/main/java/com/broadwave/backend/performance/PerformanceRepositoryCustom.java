@@ -1,6 +1,7 @@
 package com.broadwave.backend.performance;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Minkyu
@@ -13,4 +14,12 @@ public interface PerformanceRepositoryCustom {
     PerformanceCheckDto findByInsertId(String insert_id);
 
     PerformanceMiddleDataDto findByInsertIAndAutoNum(String insert_id, String autoNum);
+
+    List<PerformanceMiddleBusinessDataDto> findByInsertIAndAutoNum2(String insert_id, String autoNum);
+
+    List<Performance> findByPiAutoNumAndInsert_idDel(String autoNum, String insert_id);
+
+    Performance findByBusiness(String autoNum, String insert_id);
+
+    PerformancePiBusinessDto findByInsertIAndAutoNumAndCount(String insert_id, String autoNum, int count);
 }

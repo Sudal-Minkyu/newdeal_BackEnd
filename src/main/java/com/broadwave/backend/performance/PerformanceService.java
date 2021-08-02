@@ -47,12 +47,32 @@ public class PerformanceService {
         return performanceRepository.findByPiAutoNumAndInsert_id(autoNum,insert_id);
     }
 
+    public Performance findByBusiness(String autoNum, String insert_id) {
+        return performanceRepositoryCustom.findByBusiness(autoNum,insert_id);
+    }
+
+    public List<Performance> findByPiAutoNumAndInsert_idDel(String autoNum, String insert_id) {
+//        return performanceRepository.findByPiAutoNumAndInsert_idDel(autoNum,insert_id);
+        return performanceRepositoryCustom.findByPiAutoNumAndInsert_idDel(autoNum,insert_id);
+    }
+
     public Optional<Performance> findByPiAutoNumAndInsert_idAndPiInputCount(String autoNum, String insert_id, Integer piInputCount) {
         return performanceRepository.findByPiAutoNumAndInsert_idAndPiInputCount(autoNum,insert_id,piInputCount);
     }
 
     public void delete(Performance performance) {
-        log.info("삭제성공");
         performanceRepository.delete(performance);
+    }
+
+    public List<PerformanceMiddleBusinessDataDto> findByInsertIAndAutoNum2(String insert_id, String autoNum) {
+        return performanceRepositoryCustom.findByInsertIAndAutoNum2(insert_id,autoNum);
+    }
+
+    public Optional<Performance> findById(Long id) {
+        return performanceRepository.findById(id);
+    }
+
+    public PerformancePiBusinessDto findByInsertIAndAutoNumAndCount(String insert_id, String autoNum, int count) {
+        return performanceRepositoryCustom.findByInsertIAndAutoNumAndCount(insert_id,autoNum,count);
     }
 }

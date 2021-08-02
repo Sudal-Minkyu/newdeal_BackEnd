@@ -49,6 +49,7 @@ public enum ResponseErrorCode {
     NDE022("NDE022", "기준년도의 물가배수 환산율이 존재하지 않습니다."),
     NDE023("NDE023", "관리자에게 문의해주세요."),
     NDE024("NDE024", "우수대안이 존재하지 않습니다."),
+    NDE025("NDE025", "사업구분을 선택해주세요."),
     ;
 
     private String code;

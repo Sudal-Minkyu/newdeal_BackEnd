@@ -53,6 +53,9 @@ public class Performance {
     @Column(name="pi_safety_level")
     private String piSafetyLevel; // 안전등급(NOTNULL)
 
+    @Column(name="pi_usability_level")
+    private String piUsabilityLevel; // 사용성등급(NOTNULL)
+
     @Column(name="pi_goal_level")
     private String piGoalLevel; // 목표등급(NOTNULL)
 
@@ -79,9 +82,6 @@ public class Performance {
 
     @Column(name="pi_business_classification")
     private String piBusinessClassification; // 사업분류(NOTNULL)
-
-    @Column(name="pi_business_information")
-    private String piBusinessInformation; // 사업내용(NULL)
 
     @Column(name="pi_business_expenses")
     private Long piBusinessExpenses; // 사업비용(NOTNULL)
