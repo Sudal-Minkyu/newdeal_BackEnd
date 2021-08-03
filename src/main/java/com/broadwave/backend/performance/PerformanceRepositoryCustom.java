@@ -1,5 +1,8 @@
 package com.broadwave.backend.performance;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -17,9 +20,12 @@ public interface PerformanceRepositoryCustom {
 
     List<PerformanceMiddleBusinessDataDto> findByInsertIAndAutoNum2(String insert_id, String autoNum);
 
-    List<Performance> findByPiAutoNumAndInsert_idDel(String autoNum, String insert_id);
+    List<Performance> findByPiAutoNumAndInsert_idDel(String autoNum, String insert_id,Integer piInputMiddleSave);
 
     Performance findByBusiness(String autoNum, String insert_id);
 
     PerformancePiBusinessDto findByInsertIAndAutoNumAndCount(String insert_id, String autoNum, int count);
+
+    Page<PerformanceListDto> findByPerformanceList(String piFacilityType, String piKind, String piFacilityName, String insert_id, Pageable pageable);
+
 }

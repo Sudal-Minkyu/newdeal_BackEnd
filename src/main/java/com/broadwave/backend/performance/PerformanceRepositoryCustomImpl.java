@@ -1,11 +1,17 @@
 package com.broadwave.backend.performance;
 
+import com.broadwave.backend.performance.price.PriceDto;
+import com.broadwave.backend.performance.price.QPrice;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPQLQuery;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Minkyu
@@ -152,8 +158,9 @@ public class PerformanceRepositoryCustomImpl extends QuerydslRepositorySupport i
 
     }
 
+    // 대안 원본 리스트 가져오기
     @Override
-    public List<Performance> findByPiAutoNumAndInsert_idDel(String autoNum, String insert_id){
+    public List<Performance> findByPiAutoNumAndInsert_idDel(String autoNum, String insert_id, Integer piInputMiddleSave){
 
         QPerformance performance = QPerformance.performance;
 
@@ -209,7 +216,7 @@ public class PerformanceRepositoryCustomImpl extends QuerydslRepositorySupport i
 
         // 검색조건필터
         query.where(performance.insert_id.eq(insert_id));
-        query.where(performance.piInputMiddleSave.eq(0));
+        query.where(performance.piInputMiddleSave.eq(piInputMiddleSave));
         query.where(performance.piAutoNum.eq(autoNum));
 
         return query.fetch();
@@ -298,6 +305,45 @@ public class PerformanceRepositoryCustomImpl extends QuerydslRepositorySupport i
 
         return query.fetchOne();
 
+    }
+
+    @Override
+    public Page<PerformanceListDto> findByPerformanceList(String piFacilityType, String piKind,String piFacilityName,String insert_id, Pageable pageable) {
+
+        QPerformance performance  = QPerformance.performance;
+
+        JPQLQuery<PerformanceListDto> query = from(performance)
+                .select(Projections.constructor(PerformanceListDto.class,
+                        performance.piAutoNum,
+                        performance.piFacilityType,
+                        performance.piFacilityName,
+                        performance.piCompletionYear,
+                        performance.piErectionCost,
+                        performance.piSafetyLevel,
+                        performance.piGoalLevel,
+                        performance.piBusinessType,
+                        performance.piBusinessExpenses
+                ));
+
+        if (!piFacilityType.equals("")){
+            query.where(performance.piFacilityType.eq(piFacilityType));
+        }
+        if (!piKind.equals("")){
+            query.where(performance.piKind.eq(piKind));
+        }
+        if (!piFacilityName.equals("")){
+            query.where(performance.piFacilityName.containsIgnoreCase(piFacilityName));
+        }
+
+        // 필수조건
+        query.where(performance.insert_id.eq(insert_id)); // 1. 현재 로그인한 유저가 등록한 글만 볼수있게 한다.
+        query.where(performance.piInputGreat.eq(1)); // 2. 우수 대안만 리스트로 출력한다.
+        query.where(performance.piInputMiddleSave.eq(1)); // 3. 중간저장된 글이 아닌 완전히 작성된 대안만 출력한다.
+
+        query.orderBy(performance.id.desc());
+
+        final List<PerformanceListDto> performanceListDtos = Objects.requireNonNull(getQuerydsl()).applyPagination(pageable, query).fetch();
+        return new PageImpl<>(performanceListDtos, pageable, query.fetchCount());
     }
 
 }

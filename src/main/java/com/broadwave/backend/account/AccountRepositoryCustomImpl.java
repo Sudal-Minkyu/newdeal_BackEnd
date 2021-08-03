@@ -55,4 +55,18 @@ public class AccountRepositoryCustomImpl extends QuerydslRepositorySupport imple
         return new PageImpl<>(accounts, pageable, query.fetchCount());
     }
 
+    @Override
+    public AccountRoleNameDto findByRoleAndName(String userid) {
+        QAccount account  = QAccount.account;
+
+        JPQLQuery<AccountRoleNameDto> query = from(account)
+                .select(Projections.constructor(AccountRoleNameDto.class,
+                        account.username,
+                        account.role
+                ));
+
+        query.where(account.userid.eq(userid));
+        return query.fetchOne();
+    }
+
 }

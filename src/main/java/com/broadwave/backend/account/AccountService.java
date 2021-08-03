@@ -48,6 +48,10 @@ public class AccountService {
         accountRepository.delete(account);
     }
 
+    public AccountRoleNameDto findByRoleAndName(String userid) {
+        return accountRepositoryCustom.findByRoleAndName(userid);
+    }
+
 //    public Account modifyAccount(Account account){
 //        //password notencoding
 //

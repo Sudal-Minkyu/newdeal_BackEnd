@@ -11,4 +11,6 @@ import org.springframework.data.domain.Pageable;
  */
 public interface AccountRepositoryCustom {
     Page<AccountDtoWithTeam> findAllBySearchStrings(String userid, String username,String teamname, Pageable pageable);
+
+    AccountRoleNameDto findByRoleAndName(String userid);
 }

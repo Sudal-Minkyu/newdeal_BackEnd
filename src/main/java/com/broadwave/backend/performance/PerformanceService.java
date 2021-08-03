@@ -3,6 +3,8 @@ package com.broadwave.backend.performance;
 import com.broadwave.backend.keygenerate.KeyGenerateService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -51,9 +53,8 @@ public class PerformanceService {
         return performanceRepositoryCustom.findByBusiness(autoNum,insert_id);
     }
 
-    public List<Performance> findByPiAutoNumAndInsert_idDel(String autoNum, String insert_id) {
-//        return performanceRepository.findByPiAutoNumAndInsert_idDel(autoNum,insert_id);
-        return performanceRepositoryCustom.findByPiAutoNumAndInsert_idDel(autoNum,insert_id);
+    public List<Performance> findByPiAutoNumAndInsert_idDel(String autoNum, String insert_id,Integer piInputMiddleSave) {
+        return performanceRepositoryCustom.findByPiAutoNumAndInsert_idDel(autoNum,insert_id,piInputMiddleSave);
     }
 
     public Optional<Performance> findByPiAutoNumAndInsert_idAndPiInputCount(String autoNum, String insert_id, Integer piInputCount) {
@@ -75,4 +76,9 @@ public class PerformanceService {
     public PerformancePiBusinessDto findByInsertIAndAutoNumAndCount(String insert_id, String autoNum, int count) {
         return performanceRepositoryCustom.findByInsertIAndAutoNumAndCount(insert_id,autoNum,count);
     }
+
+    public Page<PerformanceListDto> findByPerformanceList(String piFacilityType, String piKind, String piFacilityName, String insert_id, Pageable pageable) {
+        return performanceRepositoryCustom.findByPerformanceList(piFacilityType, piKind, piFacilityName, insert_id, pageable);
+    }
+
 }

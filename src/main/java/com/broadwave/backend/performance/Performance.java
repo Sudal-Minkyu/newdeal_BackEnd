@@ -33,7 +33,7 @@ public class Performance {
     private String piFacilityType; // 시설유형(NOTNULL)
 
     @Column(name="pi_facility_name")
-    private String piFacilityName; // 시설유형(NULL)
+    private String piFacilityName; // 시설명(NULL)
 
     @Column(name="pi_kind")
     private String piKind; // 종별구분(NOTNULL)

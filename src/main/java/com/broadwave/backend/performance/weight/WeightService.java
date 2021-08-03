@@ -4,6 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 /**
  * @author Minkyu
  * Date : 2021-07-14
@@ -28,4 +30,13 @@ public class WeightService {
     public WeightDto findByAutoNum(String autoNum){
         return weigthRepositoryCustom.findByAutoNum(autoNum);
     }
+
+    public void delete(Weight weight){
+        weightRepository.delete(weight);
+    }
+
+    public Optional<Weight> findByAutoNumAndInsertId(String autoNum, String insert_id) {
+        return weightRepository.findByAutoNumAndInsertId(autoNum,insert_id);
+    }
+
 }

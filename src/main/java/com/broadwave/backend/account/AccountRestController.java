@@ -284,6 +284,19 @@ public class AccountRestController {
 //    }
 //
 
+    // NEWDEAL AccountInfo rolename 가져오기위헌 API
+    @PostMapping("rolename")
+    public ResponseEntity<Map<String,Object>> rolename(@RequestParam (value="userid", defaultValue="") String userid){
+
+        AjaxResponse res = new AjaxResponse();
+        HashMap<String, Object> data = new HashMap<>();
+
+        AccountRoleNameDto account = accountService.findByRoleAndName(userid);
+        data.put("accountData",account);
+
+        return ResponseEntity.ok(res.dataSendSuccess(data));
+    }
+
 
 
 

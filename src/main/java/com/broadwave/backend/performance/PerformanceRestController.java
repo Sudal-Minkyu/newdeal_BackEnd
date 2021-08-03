@@ -12,9 +12,10 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.hibernate.HibernateException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -163,8 +164,9 @@ public class PerformanceRestController {
         String insert_id = request.getHeader("insert_id");
         log.info("JWT_AccessToken : "+JWT_AccessToken);
         log.info("insert_id : "+insert_id);
+        log.info("삭제 할 일련번호 : "+autoNum);
 
-        List<Performance> optionalPerformance = performanceService.findByPiAutoNumAndInsert_idDel(autoNum,insert_id);
+        List<Performance> optionalPerformance = performanceService.findByPiAutoNumAndInsert_idDel(autoNum,insert_id,0);
         log.info("삭제 optionalPerformance : "+optionalPerformance);
         for(int i=0; i<optionalPerformance.size(); i++){
             performanceService.delete(optionalPerformance.get(i));
@@ -475,7 +477,7 @@ public class PerformanceRestController {
 
         log.info("일련번호 : "+autoNum);
 
-        List<Performance> performanceList = performanceService.findByPiAutoNumAndInsert_idDel(autoNum,insert_id);
+        List<Performance> performanceList = performanceService.findByPiAutoNumAndInsert_idDel(autoNum,insert_id,0);
         log.info("가중치 저장하고, 업데이트할 데이터 : "+performanceList);
         System.out.println();
 
@@ -953,8 +955,52 @@ public class PerformanceRestController {
         return ResponseEntity.ok(res.dataSendSuccess(data));
     }
 
+    // NEWDEAL 성능개선사업평가 조회페이지 (우수대안의 대한 리스트만 출력함)
+    @GetMapping("/list")
+    public ResponseEntity<Map<String,Object>> list(@RequestParam("piFacilityType")String piFacilityType, @RequestParam("piKind")String piKind,@RequestParam("piFacilityName")String piFacilityName, Pageable pageable,HttpServletRequest request) {
 
+        log.info("performanceList 호출성공");
 
+        AjaxResponse res = new AjaxResponse();
 
+        String JWT_AccessToken = request.getHeader("JWT_AccessToken");
+        String insert_id = request.getHeader("insert_id");
+        log.info("JWT_AccessToken : "+JWT_AccessToken);
+
+        // 검색조건
+        log.info("insert_id : "+insert_id);
+//        log.info("piFacilityType : "+piFacilityType);
+//        log.info("piKind : "+piKind);
+//        log.info("piFacilityName : "+piFacilityName);
+        Page<PerformanceListDto> performanceListDtoPage = performanceService.findByPerformanceList(piFacilityType, piKind,piFacilityName, insert_id, pageable);
+        return ResponseEntity.ok(res.ResponseEntityPage(performanceListDtoPage));
+    }
+
+    // NEWDEAL 성능개선사업평가 Input 아니오를 누르면 중간저장된 게시물을 삭제 할 함수
+    @PostMapping("/del")
+    public ResponseEntity<Map<String,Object>> del(@RequestParam("autoNum")String autoNum,HttpServletRequest request) {
+
+        log.info("del 호출성공");
+
+        AjaxResponse res = new AjaxResponse();
+
+        String JWT_AccessToken = request.getHeader("JWT_AccessToken");
+        String insert_id = request.getHeader("insert_id");
+        log.info("JWT_AccessToken : "+JWT_AccessToken);
+        log.info("insert_id : "+insert_id);
+        log.info("삭제 할 일련번호 : "+autoNum);
+
+        List<Performance> optionalPerformance = performanceService.findByPiAutoNumAndInsert_idDel(autoNum,insert_id,1);
+        log.info("삭제 optionalPerformance : "+optionalPerformance);
+        for (Performance performance : optionalPerformance) {
+            performanceService.delete(performance);
+        }
+
+        Optional<Weight> optionalWeight = weightService.findByAutoNumAndInsertId(autoNum,insert_id);
+        log.info("삭제 optionalWeight : "+optionalWeight);
+        optionalWeight.ifPresent(weightService::delete);
+
+        return ResponseEntity.ok(res.success());
+    }
 
 }
