@@ -118,8 +118,7 @@ public class PerformanceRestController {
         log.info("insert_id : "+insert_id);
 
         List<PerformanceMiddleBusinessDataDto> performance = performanceService.findByInsertIAndAutoNum2(insert_id,autoNum);
-        log.info("middleData performance : "+performance);
-
+//        log.info("middleData performance : "+performance);
         data.put("piBusiness",performance.get(0).getPiBusiness());
         if(performance.get(0).getPiBusiness()!=null){
             data.put("performance",performance);
@@ -254,6 +253,11 @@ public class PerformanceRestController {
 
         Performance optionalPerformance = performanceService.findByBusiness(autoNum,insert_id);
 
+        log.info("PiBusiness : "+performanceMiddleSaveBusinessDto.getPiBusiness());
+        if(performanceMiddleSaveBusinessDto.getPiBusiness()==null){
+            return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE025.getCode(), ResponseErrorCode.NDE025.getDesc(),null,null));
+        }
+
         if(optionalPerformance == null ){
             log.info("존재하지않음.");
         }else {
@@ -278,7 +282,7 @@ public class PerformanceRestController {
                     Performance performance = modelMapper.map(optionalPerformance, Performance.class);
 
                     performance.setPiBusiness(performanceMiddleSaveBusinessDto.getPiBusiness());
-                    performance.setPiBusinessType(performanceMiddleSaveBusinessDto.getPiBusinessType().get(i));
+
                     performance.setPiTargetAbsence(performanceMiddleSaveBusinessDto.getPiTargetAbsence().get(i));
                     performance.setPiBusinessClassification(performanceMiddleSaveBusinessDto.getPiBusinessClassification().get(i));
                     performance.setPiBusinessExpenses(performanceMiddleSaveBusinessDto.getPiBusinessExpenses().get(i));
@@ -294,6 +298,7 @@ public class PerformanceRestController {
 
                     if (i == 0 ) {
                         performance.setId(listPerformance.get(i).getId());
+                        performance.setPiBusinessType(performanceMiddleSaveBusinessDto.getPiBusinessType1());
                         performance.setPiBusinessObligatory(performanceMiddleSaveBusinessDto.getPiBusinessObligatory1());
                         performance.setPiBusinessMandatory(performanceMiddleSaveBusinessDto.getPiBusinessMandatory1());
                         performance.setPiBusinessPlanned(performanceMiddleSaveBusinessDto.getPiBusinessPlanned1());
@@ -315,6 +320,7 @@ public class PerformanceRestController {
                             //신규일때,
                             performance.setId(null);
                         }
+                        performance.setPiBusinessType(performanceMiddleSaveBusinessDto.getPiBusinessType2());
                         performance.setPiBusinessObligatory(performanceMiddleSaveBusinessDto.getPiBusinessObligatory2());
                         performance.setPiBusinessMandatory(performanceMiddleSaveBusinessDto.getPiBusinessMandatory2());
                         performance.setPiBusinessPlanned(performanceMiddleSaveBusinessDto.getPiBusinessPlanned2());
@@ -334,7 +340,6 @@ public class PerformanceRestController {
                     Performance performance = modelMapper.map(optionalPerformance, Performance.class);
 
                     performance.setPiBusiness(performanceMiddleSaveBusinessDto.getPiBusiness());
-                    performance.setPiBusinessType(performanceMiddleSaveBusinessDto.getPiBusinessType().get(i));
                     performance.setPiTargetAbsence(performanceMiddleSaveBusinessDto.getPiTargetAbsence().get(i));
                     performance.setPiBusinessClassification(performanceMiddleSaveBusinessDto.getPiBusinessClassification().get(i));
                     performance.setPiBusinessExpenses(performanceMiddleSaveBusinessDto.getPiBusinessExpenses().get(i));
@@ -350,6 +355,7 @@ public class PerformanceRestController {
 
                     if (i == 0 ) {
                         performance.setId(listPerformance.get(i).getId());
+                        performance.setPiBusinessType(performanceMiddleSaveBusinessDto.getPiBusinessType1());
                         performance.setPiBusinessObligatory(performanceMiddleSaveBusinessDto.getPiBusinessObligatory1());
                         performance.setPiBusinessMandatory(performanceMiddleSaveBusinessDto.getPiBusinessMandatory1());
                         performance.setPiBusinessPlanned(performanceMiddleSaveBusinessDto.getPiBusinessPlanned1());
@@ -366,6 +372,7 @@ public class PerformanceRestController {
                         }else{
                             performance.setId(null);
                         }
+                        performance.setPiBusinessType(performanceMiddleSaveBusinessDto.getPiBusinessType2());
                         performance.setPiBusinessObligatory(performanceMiddleSaveBusinessDto.getPiBusinessObligatory2());
                         performance.setPiBusinessMandatory(performanceMiddleSaveBusinessDto.getPiBusinessMandatory2());
                         performance.setPiBusinessPlanned(performanceMiddleSaveBusinessDto.getPiBusinessPlanned2());
@@ -375,6 +382,7 @@ public class PerformanceRestController {
                         }else{
                             performance.setId(null);
                         }
+                        performance.setPiBusinessType(performanceMiddleSaveBusinessDto.getPiBusinessType3());
                         performance.setPiBusinessObligatory(performanceMiddleSaveBusinessDto.getPiBusinessObligatory3());
                         performance.setPiBusinessMandatory(performanceMiddleSaveBusinessDto.getPiBusinessMandatory3());
                         performance.setPiBusinessPlanned(performanceMiddleSaveBusinessDto.getPiBusinessPlanned3());
@@ -395,7 +403,6 @@ public class PerformanceRestController {
                         Performance performance = modelMapper.map(optionalPerformance, Performance.class);
 
                         performance.setPiBusiness(performanceMiddleSaveBusinessDto.getPiBusiness());
-                        performance.setPiBusinessType(performanceMiddleSaveBusinessDto.getPiBusinessType().get(i));
                         performance.setPiTargetAbsence(performanceMiddleSaveBusinessDto.getPiTargetAbsence().get(i));
                         performance.setPiBusinessClassification(performanceMiddleSaveBusinessDto.getPiBusinessClassification().get(i));
                         performance.setPiBusinessExpenses(performanceMiddleSaveBusinessDto.getPiBusinessExpenses().get(i));
@@ -411,6 +418,7 @@ public class PerformanceRestController {
 
                         if (i == 0) {
                             performance.setId(listPerformance.get(i).getId());
+                            performance.setPiBusinessType(performanceMiddleSaveBusinessDto.getPiBusinessType1());
                             performance.setPiBusinessObligatory(performanceMiddleSaveBusinessDto.getPiBusinessObligatory1());
                             performance.setPiBusinessMandatory(performanceMiddleSaveBusinessDto.getPiBusinessMandatory1());
                             performance.setPiBusinessPlanned(performanceMiddleSaveBusinessDto.getPiBusinessPlanned1());
@@ -420,6 +428,7 @@ public class PerformanceRestController {
                             }else{
                                 performance.setId(null);
                             }
+                            performance.setPiBusinessType(performanceMiddleSaveBusinessDto.getPiBusinessType2());
                             performance.setPiBusinessObligatory(performanceMiddleSaveBusinessDto.getPiBusinessObligatory2());
                             performance.setPiBusinessMandatory(performanceMiddleSaveBusinessDto.getPiBusinessMandatory2());
                             performance.setPiBusinessPlanned(performanceMiddleSaveBusinessDto.getPiBusinessPlanned2());
@@ -429,6 +438,7 @@ public class PerformanceRestController {
                             }else{
                                 performance.setId(null);
                             }
+                            performance.setPiBusinessType(performanceMiddleSaveBusinessDto.getPiBusinessType3());
                             performance.setPiBusinessObligatory(performanceMiddleSaveBusinessDto.getPiBusinessObligatory3());
                             performance.setPiBusinessMandatory(performanceMiddleSaveBusinessDto.getPiBusinessMandatory3());
                             performance.setPiBusinessPlanned(performanceMiddleSaveBusinessDto.getPiBusinessPlanned3());
@@ -438,6 +448,7 @@ public class PerformanceRestController {
                             }else{
                                 performance.setId(null);
                             }
+                            performance.setPiBusinessType(performanceMiddleSaveBusinessDto.getPiBusinessType4());
                             performance.setPiBusinessObligatory(performanceMiddleSaveBusinessDto.getPiBusinessObligatory4());
                             performance.setPiBusinessMandatory(performanceMiddleSaveBusinessDto.getPiBusinessMandatory4());
                             performance.setPiBusinessPlanned(performanceMiddleSaveBusinessDto.getPiBusinessPlanned4());

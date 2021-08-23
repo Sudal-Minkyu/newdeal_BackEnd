@@ -39,6 +39,11 @@ public class UserLogRestController {
                                                      HttpServletRequest request){
         AjaxResponse res = new AjaxResponse();
 
+        String JWT_AccessToken = request.getHeader("JWT_AccessToken");
+        String insert_id = request.getHeader("insert_id");
+        log.info("JWT_AccessToken : "+JWT_AccessToken);
+        log.info("insert_id : "+insert_id);
+
         UserLog userLog = new UserLog();
 
         userLog.setUseMenu1(menuName1);
@@ -46,7 +51,7 @@ public class UserLogRestController {
         userLog.setUseType(useType);
         userLog.setSearchstring(data);
         userLog.setInsertDateTime(LocalDateTime.now());
-        userLog.setInsert_id("insert_id");
+        userLog.setInsert_id(insert_id);
 
         userLogService.save(userLog);
 
