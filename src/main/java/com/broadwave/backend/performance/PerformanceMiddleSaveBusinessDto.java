@@ -21,6 +21,11 @@ public class PerformanceMiddleSaveBusinessDto {
 
     private String piBusiness; // 사업구분(NOTNULL)
 
+    private String piBusinessType1; // 사업유형1(NOTNULL)
+    private String piBusinessType2; // 사업유형2(NOTNULL)
+    private String piBusinessType3; // 사업유형3(NOTNULL)
+    private String piBusinessType4; // 사업유형4(NOTNULL)
+
     private List<String> piBusinessType; // 사업유형(NOTNULL)
     private List<String> piTargetAbsence; // 대상부재(NULL)
     private List<String> piBusinessClassification; // 사업분류(NOTNULL)
