@@ -176,13 +176,6 @@ public class LifeAllTimeRestController {
             HashMap<String,Double> chartData;
             for(int stage=1; stage<26; stage++){ // 25바퀴 고정
 
-                chartData  = new HashMap<>();
-
-                chartData.put("category", 10.0);
-                chartData.put("maintenance",0.98);
-                chartData.put("noAction", 0.89);
-                chartDataList.add(chartData);
-
                 List<Double> performYear = new ArrayList<>(); // 보수보강수행시기(년) 리스트
                 List<Double> discountRateList = new ArrayList<>(); // 할인율적용 누적 보수보강비용 리스트
                 List<Double> costYear = new ArrayList<>(); // 원/년 리스트
@@ -308,8 +301,14 @@ public class LifeAllTimeRestController {
                 checkCostList.add(checkCost);
                 managementCostList.add(managementCost);
 
-                // 그래프로 보낼 데이터 뽑기
+                // 그래프로 보낼 데이터 뽑기 여기서 시작
                 // 공용연수(x축)은 0년~100년까지 하되 0년,0.5년,1년,1.5년~99.5년,100년으로 한다. 너무 많을시 줄이기.
+                chartData  = new HashMap<>();
+
+                chartData.put("category", 10.0);
+                chartData.put("maintenance",0.98);
+                chartData.put("noAction", 0.89);
+                chartDataList.add(chartData);
 
             }
 
@@ -327,6 +326,7 @@ public class LifeAllTimeRestController {
             data.put("ltAbsenceName",absenceDto.getLtAbsenceName());
 
             log.info("차트 테스트 : "+chartDataList);
+            log.info("차트 데이터 길이 : "+chartDataList.size());
             data.put("chartDataList",chartDataList);
 
         }else{
