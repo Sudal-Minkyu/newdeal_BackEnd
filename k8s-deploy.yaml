@@ -42,3 +42,11 @@ spec:
               value: NEWDEAL_API_SECURITY_URL_TAG
             - name: NEWDEAL_API_BACKEND_URL
               value: NEWDEAL_API_BACKEND_URL_TAG
+            - name: NEWDEAL_API_BACKEND_PROTOCOL
+              value: NEWDEAL_API_BACKEND_PROTOCOL_TAG
+            - name: NEWDEAL_API_FRONT_PROTOCOL
+              value: NEWDEAL_API_FRONT_PROTOCOL_TAG
+            - name: NEWDEAL_API_SECURITY_PROTOCOL
+              value: NEWDEAL_API_SECURITY_PROTOCOL_TAG
+            - name: NEWDEAL_FILEUPLOAD_URL
+              value: NEWDEAL_FILEUPLOAD_URL_TAG
