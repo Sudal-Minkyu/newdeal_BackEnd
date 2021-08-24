@@ -104,19 +104,20 @@ public class LifeAllTimeRestController {
             double rankB = ltDamageBRank-(ltStatusTwo*Math.pow(ltDamageBRank,2)+ltStatusOne*ltDamageBRank+ltStatusNum);
             double rankC = ltDamageCRank-(ltStatusTwo*Math.pow(ltDamageCRank,2)+ltStatusOne*ltDamageCRank+ltStatusNum);
             double rankD = ltDamageDRank-(ltStatusTwo*Math.pow(ltDamageDRank,2)+ltStatusOne*ltDamageDRank+ltStatusNum);
-            double rankE = ltDamageERank-(ltStatusTwo*Math.pow(ltDamageERank,2)+ltStatusOne*ltDamageERank+ltStatusNum);
+//            double rankE = ltDamageERank-(ltStatusTwo*Math.pow(ltDamageERank,2)+ltStatusOne*ltDamageERank+ltStatusNum);
+            double rankE = 0.0; // 전면교체로 가정하여 교체 신성교량이 되므로, 보수보강 수행 후 E등급 손상지수는 0으로 고정함.
 
             List<Double> damageRankList = new ArrayList<>();
             damageRankList.add(rankB);
             damageRankList.add(rankC);
             damageRankList.add(rankD);
             damageRankList.add(rankE);
-            for(int i=0; i<damageRankList.size(); i++){
-                if(damageRankList.get(i)<0){
-                    damageRankList.remove(damageRankList.get(i));
-                    damageRankList.add(0.0);
-                }
-            }
+//            for(int i=0; i<damageRankList.size(); i++){
+//                if(damageRankList.get(i)<0){
+//                    damageRankList.remove(damageRankList.get(i));
+//                    damageRankList.add(0.0);
+//                }
+//            }
 
             double costB = (ltRemunerationThree*Math.pow(ltDamageBRank,3)+ltRemunerationTwo*Math.pow(ltDamageBRank,2)+ltRemunerationOne*ltDamageBRank+ltRemunerationNum)*ltAllVolume;
             double costC =(ltRemunerationThree*Math.pow(ltDamageCRank,3)+ltRemunerationTwo*Math.pow(ltDamageCRank,2)+ltRemunerationOne*ltDamageCRank+ltRemunerationNum)*ltAllVolume;
