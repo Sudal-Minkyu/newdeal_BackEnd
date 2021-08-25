@@ -170,7 +170,13 @@ public class LifeAllTimeRestController {
             double repairYear; // 보수보강수행시기
             double costYearVal; // 원년
 
+            List<Double> damageRankYearList = new ArrayList<>(); // 보수보강수행시기 리스트
+            List<Double> ltDeteriorationList = new ArrayList<>(); // 적용된 기울기 리스트
+            List<Double> pointViewEarlyList = new ArrayList<>(); // 시점 초기값(b) 리스트
+            List<Double> pointViewList = new ArrayList<>(); // 시점 리스트
 
+            double pointView = 0; // 시점
+            double pointViewEarly = 0; // 시점 초기값(b)
 
             //person의 JSON정보를 담을 Array 선언
             List<HashMap<String,Double>> chartDataList = new ArrayList<>();
@@ -259,9 +265,17 @@ public class LifeAllTimeRestController {
                 log.info(stage+"단계 원/년 : "+costYear);
                 System.out.println();
 
+                if(stage!=1){
+                    pointViewEarly = damageRank; // 시점 초기값(b) 입력
+                }
+
                 // 1~25단계까지 변하지 않는 값
                 changeRankNum = rankList.get(thNum); // 전 단계 수행전등급
                 damageRank = damageRankList.get(thNum); // 보수보강 수행후등급
+
+                if(stage!=1){
+                    pointView = damageRankYear; // 시점 입력
+                }
 
                 // 1~25단계까지 변하는 값
                 damageRankYear = performYear.get(thNum); // 보수보강 수행시기(년)
@@ -302,22 +316,57 @@ public class LifeAllTimeRestController {
                 checkCostList.add(checkCost);
                 managementCostList.add(managementCost);
 
-                // 그래프로 보낼 데이터 뽑기 여기서 시작
-                // 공용연수(x축)은 0년~100년까지 하되 0년,0.5년,1년,1.5년~99.5년,100년으로 한다. 너무 많을시 줄이기.
-                chartData  = new HashMap<>();
 
-                chartData.put("category", 10.0);
-                chartData.put("maintenance",0.98);
-                chartData.put("noAction", 0.89);
-                chartDataList.add(chartData);
+                System.out.println();
+                log.info("차트 단계 : "+stage);
+                log.info("차트 적용된 기울기 : "+ltDeterioration);
+                log.info("차트 시점 : "+pointView);
+                log.info("차트 보수보강수행시기(년) : "+damageRankYear);
+                log.info("차트 시점 초기값(b) : "+pointViewEarly);
+                System.out.println();
 
+                damageRankYearList.add(damageRankYear);
+                ltDeteriorationList.add(ltDeterioration);
+                pointViewEarlyList.add(pointViewEarly);
+                pointViewList.add(pointView);
             }
 
-            log.info("periodicCountList : "+periodicCountList);
-            log.info("closeCountList : "+closeCountList);
-            log.info("safetyCountList : "+safetyCountList);
-            log.info("checkCostList : "+checkCostList);
-            log.info("managementCostList : "+managementCostList);
+            // 1단계 D.I 구하는 식 -> 적용된기울기 *(공용연수^2)
+            // 2단계부터 적용하기. D.I 구하는 식 -> ( 공용연수 - 해당단계의 시점값)^2 * 적용된기울기 + 시점 초기값
+            log.info("보수보강수행시기 리스트 : "+damageRankYearList);
+            log.info("적용된기울기 리스트 : "+ltDeteriorationList);
+            log.info("시점 초기값 리스트 : "+pointViewEarlyList);
+            log.info("시점 리스트 : "+pointViewList);
+
+            // 무조치의 적용된 기울기
+            double noMaintanance;
+            double noMaintananceltDeterioration = ltDeteriorationList.get(0);
+            // 차트데이터 값 for문
+            for(double year=0; year<1001; year++){
+                // 그래프로 보낼 데이터 뽑기 여기서 시작
+                chartData  = new HashMap<>();
+
+                // 공용연수 0.1년 단위
+                double publicYear = year/10;
+
+                // 무조치시 값
+                noMaintanance = noMaintananceltDeterioration*Math.pow(publicYear,2);
+                noMaintanance = 1-noMaintanance;
+                if(noMaintanance<0){
+                    noMaintanance = 0.0;
+                }
+
+                chartData.put("category", publicYear);
+                chartData.put("maintenance",0.99);
+                chartData.put("noAction", noMaintanance);
+                chartDataList.add(chartData);
+            }
+
+//            log.info("periodicCountList : "+periodicCountList);
+//            log.info("closeCountList : "+closeCountList);
+//            log.info("safetyCountList : "+safetyCountList);
+//            log.info("checkCostList : "+checkCostList);
+//            log.info("managementCostList : "+managementCostList);
 
             data.put("periodicCountList",periodicCountList);
             data.put("closeCountList",closeCountList);
