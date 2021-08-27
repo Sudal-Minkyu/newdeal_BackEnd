@@ -362,9 +362,9 @@ public class LifeAllTimeRestController {
                 }else {
                     if(change==0){
                         if (publicYear != startDamageRankYear) {
-                            maintanance = startLtDeterioration * (Math.pow(publicYear, 2));
+                            maintanance = 1-startLtDeterioration * (Math.pow(publicYear, 2));
                         }else{
-                            maintanance = startLtDeterioration * (Math.pow(publicYear, 2));
+                            maintanance = 1-startLtDeterioration * (Math.pow(publicYear, 2));
                             change++;
                             startDamageRankYear = damageRankYearList.get(change);
                             startLtDeterioration = ltDeteriorationList.get(change);
@@ -374,9 +374,9 @@ public class LifeAllTimeRestController {
                     }else{
                         if(state == 0){
                             if (publicYear != startDamageRankYear) {
-                                maintanance = Math.pow(publicYear-startPointViewList,2)*startLtDeterioration+startPointViewEarly;
+                                maintanance = 1-Math.pow(publicYear-startPointViewList,2)*startLtDeterioration+startPointViewEarly;
                             }else{
-                                maintanance = Math.pow(publicYear-startPointViewList,2)*startLtDeterioration+startPointViewEarly;
+                                maintanance = 1-Math.pow(publicYear-startPointViewList,2)*startLtDeterioration+startPointViewEarly;
                                 change++;
                                 startDamageRankYear = damageRankYearList.get(change);
                                 startLtDeterioration = ltDeteriorationList.get(change);
