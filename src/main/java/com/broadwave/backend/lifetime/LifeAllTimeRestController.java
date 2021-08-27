@@ -338,16 +338,63 @@ public class LifeAllTimeRestController {
             log.info("시점 초기값 리스트 : "+pointViewEarlyList);
             log.info("시점 리스트 : "+pointViewList);
 
+            // 선제적 유지관리 기울기
+            double maintanance;
             // 무조치의 적용된 기울기
             double noMaintanance;
+
+            int state = 0;
             double noMaintananceltDeterioration = ltDeteriorationList.get(0);
+            int change = 0;
+            double startDamageRankYear = damageRankYearList.get(change); // 보수보강수행시기
+            double startLtDeterioration = ltDeteriorationList.get(change); // 적용된기울기
+            double startPointViewEarly = pointViewEarlyList.get(change); // 시좀초기값
+            double startPointViewList = pointViewList.get(change); // 시점
             // 차트데이터 값 for문
             for(double year=0; year<1001; year++){
-                // 그래프로 보낼 데이터 뽑기 여기서 시작
-                chartData  = new HashMap<>();
 
                 // 공용연수 0.1년 단위
                 double publicYear = year/10;
+
+                // 선제적 유지관리 값
+                if(year == 0){
+                    maintanance = 0;
+                }else {
+                    if(change==0){
+                        if (publicYear != startDamageRankYear) {
+                            maintanance = startLtDeterioration * (Math.pow(publicYear, 2));
+                        }else{
+                            maintanance = startLtDeterioration * (Math.pow(publicYear, 2));
+                            change++;
+                            startDamageRankYear = damageRankYearList.get(change);
+                            startLtDeterioration = ltDeteriorationList.get(change);
+                            startPointViewEarly = pointViewEarlyList.get(change);
+                            startPointViewList = pointViewList.get(change);
+                        }
+                    }else{
+                        if(state == 0){
+                            if (publicYear != startDamageRankYear) {
+                                maintanance = Math.pow(publicYear-startPointViewList,2)*startLtDeterioration+startPointViewEarly;
+                            }else{
+                                maintanance = Math.pow(publicYear-startPointViewList,2)*startLtDeterioration+startPointViewEarly;
+                                change++;
+                                startDamageRankYear = damageRankYearList.get(change);
+                                startLtDeterioration = ltDeteriorationList.get(change);
+                                startPointViewEarly = pointViewEarlyList.get(change);
+                                startPointViewList = pointViewList.get(change);
+                            }
+                            if(Math.round(maintanance) == 1){
+                                state++;
+                            }
+                        }else{
+                            maintanance = 0.0;
+                        }
+
+                    }
+                }
+
+                // 그래프로 보낼 데이터 뽑기 여기서 시작
+                chartData  = new HashMap<>();
 
                 // 무조치시 값
                 noMaintanance = noMaintananceltDeterioration*Math.pow(publicYear,2);
@@ -357,7 +404,7 @@ public class LifeAllTimeRestController {
                 }
 
                 chartData.put("category", publicYear);
-                chartData.put("maintenance",0.99);
+                chartData.put("maintenance",maintanance);
                 chartData.put("noAction", noMaintanance);
                 chartDataList.add(chartData);
             }
