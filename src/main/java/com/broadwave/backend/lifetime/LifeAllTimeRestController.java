@@ -346,19 +346,19 @@ public class LifeAllTimeRestController {
             int state = 0;
             double noMaintananceltDeterioration = ltDeteriorationList.get(0);
             int change = 0;
-            double startDamageRankYear = damageRankYearList.get(change); // 보수보강수행시기
+            double startDamageRankYear = Math.floor(damageRankYearList.get(change)*10)/10.0; // 보수보강수행시기
             double startLtDeterioration = ltDeteriorationList.get(change); // 적용된기울기
             double startPointViewEarly = pointViewEarlyList.get(change); // 시좀초기값
             double startPointViewList = pointViewList.get(change); // 시점
-            // 차트데이터 값 for문
+            // 차트데이터 값 for문 알고리즘 천번돌아야됨.
             for(double year=0; year<1001; year++){
-
                 // 공용연수 0.1년 단위
                 double publicYear = year/10;
+//                log.info(publicYear+"년도의 "+"보수보강수행시기 : "+startDamageRankYear);
 
                 // 선제적 유지관리 값
                 if(year == 0){
-                    maintanance = 0;
+                    maintanance = 1.0;
                 }else {
                     if(change==0){
                         if (publicYear != startDamageRankYear) {
@@ -366,7 +366,7 @@ public class LifeAllTimeRestController {
                         }else{
                             maintanance = 1-startLtDeterioration * (Math.pow(publicYear, 2));
                             change++;
-                            startDamageRankYear = damageRankYearList.get(change);
+                            startDamageRankYear = Math.floor(damageRankYearList.get(change)*10)/10.0; // 보수보강수행시기
                             startLtDeterioration = ltDeteriorationList.get(change);
                             startPointViewEarly = pointViewEarlyList.get(change);
                             startPointViewList = pointViewList.get(change);
@@ -374,22 +374,31 @@ public class LifeAllTimeRestController {
                     }else{
                         if(state == 0){
                             if (publicYear != startDamageRankYear) {
-                                maintanance = 1-Math.pow(publicYear-startPointViewList,2)*startLtDeterioration+startPointViewEarly;
+                                double publicPoint = Math.pow(publicYear-startPointViewList,2);
+                                double resultdi = publicPoint*startLtDeterioration+startPointViewEarly;
+                                maintanance = 1-resultdi;
                             }else{
-                                maintanance = 1-Math.pow(publicYear-startPointViewList,2)*startLtDeterioration+startPointViewEarly;
+                                double publicPoint = Math.pow(publicYear-startPointViewList,2);
+                                double resultdi = publicPoint*startLtDeterioration+startPointViewEarly;
+                                maintanance = 1-resultdi;
                                 change++;
-                                startDamageRankYear = damageRankYearList.get(change);
+                                startDamageRankYear = Math.floor(damageRankYearList.get(change)*10)/10.0; // 보수보강수행시기
                                 startLtDeterioration = ltDeteriorationList.get(change);
                                 startPointViewEarly = pointViewEarlyList.get(change);
                                 startPointViewList = pointViewList.get(change);
                             }
-                            if(Math.round(maintanance) == 1){
+
+                            if(Math.floor(maintanance*100000)/100000.0 == 0.99999){
+                                log.info("");
+                                log.info("여기서부터 종료시점이다");
+                                log.info("");
                                 state++;
+                                maintanance = 0.0;
                             }
                         }else{
                             maintanance = 0.0;
                         }
-
+//                        log.info(publicYear+"년도의 "+"메인텐스 : "+maintanance); // 14.9, 15.0 부터 0.874 가 나와야함.
                     }
                 }
 
