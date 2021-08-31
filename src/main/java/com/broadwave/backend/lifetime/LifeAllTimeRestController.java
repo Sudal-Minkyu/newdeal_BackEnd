@@ -2,6 +2,7 @@ package com.broadwave.backend.lifetime;
 
 import com.broadwave.backend.common.AjaxResponse;
 import com.broadwave.backend.common.ResponseErrorCode;
+import com.broadwave.backend.keygenerate.KeyGenerateService;
 import com.broadwave.backend.lifetime.absence.AbsenceDto;
 import com.broadwave.backend.lifetime.absence.AbsenceService;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -27,12 +29,14 @@ public class LifeAllTimeRestController {
     private final ModelMapper modelMapper;
     private final AbsenceService absenceService;
     private final LifeAllTimeService lifeAllTimeService;
+    private final KeyGenerateService keyGenerateService;
 
     @Autowired
-    public LifeAllTimeRestController(ModelMapper modelMapper, AbsenceService absenceService, LifeAllTimeService lifeAllTimeService) {
+    public LifeAllTimeRestController(ModelMapper modelMapper, AbsenceService absenceService, LifeAllTimeService lifeAllTimeService,KeyGenerateService keyGenerateService) {
         this.modelMapper = modelMapper;
         this.absenceService = absenceService;
         this.lifeAllTimeService = lifeAllTimeService;
+        this.keyGenerateService = keyGenerateService;
     }
 
     // NEWDEAL 생애주기 의사결정 지원 서비스 전체부분 저장
@@ -46,13 +50,20 @@ public class LifeAllTimeRestController {
 
         String JWT_AccessToken = request.getHeader("JWT_AccessToken");
         String insert_id = request.getHeader("insert_id");
-        log.info("JWT_AccessToken : "+JWT_AccessToken);
-        log.info("insert_id : "+insert_id);
+
+//        log.info("JWT_AccessToken : "+JWT_AccessToken);
+//        log.info("insert_id : "+insert_id);
 
         LifeAllTime lifeAllTime = modelMapper.map(lifeAllTimeMapperDto, LifeAllTime.class);
+
+//        log.info("일련번호 생성");
+        Date now = new Date();
+        SimpleDateFormat yyMM = new SimpleDateFormat("yyMM");
+        String newAutoNum = keyGenerateService.keyGenerate("nd_lt_all_input", yyMM.format(now), insert_id);
+        lifeAllTime.setLtBridgeCode(newAutoNum);
         lifeAllTime.setInsertDateTime(LocalDateTime.now());
         lifeAllTime.setInsert_id(insert_id);
-        log.info("lifeAllTime : "+lifeAllTime);
+//        log.info("lifeAllTime : "+lifeAllTime);
 
         LifeAllTime allTime = lifeAllTimeService.save(lifeAllTime);
 
@@ -83,6 +94,7 @@ public class LifeAllTimeRestController {
             double ltAllVolume = lifeAllTimeDto.getLtAllVolume();
 
             List<Double> rankList = new ArrayList<>();
+            List<Double> rankList2 = new ArrayList<>();
             double ltDamageBRank = lifeAllTimeDto.getLtDamageBRank();
             double ltDamageCRank = lifeAllTimeDto.getLtDamageCRank();
             double ltDamageDRank = lifeAllTimeDto.getLtDamageDRank();
@@ -91,6 +103,9 @@ public class LifeAllTimeRestController {
             rankList.add(ltDamageCRank);
             rankList.add(ltDamageDRank);
             rankList.add(ltDamageERank);
+            rankList2.add(ltDamageCRank);
+            rankList2.add(ltDamageDRank);
+            rankList2.add(ltDamageERank);
 
             double ltRemunerationThree = absenceDto.getLtRemunerationThree();
             double ltRemunerationTwo = absenceDto.getLtRemunerationTwo();
@@ -112,12 +127,10 @@ public class LifeAllTimeRestController {
             damageRankList.add(rankC);
             damageRankList.add(rankD);
             damageRankList.add(rankE);
-//            for(int i=0; i<damageRankList.size(); i++){
-//                if(damageRankList.get(i)<0){
-//                    damageRankList.remove(damageRankList.get(i));
-//                    damageRankList.add(0.0);
-//                }
-//            }
+            List<Double> damageRankList2 = new ArrayList<>();
+            damageRankList2.add(rankC);
+            damageRankList2.add(rankD);
+            damageRankList2.add(rankE);
 
             double costB = (ltRemunerationThree*Math.pow(ltDamageBRank,3)+ltRemunerationTwo*Math.pow(ltDamageBRank,2)+ltRemunerationOne*ltDamageBRank+ltRemunerationNum)*ltAllVolume;
             double costC =(ltRemunerationThree*Math.pow(ltDamageCRank,3)+ltRemunerationTwo*Math.pow(ltDamageCRank,2)+ltRemunerationOne*ltDamageCRank+ltRemunerationNum)*ltAllVolume;
@@ -129,6 +142,10 @@ public class LifeAllTimeRestController {
             costRankList.add(costC);
             costRankList.add(costD);
             costRankList.add(costE);
+            List<Double> costRankList2 = new ArrayList<>();
+            costRankList2.add(costC);
+            costRankList2.add(costD);
+            costRankList2.add(costE);
 
             double discount = 1/(1+ltDiscountRate);
 
@@ -170,35 +187,64 @@ public class LifeAllTimeRestController {
             double repairYear; // 보수보강수행시기
             double costYearVal; // 원년
 
-            List<Double> damageRankYearList = new ArrayList<>(); // 보수보강수행시기 리스트
-            List<Double> ltDeteriorationList = new ArrayList<>(); // 적용된 기울기 리스트
-            List<Double> pointViewEarlyList = new ArrayList<>(); // 시점 초기값(b) 리스트
-            List<Double> pointViewList = new ArrayList<>(); // 시점 리스트
+            List<Double> damageRankYearList = new ArrayList<>(); // 선제적 유지관리 보수보강수행시기 리스트
+            List<Double> ltDeteriorationList = new ArrayList<>(); // 선제적 유지관리  적용된 기울기 리스트
+            List<Double> pointViewEarlyList = new ArrayList<>(); // 선제적 유지관리 시점 초기값(b) 리스트
+            List<Double> pointViewList = new ArrayList<>(); // 선제적 유지관리 시점 리스트
 
-            double pointView = 0; // 시점
-            double pointViewEarly = 0; // 시점 초기값(b)
+            double ltDeterioration2; // 단계별 평균열화율
+            double changeRankNum2 = 0; // 전 단계 수행전등급
+            double damageRank2 = 0; // 보수보강 수행후등급
+            double damageRankYear2 = 0; // 보수보강 수행시기(년)
+            double repairYear2; // 보수보강수행시기
+            double discountRate2 = 0; // 할인율 적용 보수보강비용
+
+            List<Double> damageRankYearList2 = new ArrayList<>(); // 현행 유지관리 보수보강수행시기 리스트
+            List<Double> ltDeteriorationList2 = new ArrayList<>(); // 현행 유지관리 적용된 기울기 리스트
+            List<Double> pointViewEarlyList2 = new ArrayList<>(); // 현행 유지관리 시점 초기값(b) 리스트
+            List<Double> pointViewList2 = new ArrayList<>(); // 현행 유지관리 시점 리스트
+
+            double pointView = 0; // 선제적 유지관리 시점
+            double pointViewEarly = 0; // 선제적 유지관리 시점 초기값(b)
+
+            double pointView2 = 0; // 현행 유지관리 시점
+            double pointViewEarly2 = 0; // 현행 유지관리 시점 초기값(b)
 
             //person의 JSON정보를 담을 Array 선언
             List<HashMap<String,Double>> chartDataList = new ArrayList<>();
             HashMap<String,Double> chartData;
+
+
             for(int stage=1; stage<26; stage++){ // 25바퀴 고정
 
-                List<Double> performYear = new ArrayList<>(); // 보수보강수행시기(년) 리스트
-                List<Double> discountRateList = new ArrayList<>(); // 할인율적용 누적 보수보강비용 리스트
-                List<Double> costYear = new ArrayList<>(); // 원/년 리스트
+                List<Double> performYear = new ArrayList<>(); // 선행유지관리 보수보강수행시기(년) 리스트
+                List<Double> discountRateList = new ArrayList<>(); // 선행유지관리 할인율적용 누적 보수보강비용 리스트
+                List<Double> costYear = new ArrayList<>(); // 선행유지관리 원/년 리스트
+
+                List<Double> performYear2 = new ArrayList<>(); // 선행유지관리 현행유지관리 보수보강수행시기(년) 리스트
+                List<Double> discountRateList2 = new ArrayList<>(); // 선행유지관리 할인율적용 누적 보수보강비용 리스트
+                List<Double> costYear2 = new ArrayList<>(); // 선행유지관리 원/년 리스트
+
                 if(stage==1){
                     ltDeterioration = absenceDto.getLtDeterioration();
+                    ltDeterioration2 = absenceDto.getLtDeterioration();
                 }else{
                     if(changeRankNum == 1.0){
                         ltDeterioration = absenceDto.getLtDeterioration();
                     }else{
                         ltDeterioration = absenceDto.getLtDeterioration()*(Math.pow(ltIncrease,stage-1));
                     }
+                    if(changeRankNum2 == 1.0){
+                        ltDeterioration2 = absenceDto.getLtDeterioration();
+                    }else{
+                        ltDeterioration2 = absenceDto.getLtDeterioration()*(Math.pow(ltIncrease,stage-1));
+                    }
                 }
 
-                log.info(stage+"단계 평균열화율  : "+ltDeterioration);
-
-                for(int step=1; step<5; step++){ // 5바퀴 고정
+//                log.info(stage+"단계 선제적 유지관리 평균열화율  : "+ltDeterioration);
+//                log.info(stage+"단계 현행 유지관리 평균열화율  : "+ltDeterioration2);
+                // 선제적 유지관리
+                for(int step=1; step<5; step++){ // 4바퀴 고정
 
                     // 1단계와 2~25단계까지 식이 다른 값들.
                     if(stage==1){
@@ -242,14 +288,55 @@ public class LifeAllTimeRestController {
                     // 원/년 리스트에 담기 : costYear
                     costYear.add(cost_year);
 
-//                    log.info(i+"단계 arrival_ERank : "+arrival_ERank);
-//                    log.info(i+"단계 periodic : "+periodic);
-//                    log.info(i+"단계 close : "+close);
-//                    log.info(i+"단계 safety : "+safety);
-//                    log.info(i+"단계 check_cost : "+check_cost);
-//                    log.info(i+"단계 all_cost : "+all_cost);
-//                    log.info(i+"단계 cost_year : "+cost_year);
-//                    log.info("@@@@@@@@@@@@@@@@@");
+                }
+
+                // 현행유지관리
+                for(int step=1; step<4; step++){ // 3바퀴 고정
+
+                    // 1단계와 2~25단계까지 식이 다른 값들.
+                    if(stage==1){
+                        repairYear2 = Math.pow((rankList2.get(step - 1) / ltDeterioration2), 0.5); // 보수보강 수행시기(년)
+                        performYear2.add(repairYear2); // 보수보강 수행시기(년) 리스트로 저장
+
+                        discountRateList2.add(costRankList2.get(step-1)*1/Math.pow((1+lifeAllTimeDto.getLtDiscountRate()),repairYear2)); // 누적 보수보강비용(원) 리스트로 저장
+                    }else{
+
+                        repairYear2 = damageRankYear2+Math.sqrt((rankList2.get(step-1)-damageRank2)/ltDeterioration2); // 보수보강 수행시기(년)
+                        performYear2.add(repairYear2); // 보수보강 수행시기(년) 리스트로 저장
+
+                        discountRateList2.add(costRankList2.get(step-1)*1/Math.pow((1+lifeAllTimeDto.getLtDiscountRate()),repairYear2)+discountRate2); // 누적 보수보강비용(원) 리스트로 저장
+                    }
+
+                    // 1~25단계까지 식이 같은 값들.
+
+                    // 보수보강후 E등급 도달시기(년)
+                    double arrival_ERank = Math.pow( (1-damageRankList2.get(step-1)) / (ltDeterioration2*ltIncrease),0.5)+repairYear2;
+
+                    // 총 점검비용 계산하기
+                    // 1. 정기점검 횟수
+                    double periodic = Math.floor(arrival_ERank/lifeAllTimeDto.getLtPeriodicFrequency());
+
+                    // 2. 정밀점검 횟수
+                    double close = Math.floor(arrival_ERank/lifeAllTimeDto.getLtCloseFrequency());
+
+                    // 3. 정밀안전진단 횟수
+                    double safety;
+                    if(arrival_ERank<15){
+                        safety = 1.0;
+                    }else{
+                        safety = Math.floor(1+((arrival_ERank-10)/lifeAllTimeDto.getLtSafetyFrequency()));
+                    }
+
+                    // 4. 총 점검비용
+                    double check_cost2 = lifeAllTimeDto.getLtPeriodicCost()*ltPeriodicRn*(1-Math.pow(ltPeriodicRn,periodic))/(1-ltPeriodicRn) + lifeAllTimeDto.getLtCloseCost()*ltCloseRn*(1-Math.pow(ltCloseRn,close))/(1-ltCloseRn) + lifeAllTimeDto.getLtSafetyCost()*ltSafetyRn*(1-Math.pow(ltSafetyRn,safety+1))/(1-ltSafetyRn)- lifeAllTimeDto.getLtSafetyCost()*ltSafetyRn;
+
+                    // 총 유지관리비용 = 누적 보수보강비용(discountRateList.get(j)) + 총 점검비용
+                    double all_cost2 = discountRateList2.get(step-1)+check_cost2;
+                    // 원/년 = 총 유지관리비용 / 보수보강후 E등급 도달시기(년)
+                    double cost_year2 = all_cost2/arrival_ERank;
+                    // 원/년 리스트에 담기 : costYear
+                    costYear2.add(cost_year2);
+
                 }
 
                 int thNum = 0;
@@ -260,21 +347,32 @@ public class LifeAllTimeRestController {
                         break;
                     }
                 }
-                log.info(stage+"단계 보수보강수행시기(년)  : "+performYear);
-                log.info(stage+"단계 누적 보수보강비용(원) : "+discountRateList);
-                log.info(stage+"단계 원/년 : "+costYear);
-                System.out.println();
+
+                int thNum2 = 0;
+                Double minVal2 = Collections.min(costYear2);
+                for (int x=0; x<3; x++) {
+                    if (costYear2.get(x).equals(minVal2)) {
+                        thNum2 = x;
+                        break;
+                    }
+                }
 
                 if(stage!=1){
                     pointViewEarly = damageRank; // 시점 초기값(b) 입력
+                    pointViewEarly2 = damageRank2; // 시점 초기값(b) 입력
                 }
 
-                // 1~25단계까지 변하지 않는 값
+                // 선제적 유지관리 1~25단계까지 변하지 않는 값
                 changeRankNum = rankList.get(thNum); // 전 단계 수행전등급
                 damageRank = damageRankList.get(thNum); // 보수보강 수행후등급
 
+                // 현행 유지관리 1~25단계까지 변하지 않는 값
+                changeRankNum2 = rankList2.get(thNum2); // 전 단계 수행전등급
+                damageRank2 = damageRankList2.get(thNum2); // 보수보강 수행후등급
+
                 if(stage!=1){
                     pointView = damageRankYear; // 시점 입력
+                    pointView2 = damageRankYear2; // 시점 입력
                 }
 
                 // 1~25단계까지 변하는 값
@@ -282,11 +380,9 @@ public class LifeAllTimeRestController {
                 discountRate = discountRateList.get(thNum); // [할인율 적용] 누적 보수보강비용
                 costYearVal = costYear.get(thNum); // 원년
 
-                log.info("선택된 값의 보수보강 수행전등급 changeRankNum : "+changeRankNum);
-                log.info("선택된 값의 보수보강 수행후등급 damageRank : "+damageRank);
-                log.info("선택된 값의 보수보강수행시기(년) damageRankYear : "+damageRankYear);
-                log.info("선택된 값의 누적 보수보강비용(원) discountRate : "+discountRate);
-                log.info("");
+                // 1~25단계까지 변하는 값
+                damageRankYear2 = performYear2.get(thNum2); // 보수보강 수행시기(년)
+                discountRate2 = discountRateList2.get(thNum2); // [할인율 적용] 누적 보수보강비용
 
                 double periodicCount = Math.floor(damageRankYear/lifeAllTimeDto.getLtPeriodicFrequency()); // 정기점검 횟수
                 double closeCount = Math.floor(damageRankYear/lifeAllTimeDto.getLtCloseFrequency()); // 정밀점검 횟수
@@ -304,62 +400,77 @@ public class LifeAllTimeRestController {
                 double checkCost = checkCostStep1+checkCostStep2+checkCostStep3-checkCostStep4;
                 double managementCost = discountRate+checkCost;
 
-                log.info("periodicCount : "+periodicCount);
-                log.info("closeCount : "+closeCount);
-                log.info("safetyCount : "+safetyCount);
-                log.info("checkCost : "+checkCost);
-                log.info("managementCost : "+managementCost);
-
                 periodicCountList.add(periodicCount);
                 closeCountList.add(closeCount);
                 safetyCountList.add(safetyCount);
                 checkCostList.add(checkCost);
                 managementCostList.add(managementCost);
 
-
-                System.out.println();
-                log.info("차트 단계 : "+stage);
-                log.info("차트 적용된 기울기 : "+ltDeterioration);
-                log.info("차트 시점 : "+pointView);
-                log.info("차트 보수보강수행시기(년) : "+damageRankYear);
-                log.info("차트 시점 초기값(b) : "+pointViewEarly);
-                System.out.println();
-
                 damageRankYearList.add(damageRankYear);
                 ltDeteriorationList.add(ltDeterioration);
                 pointViewEarlyList.add(pointViewEarly);
                 pointViewList.add(pointView);
+
+                damageRankYearList2.add(damageRankYear2);
+                ltDeteriorationList2.add(ltDeterioration2);
+                pointViewEarlyList2.add(pointViewEarly2);
+                pointViewList2.add(pointView2);
+
             }
+
+
 
             // 1단계 D.I 구하는 식 -> 적용된기울기 *(공용연수^2)
             // 2단계부터 적용하기. D.I 구하는 식 -> ( 공용연수 - 해당단계의 시점값)^2 * 적용된기울기 + 시점 초기값
-            log.info("보수보강수행시기 리스트 : "+damageRankYearList);
-            log.info("적용된기울기 리스트 : "+ltDeteriorationList);
-            log.info("시점 초기값 리스트 : "+pointViewEarlyList);
-            log.info("시점 리스트 : "+pointViewList);
+//            log.info("선제적 유지관리 보수보강수행시기 리스트 : "+damageRankYearList);
+//            log.info("선제적 유지관리 적용된기울기 리스트 : "+ltDeteriorationList);
+//            log.info("선제적 유지관리 시점 초기값 리스트 : "+pointViewEarlyList);
+//            log.info("선제적 유지관리 시점 리스트 : "+pointViewList);
+//            log.info("");
+//            log.info("현행 유지관리 보수보강수행시기 리스트 : "+damageRankYearList2);
+//            log.info("현행 유지관리 적용된기울기 리스트 : "+ltDeteriorationList2);
+//            log.info("현행 유지관리 시점 초기값 리스트 : "+pointViewEarlyList2);
+//            log.info("현행 유지관리 시점 리스트 : "+pointViewList2);
 
             // 선제적 유지관리 기울기
             double maintanance;
             // 무조치의 적용된 기울기
             double noMaintanance;
 
+            // 현행 유지관리 기울기
+            double maintanance2;
+
+
+            double noMaintananceltDeterioration = absenceDto.getLtDeterioration();
+
+            // 선제적 유지관리
             int state = 0;
-            double noMaintananceltDeterioration = ltDeteriorationList.get(0);
             int change = 0;
             double startDamageRankYear = Math.floor(damageRankYearList.get(change)*10)/10.0; // 보수보강수행시기
             double startLtDeterioration = ltDeteriorationList.get(change); // 적용된기울기
             double startPointViewEarly = pointViewEarlyList.get(change); // 시좀초기값
             double startPointViewList = pointViewList.get(change); // 시점
+
+            // 현행 유지관리
+            int state2 = 0;
+            int change2 = 0;
+            double startDamageRankYear2 = Math.floor(damageRankYearList2.get(change2)*10)/10.0; // 보수보강수행시기
+            double startLtDeterioration2 = ltDeteriorationList2.get(change2); // 적용된기울기
+            double startPointViewEarly2 = pointViewEarlyList2.get(change2); // 시좀초기값
+            double startPointViewList2 = pointViewList2.get(change2); // 시점
+
+
             // 차트데이터 값 for문 알고리즘 천번돌아야됨.
             for(double year=0; year<1001; year++){
                 // 공용연수 0.1년 단위
                 double publicYear = year/10;
-//                log.info(publicYear+"년도의 "+"보수보강수행시기 : "+startDamageRankYear);
 
-                // 선제적 유지관리 값
+                // 그래프 선제적유지관리, 현행유지관리 데이터 계산
                 if(year == 0){
                     maintanance = 1.0;
+                    maintanance2 = 1.0;
                 }else {
+                    // 선제적 유지관리 값
                     if(change==0){
                         if (publicYear != startDamageRankYear) {
                             maintanance = 1-startLtDeterioration * (Math.pow(publicYear, 2));
@@ -373,33 +484,66 @@ public class LifeAllTimeRestController {
                         }
                     }else{
                         if(state == 0){
-                            if (publicYear != startDamageRankYear) {
-                                double publicPoint = Math.pow(publicYear-startPointViewList,2);
-                                double resultdi = publicPoint*startLtDeterioration+startPointViewEarly;
-                                maintanance = 1-resultdi;
-                            }else{
-                                double publicPoint = Math.pow(publicYear-startPointViewList,2);
-                                double resultdi = publicPoint*startLtDeterioration+startPointViewEarly;
-                                maintanance = 1-resultdi;
+                            double publicPoint = Math.pow(publicYear-startPointViewList,2);
+                            double resultdi = publicPoint*startLtDeterioration+startPointViewEarly;
+                            maintanance = 1-resultdi;
+                            if (publicYear == startDamageRankYear) {
                                 change++;
-                                startDamageRankYear = Math.floor(damageRankYearList.get(change)*10)/10.0; // 보수보강수행시기
+                                startDamageRankYear = Math.floor(damageRankYearList.get(change) * 10) / 10.0; // 보수보강수행시기
                                 startLtDeterioration = ltDeteriorationList.get(change);
                                 startPointViewEarly = pointViewEarlyList.get(change);
                                 startPointViewList = pointViewList.get(change);
                             }
 
                             if(Math.floor(maintanance*100000)/100000.0 == 0.99999){
-                                log.info("");
-                                log.info("여기서부터 종료시점이다");
-                                log.info("");
+//                                log.info("");
+//                                log.info("여기서부터 종료시점이다");
+//                                log.info("");
                                 state++;
                                 maintanance = 0.0;
                             }
                         }else{
                             maintanance = 0.0;
                         }
-//                        log.info(publicYear+"년도의 "+"메인텐스 : "+maintanance); // 14.9, 15.0 부터 0.874 가 나와야함.
                     }
+
+                    // 현행 유지관리 값
+                    if(change2==0){
+                        if (publicYear != startDamageRankYear2) {
+                            maintanance2 = 1-startLtDeterioration2 * (Math.pow(publicYear, 2));
+                        }else{
+                            maintanance2 = 1-startLtDeterioration2 * (Math.pow(publicYear, 2));
+                            change2++;
+                            startDamageRankYear2 = Math.floor(damageRankYearList2.get(change2)*10)/10.0; // 보수보강수행시기
+                            startLtDeterioration2 = ltDeteriorationList2.get(change2);
+                            startPointViewEarly2 = pointViewEarlyList2.get(change2);
+                            startPointViewList2 = pointViewList2.get(change2);
+                        }
+                    }else{
+                        if(state2 == 0){
+                            double publicPoint = Math.pow(publicYear-startPointViewList2,2);
+                            double resultdi = publicPoint*startLtDeterioration2+startPointViewEarly2;
+                            maintanance2 = 1-resultdi;
+                            if (publicYear == startDamageRankYear2) {
+                                change2++;
+                                startDamageRankYear2 = Math.floor(damageRankYearList2.get(change2) * 10) / 10.0; // 보수보강수행시기
+                                startLtDeterioration2 = ltDeteriorationList2.get(change2);
+                                startPointViewEarly2 = pointViewEarlyList2.get(change2);
+                                startPointViewList2 = pointViewList2.get(change2);
+                            }
+
+                            if(Math.floor(maintanance2*100000)/100000.0 == 0.99999){
+//                                log.info("");
+//                                log.info("여기서부터 종료시점이다");
+//                                log.info("");
+                                state2++;
+                                maintanance2 = 0.0;
+                            }
+                        }else{
+                            maintanance2 = 0.0;
+                        }
+                    }
+
                 }
 
                 // 그래프로 보낼 데이터 뽑기 여기서 시작
@@ -413,8 +557,15 @@ public class LifeAllTimeRestController {
                 }
 
                 chartData.put("category", publicYear);
-                chartData.put("maintenance",maintanance);
-                chartData.put("noAction", noMaintanance);
+                chartData.put("maintenance", Math.floor(maintanance*1000)/1000.0);
+                chartData.put("noAction", Math.floor(noMaintanance*1000)/1000.0);
+                chartData.put("maintenance2", Math.floor(maintanance2*1000)/1000.0);
+
+                chartData.put("aRank", Math.floor((1-0.1)*10)/10.0);
+                chartData.put("bRank", Math.floor((1-ltDamageBRank)*10)/10.0);
+                chartData.put("cRank", Math.floor((1-ltDamageCRank)*10)/10.0);
+                chartData.put("dRank", Math.floor((1-ltDamageDRank)*10)/10.0);
+
                 chartDataList.add(chartData);
             }
 
@@ -431,8 +582,8 @@ public class LifeAllTimeRestController {
             data.put("managementCostList",managementCostList);
             data.put("ltAbsenceName",absenceDto.getLtAbsenceName());
 
-            log.info("차트 테스트 : "+chartDataList);
-            log.info("차트 데이터 길이 : "+chartDataList.size());
+//            log.info("차트 테스트 : "+chartDataList);
+//            log.info("차트 데이터 길이 : "+chartDataList.size());
             data.put("chartDataList",chartDataList);
 
         }else{
