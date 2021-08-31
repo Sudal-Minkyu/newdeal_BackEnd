@@ -18,7 +18,7 @@ import org.slf4j.Logger;
 @Slf4j
 public class LifeAllTimeMapperDto {
 
-    private String ltBridgeCode; // 교량코드(NULL)
+//    private String ltBridgeCode; // 교량코드(NULL)
     private String ltBridgeName; // 교량명(NULL)
     private String ltSpanNum; // 경간수(NOTNULL)
     private String ltAbsenceCode; // 부재코드(NOTNULL)
@@ -43,9 +43,9 @@ public class LifeAllTimeMapperDto {
         return log;
     }
 
-    public String getLtBridgeCode() {
-        return ltBridgeCode;
-    }
+//    public String getLtBridgeCode() {
+//        return ltBridgeCode;
+//    }
 
     public String getLtBridgeName() {
         return ltBridgeName;
