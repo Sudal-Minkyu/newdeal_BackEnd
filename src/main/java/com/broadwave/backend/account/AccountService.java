@@ -33,7 +33,7 @@ public class AccountService {
 
     public Account saveAccount(Account account){
         account.setPassword(passwordEncoder.encode(account.getPassword()));
-        return this.accountRepository.save(account);
+        return accountRepository.save(account);
     }
 
     public Optional<Account> findByUserid(String userid ){
@@ -50,6 +50,11 @@ public class AccountService {
 
     public AccountRoleNameDto findByRoleAndName(String userid) {
         return accountRepositoryCustom.findByRoleAndName(userid);
+    }
+
+    public Account registerAccount(Account account){
+        account.setPassword(passwordEncoder.encode(account.getPassword()));
+        return accountRepository.save(account);
     }
 
 //    public Account modifyAccount(Account account){

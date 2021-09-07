@@ -297,6 +297,63 @@ public class AccountRestController {
         return ResponseEntity.ok(res.dataSendSuccess(data));
     }
 
+    @PostMapping("register")
+    public ResponseEntity<Map<String,Object>> accountRegister(@ModelAttribute AccountRegisterMapperDto accountRegisterMapperDto, HttpServletRequest request){
+
+        AjaxResponse res = new AjaxResponse();
+
+        Account account = modelMapper.map(accountRegisterMapperDto, Account.class);
+        Optional<Team> optionalTeam = teamService.findByTeamcode(accountRegisterMapperDto.getTeamcode());
+
+        log.info("account ; "+account);
+
+        //패스워드를 입력하세요.
+        if (accountRegisterMapperDto.getPassword() == null || accountRegisterMapperDto.getPassword().equals("")){
+            return ResponseEntity.ok(res.fail(ResponseErrorCode.E006.getCode(), ResponseErrorCode.E006.getDesc(),null,null));
+        }else{
+            //암호검토
+            if(!accountRegisterMapperDto.getPassword().equals(accountRegisterMapperDto.getCheck_password()) ){
+                log.info("비밀번호와 비밀번호 확인과 일치하지 않습니다.");
+                return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE026.getCode(),ResponseErrorCode.NDE026.getDesc(),null,null));
+            }
+        }
+
+        //아이디를 입력하세요.
+        if (accountRegisterMapperDto.getUserid() == null || accountRegisterMapperDto.getUserid().equals("")){
+            log.info(ResponseErrorCode.E007.getDesc());
+            return ResponseEntity.ok(res.fail(ResponseErrorCode.E007.getCode(), ResponseErrorCode.E007.getDesc(),null,null));
+        }
+
+        //부서코드가 존재하지않으면
+        if (optionalTeam.isEmpty()) {
+            return ResponseEntity.ok(res.fail(ResponseErrorCode.E005.getCode(), ResponseErrorCode.E005.getDesc(),null,null));
+        }else{
+            Team team = optionalTeam.get();
+            account.setTeam(team);
+        }
+
+        Optional<Account> optionalAccount = accountService.findByUserid(account.getUserid());
+
+//        String JWT_AccessToken = request.getHeader("JWT_AccessToken");
+//        String insert_id = request.getHeader("insert_id");
+//        log.info("JWT_AccessToken : "+JWT_AccessToken);
+//        log.info("insert_id : "+insert_id);
+
+        //userid 중복체크
+        if (optionalAccount.isPresent()) {
+                log.info("사용자저장실패(사용자아이디중복) 사용자아이디: '" + account.getUserid() + "'");
+                return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE001.getCode(), ResponseErrorCode.NDE001.getDesc(),null,null));
+        }else{
+            account.setRole(AccountRole.ROLE_USER);
+            account.setInsert_id(accountRegisterMapperDto.getUserid());
+            account.setInsertDateTime(LocalDateTime.now());
+        }
+
+        Account accountSave =  accountService.registerAccount(account);
+
+        log.info("회원가입 성공 : id '" + accountSave.getUserid() + "'");
+        return ResponseEntity.ok(res.success());
+    }
 
 
 

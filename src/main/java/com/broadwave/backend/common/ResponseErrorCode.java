@@ -50,6 +50,7 @@ public enum ResponseErrorCode {
     NDE023("NDE023", "관리자에게 문의해주세요."),
     NDE024("NDE024", "우수대안이 존재하지 않습니다."),
     NDE025("NDE025", "사업구분을 선택해주세요."),
+    NDE026("NDE026", "비밀번호가 일치하지않습니다."),
     ;
 
     private String code;

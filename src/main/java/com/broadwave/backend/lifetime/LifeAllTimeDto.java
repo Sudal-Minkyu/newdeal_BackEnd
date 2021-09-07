@@ -22,12 +22,18 @@ public class LifeAllTimeDto {
     private String ltSpanNum; // 경간수(NOTNULL)
     private String ltAbsenceCode; // 부재코드(NOTNULL)
 
+    private Double ltAllTeaRoad; // 차로수(NOTNULL)
+    private String ltAllKind; // 종별구분(NOTNULL)
+    private Double ltAllLength; // 연장(NOTNULL)
+    private Double ltAllArea; // 폭(NOTNULL)
+    private String ltAllCompletionDate; // 준공일자(NOTNULL)
+    private Double ltAllVolume; // 전체물량(NOTNULL)
+
     private Double ltDamageBRank; // B등급 손상지수(NOTNULL)
     private Double ltDamageCRank; // C등급 손상지수(NOTNULL)
     private Double ltDamageDRank; // D등급 손상지수(NOTNULL)
     private Double ltDamageERank; // E등급 손상지수(NOTNULL)
 
-    private Double ltAllVolume; // 전체물량(NOTNULL)
     private Double ltDiscountRate; // 할인율(NOTNULL)
     private Double ltIncrease; // 열화증가율(NOTNULL)
 
