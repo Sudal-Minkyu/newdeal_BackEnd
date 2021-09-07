@@ -29,12 +29,18 @@ public class LifeAllTimeRepositoryCustomImpl extends QuerydslRepositorySupport i
                         lifeAllTime.ltSpanNum,
                         lifeAllTime.ltAbsenceCode,
 
+                        lifeAllTime.ltAllTeaRoad,
+                        lifeAllTime.ltAllKind,
+                        lifeAllTime.ltAllLength,
+                        lifeAllTime.ltAllArea,
+                        lifeAllTime.ltAllCompletionDate,
+                        lifeAllTime.ltAllVolume,
+
                         lifeAllTime.ltDamageBRank,
                         lifeAllTime.ltDamageCRank,
                         lifeAllTime.ltDamageDRank,
                         lifeAllTime.ltDamageERank,
 
-                        lifeAllTime.ltAllVolume,
                         lifeAllTime.ltDiscountRate,
                         lifeAllTime.ltIncrease,
 

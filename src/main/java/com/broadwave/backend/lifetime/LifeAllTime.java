@@ -38,6 +38,23 @@ public class LifeAllTime {
     @Column(name="lt_absence_code")
     private String ltAbsenceCode; // 부재코드(NOTNULL)
 
+    @Column(name="lt_all_tea_road")
+    private Double ltAllTeaRoad; // 차로수(NOTNULL)
+
+    @Column(name="lt_all_kind")
+    private String ltAllKind; // 종별구분(NOTNULL)
+
+    @Column(name="lt_all_length")
+    private Double ltAllLength; // 연장(NOTNULL)
+
+    @Column(name="lt_all_area")
+    private Double ltAllArea; // 폭(NOTNULL)
+
+    @Column(name="lt_all_completion_date")
+    private String ltAllCompletionDate; // 준공일자(NOTNULL)
+
+    @Column(name="lt_all_volume")
+    private Double ltAllVolume; // 전체물량(NOTNULL)
 
     @Column(name="lt_damage_b_rank")
     private Double ltDamageBRank; // B등급 손상지수(NOTNULL)
@@ -51,9 +68,6 @@ public class LifeAllTime {
     @Column(name="lt_damage_e_rank")
     private Double ltDamageERank; // E등급 손상지수(NOTNULL)
 
-
-    @Column(name="lt_all_volume")
-    private Double ltAllVolume; // 전체물량(NOTNULL)
 
     @Column(name="lt_discount_rate")
     private Double ltDiscountRate; // 할인율(NOTNULL)

@@ -215,15 +215,16 @@ public class LifeAllTimeRestController {
             List<HashMap<String,Double>> chartDataList = new ArrayList<>();
             HashMap<String,Double> chartData;
 
+            List<Double> discountAccumulateList = new ArrayList<>(); // 선행유지관리 할인율적용 자바스크립트 누적 보수보강비용 리스트
 
             for(int stage=1; stage<26; stage++){ // 25바퀴 고정
 
-                List<Double> performYear = new ArrayList<>(); // 선행유지관리 보수보강수행시기(년) 리스트
                 List<Double> discountRateList = new ArrayList<>(); // 선행유지관리 할인율적용 누적 보수보강비용 리스트
-                List<Double> costYear = new ArrayList<>(); // 선행유지관리 원/년 리스트
-
-                List<Double> performYear2 = new ArrayList<>(); // 선행유지관리 현행유지관리 보수보강수행시기(년) 리스트
                 List<Double> discountRateList2 = new ArrayList<>(); // 선행유지관리 할인율적용 누적 보수보강비용 리스트
+
+                List<Double> performYear = new ArrayList<>(); // 선행유지관리 보수보강수행시기(년) 리스트
+                List<Double> costYear = new ArrayList<>(); // 선행유지관리 원/년 리스트
+                List<Double> performYear2 = new ArrayList<>(); // 선행유지관리 현행유지관리 보수보강수행시기(년) 리스트
                 List<Double> costYear2 = new ArrayList<>(); // 선행유지관리 원/년 리스트
 
                 if(stage==1){
@@ -379,6 +380,8 @@ public class LifeAllTimeRestController {
                 // 1~25단계까지 변하는 값
                 damageRankYear = performYear.get(thNum); // 보수보강 수행시기(년)
                 discountRate = discountRateList.get(thNum); // [할인율 적용] 누적 보수보강비용
+                discountAccumulateList.add(discountRate);// [할인율 적용] 누적 보수보강비용 리스트
+
                 costYearVal = costYear.get(thNum); // 원년
 
                 // 1~25단계까지 변하는 값
@@ -576,12 +579,22 @@ public class LifeAllTimeRestController {
 //            log.info("checkCostList : "+checkCostList);
 //            log.info("managementCostList : "+managementCostList);
 
+            data.put("damageRankList",damageRankList);
+            data.put("costRankList",costRankList);
+            data.put("discount",discount);
+            data.put("ltPeriodicRn",ltPeriodicRn);
+            data.put("ltCloseRn",ltCloseRn);
+            data.put("ltSafetyRn",ltSafetyRn);
+
             data.put("periodicCountList",periodicCountList);
             data.put("closeCountList",closeCountList);
             data.put("safetyCountList",safetyCountList);
             data.put("checkCostList",checkCostList);
             data.put("managementCostList",managementCostList);
             data.put("ltAbsenceName",absenceDto.getLtAbsenceName());
+
+            data.put("damageRankYearList",damageRankYearList);
+            data.put("discountAccumulateList",discountAccumulateList);
 
 //            log.info("차트 테스트 : "+chartDataList);
 //            log.info("차트 데이터 길이 : "+chartDataList.size());
