@@ -17,7 +17,6 @@ import javax.persistence.Column;
 @AllArgsConstructor
 @ToString
 @Setter
-@Getter
 @Slf4j
 public class LifeAllTimeMapperDto {
 

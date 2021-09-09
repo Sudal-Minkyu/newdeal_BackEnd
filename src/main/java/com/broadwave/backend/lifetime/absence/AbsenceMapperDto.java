@@ -1,26 +1,25 @@
 package com.broadwave.backend.lifetime.absence;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author Minkyu
- * Date : 2021-08-04
+ * Date : 2021-09-09
  * Time :
- * Remark : 생애주기 의사결전 지원서비스 - 부재별 평균열화율 수치 AbsenceDto
+ * Remark :
  */
-@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AbsenceDto {
+@ToString
+@Data
+@Slf4j
+public class AbsenceMapperDto {
 
     private String ltAbsence; // 부재(NULL)
-
-    private String ltAbsenceName; // 부재명(NULL)
     private String ltAbsenceCode; // 부재코드(NULL)
+    private String ltAbsenceName; // 부재명(NULL)
 
     private Double ltDeterioration; // 평균열화율(NOTNULL)
     private Double ltStandardDeviation; // 표준편차(NOTNULL)
@@ -33,4 +32,5 @@ public class AbsenceDto {
     private Double ltStatusTwo; // 상태향상 모델모델 2차항 계수(NOTNULL)
     private Double ltStatusOne; // 상태향상 모델모델 1차항 계수(NOTNULL)
     private Double ltStatusNum; // 상태향상 모델모델 상수(NOTNULL)
+
 }
