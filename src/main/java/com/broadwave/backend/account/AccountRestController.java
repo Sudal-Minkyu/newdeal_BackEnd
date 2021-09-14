@@ -239,9 +239,7 @@ public class AccountRestController {
 //    @PostMapping("modifyemail")
 //    public ResponseEntity accountSaveEmail(@ModelAttribute AccountMapperDtoModify accountMapperDto, HttpServletRequest request){
 //
-//
 //        Account account = modelMapper.map(accountMapperDto, Account.class);
-//
 //
 //        //아이디를 입력하세요.
 //        if (accountMapperDto.getUserid() == null || accountMapperDto.getUserid().equals("")){
@@ -249,11 +247,9 @@ public class AccountRestController {
 //            return ResponseEntity.ok(res.fail(ResponseErrorCode.E009.getCode(), ResponseErrorCode.E009.getDesc()));
 //        }
 //
-//
 //        Optional<Account> optionalAccount = accountService.findByUserid(account.getUserid());
 //
 //        String currentuserid = CommonUtils.getCurrentuser(request);
-//
 //
 //        //수정일때
 //        if(!optionalAccount.isPresent()){
@@ -272,17 +268,12 @@ public class AccountRestController {
 //        account.setModify_id(currentuserid);
 //        account.setModifyDateTime(LocalDateTime.now());
 //
-//
-//
-//
 //        Account accountSave =  this.accountService.modifyAccount(account);
-//
 //
 //        log.info("사용자 저장 성공 : id '" + account.getUserid() + "'");
 //        return ResponseEntity.ok(res.success());
 //
 //    }
-//
 
     // NEWDEAL AccountInfo rolename 가져오기위헌 API
     @PostMapping("rolename")
@@ -297,15 +288,16 @@ public class AccountRestController {
         return ResponseEntity.ok(res.dataSendSuccess(data));
     }
 
+    // NEWDEAL 회원가입페이지
     @PostMapping("register")
     public ResponseEntity<Map<String,Object>> accountRegister(@ModelAttribute AccountRegisterMapperDto accountRegisterMapperDto, HttpServletRequest request){
 
         AjaxResponse res = new AjaxResponse();
 
         Account account = modelMapper.map(accountRegisterMapperDto, Account.class);
-        Optional<Team> optionalTeam = teamService.findByTeamcode(accountRegisterMapperDto.getTeamcode());
+        Optional<Team> optionalTeam = teamService.findByTeamcode("T00003");
 
-        log.info("account ; "+account);
+//        log.info("account ; "+account);
 
         //패스워드를 입력하세요.
         if (accountRegisterMapperDto.getPassword() == null || accountRegisterMapperDto.getPassword().equals("")){
@@ -344,7 +336,7 @@ public class AccountRestController {
                 log.info("사용자저장실패(사용자아이디중복) 사용자아이디: '" + account.getUserid() + "'");
                 return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE001.getCode(), ResponseErrorCode.NDE001.getDesc(),null,null));
         }else{
-            account.setRole(AccountRole.ROLE_USER);
+            account.setRole(AccountRole.ROLE_ADMIN);
             account.setInsert_id(accountRegisterMapperDto.getUserid());
             account.setInsertDateTime(LocalDateTime.now());
         }
