@@ -27,6 +27,9 @@ public class Absence {
     private Long id; // 고유ID값(NOTNULL)
 
 
+    @Column(name="lt_absence")
+    private String ltAbsence; // 부재(NULL)
+
     @Column(name="lt_absence_code")
     private String ltAbsenceCode; // 부재코드(NULL)
 
@@ -66,5 +69,14 @@ public class Absence {
 
     @Column(name="insert_date")
     private LocalDateTime insertDateTime;
+
+    @Column(name="insert_id")
+    private String insertId;
+
+    @Column(name="modify_date")
+    private LocalDateTime modifyDateTime;
+
+    @Column(name="modify_id")
+    private String modifyId;
 
 }

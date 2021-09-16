@@ -1,4 +1,4 @@
-package com.broadwave.backend.lifetime;
+package com.broadwave.backend.lifetime.all;
 
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;

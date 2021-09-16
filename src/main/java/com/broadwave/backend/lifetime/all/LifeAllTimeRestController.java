@@ -1,4 +1,4 @@
-package com.broadwave.backend.lifetime;
+package com.broadwave.backend.lifetime.all;
 
 import com.broadwave.backend.common.AjaxResponse;
 import com.broadwave.backend.common.ResponseErrorCode;
@@ -19,7 +19,7 @@ import java.util.*;
 /**
  * @author Minkyu
  * Date : 2021-08-04
- * Remark : NEWDEAL 성능개선사업평가 컨트롤러
+ * Remark : NEWDEAL 성능개선사업평가 전체부분 컨트롤러
  */
 @Slf4j
 @RestController

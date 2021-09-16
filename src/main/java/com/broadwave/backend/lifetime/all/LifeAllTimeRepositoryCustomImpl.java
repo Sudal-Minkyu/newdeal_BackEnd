@@ -1,4 +1,4 @@
-package com.broadwave.backend.lifetime;
+package com.broadwave.backend.lifetime.all;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPQLQuery;

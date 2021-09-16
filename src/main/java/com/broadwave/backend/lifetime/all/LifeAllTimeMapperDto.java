@@ -1,4 +1,4 @@
-package com.broadwave.backend.lifetime;
+package com.broadwave.backend.lifetime.all;
 
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +17,6 @@ import javax.persistence.Column;
 @AllArgsConstructor
 @ToString
 @Setter
-@Getter
 @Slf4j
 public class LifeAllTimeMapperDto {
 
