@@ -1,6 +1,5 @@
 package com.broadwave.backend.lifetime.all;
 
-import com.broadwave.backend.lifetime.QLifeAllTime;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPQLQuery;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
