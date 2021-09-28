@@ -132,6 +132,8 @@ public class LifeAllTimeRestController {
             damageRankList2.add(rankD);
             damageRankList2.add(rankE);
 
+            List<String> costRank = new ArrayList<>(); // 보수보강 수행전등급 랭크(알파벳)
+            String costRankValue;
             double costB = (ltRemunerationThree*Math.pow(ltDamageBRank,3)+ltRemunerationTwo*Math.pow(ltDamageBRank,2)+ltRemunerationOne*ltDamageBRank+ltRemunerationNum)*ltAllVolume;
             double costC =(ltRemunerationThree*Math.pow(ltDamageCRank,3)+ltRemunerationTwo*Math.pow(ltDamageCRank,2)+ltRemunerationOne*ltDamageCRank+ltRemunerationNum)*ltAllVolume;
             double costD = (ltRemunerationThree*Math.pow(ltDamageDRank,3)+ltRemunerationTwo*Math.pow(ltDamageDRank,2)+ltRemunerationOne*ltDamageDRank+ltRemunerationNum)*ltAllVolume;
@@ -212,8 +214,8 @@ public class LifeAllTimeRestController {
             double pointViewEarly2 = 0; // 현행 유지관리 시점 초기값(b)
 
             //person의 JSON정보를 담을 Array 선언
-            List<HashMap<String,Double>> chartDataList = new ArrayList<>();
-            HashMap<String,Double> chartData;
+            List<HashMap<String,Object>> chartDataList = new ArrayList<>();
+            HashMap<String,Object> chartData;
 
             List<Double> discountAccumulateList = new ArrayList<>(); // 선행유지관리 할인율적용 자바스크립트 누적 보수보강비용 리스트
 
@@ -367,6 +369,17 @@ public class LifeAllTimeRestController {
                 // 선제적 유지관리 1~25단계까지 변하지 않는 값
                 changeRankNum = rankList.get(thNum); // 전 단계 수행전등급
                 damageRank = damageRankList.get(thNum); // 보수보강 수행후등급
+
+                if(thNum==0){
+                    costRankValue = "B";
+                }else if(thNum==1){
+                    costRankValue = "C";
+                }else if(thNum==2){
+                    costRankValue = "D";
+                }else{
+                    costRankValue = "E";
+                }
+                costRank.add(costRankValue);
 
                 // 현행 유지관리 1~25단계까지 변하지 않는 값
                 changeRankNum2 = rankList2.get(thNum2); // 전 단계 수행전등급
@@ -570,21 +583,30 @@ public class LifeAllTimeRestController {
                 chartData.put("cRank", Math.floor((1-ltDamageCRank)*10)/10.0);
                 chartData.put("dRank", Math.floor((1-ltDamageDRank)*10)/10.0);
 
+                if(year==1000){
+                    chartData.put("bulletDisabled",false);
+                }
                 chartDataList.add(chartData);
             }
+
+            data.put("aRankValue", Math.floor((1-0.1)*10)/10.0);
+            data.put("bRankValue", Math.floor((1-ltDamageBRank)*10)/10.0);
+            data.put("cRankValue", Math.floor((1-ltDamageCRank)*10)/10.0);
+            data.put("dRankValue", Math.floor((1-ltDamageDRank)*10)/10.0);
 
 //            log.info("periodicCountList : "+periodicCountList);
 //            log.info("closeCountList : "+closeCountList);
 //            log.info("safetyCountList : "+safetyCountList);
 //            log.info("checkCostList : "+checkCostList);
 //            log.info("managementCostList : "+managementCostList);
-
+//            log.info("costRank : "+costRank);
             data.put("damageRankList",damageRankList);
             data.put("costRankList",costRankList);
-            data.put("discount",discount);
-            data.put("ltPeriodicRn",ltPeriodicRn);
-            data.put("ltCloseRn",ltCloseRn);
-            data.put("ltSafetyRn",ltSafetyRn);
+            data.put("costRank",costRank);
+//            data.put("discount",discount);
+//            data.put("ltPeriodicRn",ltPeriodicRn);
+//            data.put("ltCloseRn",ltCloseRn);
+//            data.put("ltSafetyRn",ltSafetyRn);
 
             data.put("periodicCountList",periodicCountList);
             data.put("closeCountList",closeCountList);

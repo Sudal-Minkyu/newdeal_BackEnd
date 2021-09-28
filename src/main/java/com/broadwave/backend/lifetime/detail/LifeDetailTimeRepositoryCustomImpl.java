@@ -57,11 +57,7 @@ public class LifeDetailTimeRepositoryCustomImpl extends QuerydslRepositorySuppor
                         lifeDetailTime.ltCostThree,
                         lifeDetailTime.ltCostFour,
                         lifeDetailTime.ltCostFive,
-                        lifeDetailTime.ltCostSix,
-
-                        lifeDetailTime.ltDetailLength,
-                        lifeDetailTime.ltDetailNum,
-                        lifeDetailTime.ltDetailCost
+                        lifeDetailTime.ltCostSix
                 ));
 
         query.where(lifeDetailTime.id.eq(id));

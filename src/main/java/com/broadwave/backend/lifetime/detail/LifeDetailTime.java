@@ -110,17 +110,6 @@ public class LifeDetailTime {
     @Column(name="lt_cost_six")
     private Double ltCostSix; // 보수보강비용_6(NOTNULL)
 
-
-    @Column(name="lt_detail_length")
-    private Double ltDetailLength; // 보수보강 총 길이(NOTNULL)
-
-    @Column(name="lt_detail_num")
-    private Integer ltDetailNum; // 보수보강 개입 횟수(NOTNULL)
-
-    @Column(name="lt_detail_cost")
-    private Double ltDetailCost; // 보수보강 총 비용(NOTNULL)
-
-
     @Column(name="insert_date")
     private LocalDateTime insertDateTime;
 

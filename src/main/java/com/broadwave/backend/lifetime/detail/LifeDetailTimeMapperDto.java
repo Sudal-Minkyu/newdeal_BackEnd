@@ -52,10 +52,6 @@ public class LifeDetailTimeMapperDto {
     private Double ltCostFive; // 보수보강 비용_5(NOTNULL)
     private Double ltCostSix; // 보수보강비용_6(NOTNULL)
 
-    private Double ltDetailLength; // 보수보강 총 길이(NOTNULL)
-    private Integer ltDetailNum; // 보수보강 개입 횟수(NOTNULL)
-    private Double ltDetailCost; // 보수보강 총 비용(NOTNULL)
-
     public Double getLtFyAverage() {
         return ltFyAverage;
     }
@@ -158,18 +154,6 @@ public class LifeDetailTimeMapperDto {
 
     public Double getLtCostSix() {
         return ltCostSix;
-    }
-
-    public Double getLtDetailLength() {
-        return ltDetailLength;
-    }
-
-    public Integer getLtDetailNum() {
-        return ltDetailNum;
-    }
-
-    public Double getLtDetailCost() {
-        return ltDetailCost;
     }
 
 }

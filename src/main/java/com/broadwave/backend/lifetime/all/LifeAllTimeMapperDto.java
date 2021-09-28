@@ -75,7 +75,7 @@ public class LifeAllTimeMapperDto {
     }
 
     public String getLtAllCompletionDate() {
-        return ltAllCompletionDate.substring(0,4)+ltAllCompletionDate.substring(5,7)+ltAllCompletionDate.substring(8,10);
+        return ltAllCompletionDate;
     }
 
     public Double getLtAllVolume() {
