@@ -16,6 +16,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.formulacompiler.runtime.Computation;
+import org.formulacompiler.runtime.internal.Environment;
+import org.formulacompiler.runtime.internal.RuntimeDouble_v2;
+import org.formulacompiler.runtime.internal.Runtime_v2;
+
+import JSci.maths.*;
+
 /**
  * @author Minkyu
  * Date : 2021-09-13
@@ -88,13 +95,15 @@ public class LifeDetailTimeRestController {
             List<Double> meanList = new ArrayList<>();
             List<Double> sdtList = new ArrayList<>();
 
+            double areAverage = 0.015; // 철근 단면적 감소율 평균값
+            double areVariance = 0.1; // 철근 단면적 감소율 변동계수
             for(int i=0; i<20; i++){
                 if(i==0){
                     meanList.add(1.0);
                     sdtList.add(0.1);
                 }else{
-                    double mean = meanList.get(i-1)-(meanList.get(i-1)*0.015);
-                    double sdt = mean*0.1;
+                    double mean = meanList.get(i-1)-(meanList.get(i-1) * areAverage);
+                    double sdt = mean * areVariance;
                     meanList.add(mean);
                     sdtList.add(sdt);
                 }
@@ -102,7 +111,37 @@ public class LifeDetailTimeRestController {
             log.info("meanList : "+meanList);
             log.info("sdtList : "+sdtList);
 
+            // 사용자 입력 난수 -  평균값
+            double fyAverage = lifeDetailTimeDto.getLtFyAverage(); // 철근 항복강도 평균값
+            double AAverage = lifeDetailTimeDto.getLtSectionAverage(); // 철근 단면적 평균값
+            double fcAverage = lifeDetailTimeDto.getLtFcAverage(); // 콘크리트 압축강도 평균값
+            double mdckAverage = lifeDetailTimeDto.getLtVehicleAverage(); // 차량하중 평균값
+            // 사용자 입력 난수 -  표준편차
+            double fyStandard = lifeDetailTimeDto.getLtFyStandard(); // 철근 항복강도 표준편차
+            double AStandard = lifeDetailTimeDto.getLtSectionStandard(); // 철근 단면적 표준편차
+            double fcStandard = lifeDetailTimeDto.getLtFcStandard(); // 콘크리트 압축강도 표준편차
+            double mdckStandard = lifeDetailTimeDto.getLtVehicleStandard(); // 차량하중 표준편차
 
+            // 시스템 난수 -  평균값
+            double ymfcAverage = 1.02; // 바닥판 모델링 불확실성 인자 평균값
+            double asphAverage = 1.0; // 아스콘 중량 불확실성 인자 평균값
+            double concAverage = 1.05; // 콘크리트 중량 불확실성 인자 평균값
+            // 시스템 난수 -  표준편차
+            double ymfcStandard = 0.06; // 바닥판 모델링 불확실성 인자 표준편차
+            double asphStandard= 0.25; // 아스콘 중량 불확실성 인자 표준편차
+            double concStandard = 0.11; // 콘크리트 중량 불확실성 인자 표준편차
+
+            // Are 난수
+            double areRandom;
+
+            double a;
+            log.info("테스트입니다 : ");
+            int simulation = 101; // 시뮬레이션 횟수
+//            for(int i=1; i<2; i++){
+//                double rand = Math.random();
+////                double fyNum = NORMINV(rand,fyAverage,fyStandard); // fy 난수
+////                log.info("fyNum 난수 : "+fyNum);
+//            }
 
 //            data.put("chartDataList",chartDataList);
 
@@ -116,17 +155,6 @@ public class LifeDetailTimeRestController {
 
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
 }
+
 
