@@ -16,13 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.formulacompiler.runtime.Computation;
-import org.formulacompiler.runtime.internal.Environment;
-import org.formulacompiler.runtime.internal.RuntimeDouble_v2;
-import org.formulacompiler.runtime.internal.Runtime_v2;
-
-import JSci.maths.*;
-
 /**
  * @author Minkyu
  * Date : 2021-09-13
