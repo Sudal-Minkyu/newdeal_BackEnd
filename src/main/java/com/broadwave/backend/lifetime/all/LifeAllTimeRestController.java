@@ -213,7 +213,7 @@ public class LifeAllTimeRestController {
             double pointView2 = 0; // 현행 유지관리 시점
             double pointViewEarly2 = 0; // 현행 유지관리 시점 초기값(b)
 
-            //person의 JSON정보를 담을 Array 선언
+            //차트의 JSON정보를 담을 Array 선언
             List<HashMap<String,Object>> chartDataList = new ArrayList<>();
             HashMap<String,Object> chartData;
 
