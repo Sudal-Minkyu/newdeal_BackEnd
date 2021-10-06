@@ -335,12 +335,12 @@ public class LifeDetailTimeRestController {
                 actionchartData  = new HashMap<>();
 
                 noactionchartData.put("publicYear", publicYear);
-                noactionchartData.put("redline", 2.5);
+                noactionchartData.put("redline", lifeDetailTimeDto.getLtTargetValue());
                 noactionchartData.put("noaction", Math.floor(b_List.get(publicYear)*1000)/1000.0);
                 noactionChartDataList.add(noactionchartData);
 
                 actionchartData.put("publicYear", publicYear);
-                actionchartData.put("redline", 2.5);
+                actionchartData.put("redline", lifeDetailTimeDto.getLtTargetValue());
                 actionchartData.put("action", Math.floor(b_Two_List.get(publicYear)*1000)/1000.0);
                 actionChartDataList.add(actionchartData);
 
@@ -352,6 +352,7 @@ public class LifeDetailTimeRestController {
             log.info("유지보수 차트 테스트 : "+actionChartDataList);
             log.info("유지보수 차트 데이터 길이 : "+actionChartDataList.size());
 
+            data.put("ltTargetValue", lifeDetailTimeDto.getLtTargetValue());
             data.put("noactionChartDataList",noactionChartDataList);
             data.put("actionChartDataList",actionChartDataList);
 
