@@ -42,6 +42,7 @@ public class LifeDetailTimeRepositoryCustomImpl extends QuerydslRepositorySuppor
                         lifeDetailTime.ltVehicleStandard,
                         lifeDetailTime.ltVehicleVariance,
 
+                        lifeDetailTime.ltRepairLength,
                         lifeDetailTime.ltTargetValue,
                         lifeDetailTime.ltRecoveryPercent,
 
