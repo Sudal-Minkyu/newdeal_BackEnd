@@ -35,6 +35,7 @@ public class LifeDetailTimeDto {
     private Double ltVehicleStandard; // 차량하중 표준편차(NOTNULL)
     private Double ltVehicleVariance; // 차량하중 변동계수(NOTNULL)
 
+    private Double ltRepairLength; // 보수보강 총길이(NOTNULL)
     private Double ltTargetValue; // 생애주기 목표값(NOTNULL)
     private Double ltRecoveryPercent; // 보수보강 회복율(NOTNULL)
 

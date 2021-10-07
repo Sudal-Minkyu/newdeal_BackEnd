@@ -65,6 +65,8 @@ public class LifeDetailTime {
     @Column(name="lt_vehicle_variance")
     private Double ltVehicleVariance; // 차량하중 변동계수(NOTNULL)
 
+    @Column(name="lt_repair_length")
+    private Double ltRepairLength; // 보수보강 총길이(NOTNULL)
 
     @Column(name="lt_target_value")
     private Double ltTargetValue; // 생애주기 목표값(NOTNULL)

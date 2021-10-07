@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -40,7 +39,7 @@ public class LifeDetailTimeRestController {
     @PostMapping("/save")
     public ResponseEntity<Map<String,Object>> save(@ModelAttribute LifeDetailTimeMapperDto lifeDetailTimeMapperDto, HttpServletRequest request) {
 
-        log.info("save 호출성공");
+//        log.info("save 호출성공");
 
         AjaxResponse res = new AjaxResponse();
         HashMap<String, Object> data = new HashMap<>();
@@ -70,7 +69,7 @@ public class LifeDetailTimeRestController {
     @PostMapping("/output")
     public ResponseEntity<Map<String,Object>> output(@RequestParam(value="id", defaultValue="")Long id, HttpServletRequest request) {
 
-        log.info("output 호출성공");
+//        log.info("output 호출성공");
 
         AjaxResponse res = new AjaxResponse();
         HashMap<String, Object> data = new HashMap<>();
@@ -82,7 +81,7 @@ public class LifeDetailTimeRestController {
 
         if(lifeDetailTimeDto.getId() != null){
 
-            log.info("lifeDetailTimeDto : "+lifeDetailTimeDto);
+//            log.info("lifeDetailTimeDto : "+lifeDetailTimeDto);
 
             List<Double> ltRecoveryList = new ArrayList<>();
             ltRecoveryList.add(lifeDetailTimeDto.getLtRecoveryOne());
@@ -116,8 +115,8 @@ public class LifeDetailTimeRestController {
                     sdtList.add(sdt);
                 }
             }
-            log.info("meanList : "+meanList);
-            log.info("sdtList : "+sdtList);
+//            log.info("meanList : "+meanList);
+//            log.info("sdtList : "+sdtList);
 
             // 사용자 입력 난수 -  평균값
             double fyAverage = lifeDetailTimeDto.getLtFyAverage(); // 철근 항복강도 평균값
@@ -207,16 +206,16 @@ public class LifeDetailTimeRestController {
                 b_List.add(-NormMath.sinv(pf));
             }
 
-            System.out.println();
-            log.info("무조치시 PF pf_List : " + pf_List);
-            log.info("무조치시 B b_List : " + b_List);
+//            System.out.println();
+//            log.info("무조치시 PF pf_List : " + pf_List);
+//            log.info("무조치시 B b_List : " + b_List);
 //            log.info("사이즈 : " + b_List.size());
 
-            System.out.println();
+//            System.out.println();
             double pf_max = Collections.max(pf_List);
             double pf_min = -NormMath.sinv(pf_max);
-            log.info("손상확률 최대값(PF 최댓값) : " + pf_max);
-            log.info("신뢰성 지수 최소값 : " + pf_min);
+//            log.info("손상확률 최대값(PF 최댓값) : " + pf_max);
+//            log.info("신뢰성 지수 최소값 : " + pf_min);
 
             double b_max = Collections.max(b_List);
 
@@ -261,7 +260,7 @@ public class LifeDetailTimeRestController {
             }
 
             int count = 0;
-            int repairLength = 10; // 보수보강 총 길이
+            double ltRepairLength = lifeDetailTimeDto.getLtRepairLength(); // 보수보강 총 길이
             int repairNumber = 0; // 보수보강 개입 횟수
             int repairCost = 0; // 보수보강 총 비용
             for(int i=0; i<21; i++){
@@ -279,22 +278,22 @@ public class LifeDetailTimeRestController {
 
             for(int i=0; i<ltRecoveryList.size(); i++){
                 if(lifeDetailTimeDto.getLtRecoveryPercent().equals(ltRecoveryList.get(i))){
-                    repairCost = Integer.parseInt(String.valueOf(Math.round(repairLength * repairNumber * ltCostList.get(i))));
+                    repairCost = Integer.parseInt(String.valueOf(Math.round(ltRepairLength * repairNumber * ltCostList.get(i))));
                     break;
                 }
             }
 
 
-            System.out.println();
-            log.info("보수보강 총 길이 : " +repairLength);
-            log.info("보수보강 개입 횟수: " + repairNumber);
-            log.info("보수보강 총 비용 : "+ repairCost);
-
-            System.out.println();
-            log.info("신뢰성 지수 최대값 : " +b_max);
-            log.info("신뢰성 지수 최소값 : " + lifeDetailTimeDto.getLtTargetValue());
-            log.info("보수보강 회복율 : " + lifeDetailTimeDto.getLtRecoveryPercent()*100);
-            log.info("유지보수 무조치 가능년수 : "+ maintenanceYear);
+//            System.out.println();
+//            log.info("보수보강 총 길이 : " +ltRepairLength);
+//            log.info("보수보강 개입 횟수: " + repairNumber);
+//            log.info("보수보강 총 비용 : "+ repairCost);
+//
+//            System.out.println();
+//            log.info("신뢰성 지수 최대값 : " +b_max);
+//            log.info("신뢰성 지수 최소값 : " + lifeDetailTimeDto.getLtTargetValue());
+//            log.info("보수보강 회복율 : " + lifeDetailTimeDto.getLtRecoveryPercent()*100);
+//            log.info("유지보수 무조치 가능년수 : "+ maintenanceYear);
 
 //            log.info("b_One_List : "+ b_One_List);
 //            log.info("b_Two_List : "+ b_Two_List);
@@ -316,7 +315,7 @@ public class LifeDetailTimeRestController {
             data.put("bOneList",b_One_List); // 유지보수 개입 시 B1
             data.put("bTwoList",b_Two_List); // 유지보수 개입 시 B2
 
-            data.put("repairLength",repairLength);; // 보수보강 총 길이
+            data.put("ltRepairLength",ltRepairLength);; // 보수보강 총 길이
             data.put("repairNumber",repairNumber); // 보수보강 개입 횟수
             data.put("repairCost",repairCost); // 보수보강 총 비용
 
@@ -346,11 +345,11 @@ public class LifeDetailTimeRestController {
 
             }
 
-            System.out.println();
-            log.info("무조치 차트 테스트 : "+noactionChartDataList);
-            log.info("무조치 차트 데이터 길이 : "+noactionChartDataList.size());
-            log.info("유지보수 차트 테스트 : "+actionChartDataList);
-            log.info("유지보수 차트 데이터 길이 : "+actionChartDataList.size());
+//            System.out.println();
+//            log.info("무조치 차트 테스트 : "+noactionChartDataList);
+//            log.info("무조치 차트 데이터 길이 : "+noactionChartDataList.size());
+//            log.info("유지보수 차트 테스트 : "+actionChartDataList);
+//            log.info("유지보수 차트 데이터 길이 : "+actionChartDataList.size());
 
             data.put("ltTargetValue", lifeDetailTimeDto.getLtTargetValue());
             data.put("noactionChartDataList",noactionChartDataList);
