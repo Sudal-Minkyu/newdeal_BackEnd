@@ -105,7 +105,7 @@ public class MasterCodeRestcontroller {
         }
         MasterCode masterCode = optionalMasterCode.get();
 
-        data.clear();
+
         data.put("datarow",masterCode);
 
         //log.info("마스터코드 조회 성공 : " + masterCode.toString() );

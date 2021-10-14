@@ -3,17 +3,12 @@ package com.broadwave.backend.common;
 import com.broadwave.backend.excel.DtoExcel;
 import com.broadwave.backend.excel.ExcelConstant;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
-import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author InSeok
@@ -84,14 +79,14 @@ public abstract class CommonUtils {
 //            res.put("current_page",pages.getNumber() + 1);
 //            res.put("total_rows",pages.getTotalElements());
 //            res.put("current_rows",pages.getNumberOfElements());
-////            res.addResponse("data",data);
+////           
 //        }else{
 //            log.info("출력2");
 //            res.put("total_page",pages.getTotalPages());
 //            res.put("current_page",pages.getNumber() + 1);
 //            res.put("total_rows",pages.getTotalElements());
 //            res.put("current_rows",pages.getNumberOfElements());
-////            res.addResponse("data",data);
+////           
 //        }
 //        return ResponseEntity.ok(res);
 //    }

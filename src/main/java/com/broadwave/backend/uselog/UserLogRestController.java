@@ -4,13 +4,11 @@ import com.broadwave.backend.common.AjaxResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -25,9 +23,12 @@ public class UserLogRestController {
 
     private final UserLogService userLogService;
 
+    private final UserLogRepositoryCustom userLogRepositoryCustom;
+
     @Autowired
-    public UserLogRestController(UserLogService userLogService) {
+    public UserLogRestController(UserLogService userLogService, UserLogRepositoryCustom userLogRepositoryCustom) {
         this.userLogService = userLogService;
+        this.userLogRepositoryCustom = userLogRepositoryCustom;
     }
 
     // NEWDEAL 메류 로그/서치 기록
@@ -57,5 +58,21 @@ public class UserLogRestController {
 
         return ResponseEntity.ok(res.success());
     }
+
+    // NEWDEAL 유저수가져오기
+    @GetMapping("count")
+    public ResponseEntity<Map<String,Object>> dataSearchCount(){
+
+        AjaxResponse res = new AjaxResponse();
+        HashMap<String, Object> data = new HashMap<>();
+
+        Long dataSearchCount = userLogRepositoryCustom.findBySearchCount();
+
+        data.put("dataSearchCount",dataSearchCount);
+
+        return ResponseEntity.ok(res.dataSendSuccess(data));
+    }
+
+
 
 }

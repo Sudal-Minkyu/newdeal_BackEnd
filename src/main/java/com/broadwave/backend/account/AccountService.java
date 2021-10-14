@@ -28,6 +28,10 @@ public class AccountService {
     @Autowired
     PasswordEncoder passwordEncoder;
 
+    public Long findByAccountCount() {
+        return accountRepositoryCustom.findByAccountCount();
+    }
+
 //    @Autowired
 //    TeamService teamService;
 

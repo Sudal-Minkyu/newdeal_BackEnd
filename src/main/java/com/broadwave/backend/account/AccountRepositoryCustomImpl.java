@@ -3,12 +3,15 @@ package com.broadwave.backend.account;
 import com.broadwave.backend.teams.QTeam;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPQLQuery;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 import org.springframework.stereotype.Repository;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.List;
 import java.util.Objects;
 
@@ -68,5 +71,15 @@ public class AccountRepositoryCustomImpl extends QuerydslRepositorySupport imple
         query.where(account.userid.eq(userid));
         return query.fetchOne();
     }
+
+    @PersistenceContext
+    private EntityManager entityManager;
+    @Override
+    public Long findByAccountCount() {
+        QAccount account  = QAccount.account;
+        JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
+        return queryFactory .selectFrom(account) .fetchCount();
+    }
+
 
 }

@@ -34,14 +34,17 @@ public class AccountRestController {
     private final TeamService teamService;
     private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
+    private final AccountRepositoryCustom accountRepositoryCustom;
+
 //    private final LoginlogService loginlogService;
 
     @Autowired
-    public AccountRestController(ModelMapper modelMapper, TeamService teamService, AccountService accountService,PasswordEncoder passwordEncoder) {
+    public AccountRestController(ModelMapper modelMapper, TeamService teamService, AccountService accountService,PasswordEncoder passwordEncoder, AccountRepositoryCustom accountRepositoryCustom) {
         this.modelMapper = modelMapper;
         this.teamService = teamService;
         this.accountService = accountService;
         this.passwordEncoder = passwordEncoder;
+        this.accountRepositoryCustom = accountRepositoryCustom;
     }
 
     // AccountSave API
@@ -249,7 +252,7 @@ public class AccountRestController {
 //
 //        Optional<Account> optionalAccount = accountService.findByUserid(account.getUserid());
 //
-//        String currentuserid = CommonUtils.getCurrentuser(request);
+//
 //
 //        //수정일때
 //        if(!optionalAccount.isPresent()){
@@ -326,11 +329,6 @@ public class AccountRestController {
 
         Optional<Account> optionalAccount = accountService.findByUserid(account.getUserid());
 
-//        String JWT_AccessToken = request.getHeader("JWT_AccessToken");
-//        String insert_id = request.getHeader("insert_id");
-//        log.info("JWT_AccessToken : "+JWT_AccessToken);
-//        log.info("insert_id : "+insert_id);
-
         //userid 중복체크
         if (optionalAccount.isPresent()) {
                 log.info("사용자저장실패(사용자아이디중복) 사용자아이디: '" + account.getUserid() + "'");
@@ -344,9 +342,25 @@ public class AccountRestController {
         Account accountSave =  accountService.registerAccount(account);
 
         log.info("회원가입 성공 : id '" + accountSave.getUserid() + "'");
+
         return ResponseEntity.ok(res.success());
     }
 
+    // NEWDEAL 유저수가져오기
+    @GetMapping("count")
+    public ResponseEntity<Map<String,Object>> userCount(){
+
+        AjaxResponse res = new AjaxResponse();
+        HashMap<String, Object> data = new HashMap<>();
+
+        Long userCount = accountRepositoryCustom.findByAccountCount();
+        
+//        log.info("회원가입 성공 : id '" + accountSave.getUserid() + "'");
+//        log.info("유저수 : "+userCount);
+        data.put("userCount",userCount);
+
+        return ResponseEntity.ok(res.dataSendSuccess(data));
+    }
 
 
 

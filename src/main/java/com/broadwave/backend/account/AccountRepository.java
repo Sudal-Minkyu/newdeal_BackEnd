@@ -14,4 +14,7 @@ public interface AccountRepository extends JpaRepository<Account,Long> {
     @Query("select a from Account a join fetch a.team where a.userid = :userid")
     Optional<Account> findByUserid(@Param("userid") String userid);
 
+//    @Query("select count(bs_account) from Account bs_account")
+//    void findByAccountCount();
+
 }

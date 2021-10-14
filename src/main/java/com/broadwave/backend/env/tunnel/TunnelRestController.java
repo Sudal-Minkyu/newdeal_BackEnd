@@ -39,9 +39,6 @@ public class TunnelRestController {
         AjaxResponse res = new AjaxResponse();
         HashMap<String, Object> data = new HashMap<>();
 
-//        String currentuserid = CommonUtils.getCurrentuser(request);
-//        log.info("터널정보조회 / 조회자 :'" + currentuserid);
-
         List<TunnelDto> tunnels = tunnelService.findAll();
         List<List<String>> tunnelsArray = new ArrayList<>();
 
