@@ -31,34 +31,39 @@ public class PerformanceFunctionService {
 
     }
 
-//**************************** 노후화_기술성 함수 ********************************
+//**************************** 노후화대응 _기술성 함수 ********************************
 
-    // 안정성 환산점수
-    public Map<String, String> safetyLevel(String piSafetyLevel) {
+    // 노후화 대응, 기준변화, 사용성변화 - 안정성 환산점수 10/29 완료
+    public Map<String, String> safetyLevel(String piSafetyLevel,int safeValue) {
         log.info("안정성 환산점수 함수호출");
         funRankScore.clear();
         log.info("piSafetyLevel : " + piSafetyLevel);
-        switch (piSafetyLevel) {
-            case "A":
-                funRankScore.put("score", "10");
-                funRankScore.put("rank", "E");
-                break;
-            case "B":
-                funRankScore.put("score", "50");
-                funRankScore.put("rank", "D");
-                break;
-            case "C":
-                funRankScore.put("score", "70");
-                funRankScore.put("rank", "C");
-                break;
-            case "D":
-                funRankScore.put("score", "90");
-                funRankScore.put("rank", "B");
-                break;
-            default:
-                funRankScore.put("score", "100");
-                funRankScore.put("rank", "A");
-                break;
+        if(safeValue != 0){
+            switch (piSafetyLevel) {
+                case "A":
+                    funRankScore.put("score", "10");
+                    funRankScore.put("rank", "E");
+                    break;
+                case "B":
+                    funRankScore.put("score", "50");
+                    funRankScore.put("rank", "D");
+                    break;
+                case "C":
+                    funRankScore.put("score", "70");
+                    funRankScore.put("rank", "C");
+                    break;
+                case "D":
+                    funRankScore.put("score", "90");
+                    funRankScore.put("rank", "B");
+                    break;
+                default:
+                    funRankScore.put("score", "100");
+                    funRankScore.put("rank", "A");
+                    break;
+            }
+        }else{
+            int score = 100-safeValue;
+            funRankScore.put("score", String.valueOf(score));
         }
         return funRankScore;
     }

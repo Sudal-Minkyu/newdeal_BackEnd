@@ -1066,6 +1066,9 @@ public class PerformanceRestController {
         Map<Integer,List<String>> policy_scroeMap = new HashMap<>();
         Map<Integer,List<String>> policy_rankMap = new HashMap<>();
 
+        String piBusiness = null;
+        String piBusinessType = null;
+        int safeValue = 0;
         for(int i=0; i<performance.size(); i++){
 
             technicality_scroeList = new ArrayList<>();
@@ -1077,11 +1080,34 @@ public class PerformanceRestController {
             policy_scroeList = new ArrayList<>();
             policy_rankList = new ArrayList<>();
 
-            // 기술성 - 안전성
-            Map<String,String> safetyLevel  = performanceFunctionService.safetyLevel(performance.get(i).getPiSafetyLevel());
-            technicality_scroeList.add(safetyLevel.get("score"));
-            technicality_rankList.add(safetyLevel.get("rank"));
             String type = performance.get(i).getPiFacilityType();
+            piBusiness = performance.get(0).getPiBusiness();
+            piBusinessType = performance.get(0).getPiBusinessType();
+
+            // 안전성 - 공통
+            Map<String,String> safetyLevel;
+            if(piBusinessType.startsWith("유지")) {
+                safetyLevel  = performanceFunctionService.safetyLevel(performance.get(i).getPiSafetyLevel(),safeValue);
+                technicality_scroeList.add(safetyLevel.get("score"));
+                technicality_rankList.add(performance.get(i).getPiSafetyLevel());
+            }else{
+                safetyLevel  = performanceFunctionService.safetyLevel(performance.get(i).getPiSafetyLevel(),0);
+                safeValue = Integer.parseInt(safetyLevel.get("score"));
+                technicality_scroeList.add(safetyLevel.get("score"));
+                technicality_rankList.add(safetyLevel.get("rank"));
+            }
+
+
+
+            if(piBusiness.equals("노후화대응")){
+
+            }else if(piBusiness.equals("기준변화")){
+
+            }else{
+
+            }
+
+
             // 기술성 - 사용성
             if(type.equals("교량") || type.equals("터널")){
                 Map<String,String> usabilityLevel  = performanceFunctionService.usabilityLevel(performance.get(i).getPiUsabilityAndGoalLevel());
