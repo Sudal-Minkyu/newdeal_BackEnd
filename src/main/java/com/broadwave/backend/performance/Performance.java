@@ -53,11 +53,8 @@ public class Performance {
     @Column(name="pi_safety_level")
     private String piSafetyLevel; // 안전등급(NOTNULL)
 
-    @Column(name="pi_usability_level")
-    private String piUsabilityLevel; // 사용성등급(NOTNULL)
-
-    @Column(name="pi_goal_level")
-    private String piGoalLevel; // 목표등급(NOTNULL)
+    @Column(name="pi_usability_and_goal_level")
+    private String piUsabilityAndGoalLevel; // 사용성등급(NOTNULL) , 목표안전등급
 
     @Column(name="pi_maintenance_delay")
     private Double piMaintenanceDelay;  // 유지보수기간(NOTNULL)

@@ -40,8 +40,7 @@ public class PerformanceRepositoryCustomImpl extends QuerydslRepositorySupport i
                         performance.piType,
                         performance.piErectionCost,
                         performance.piSafetyLevel,
-                        performance.piUsabilityLevel,
-                        performance.piGoalLevel,
+                        performance.piUsabilityAndGoalLevel,
                         performance.piMaintenanceDelay,
                         performance.piManagement,
                         performance.piAgency,
@@ -82,6 +81,7 @@ public class PerformanceRepositoryCustomImpl extends QuerydslRepositorySupport i
         JPQLQuery<PerformanceCheckDto> query = from(performance)
                 .select(Projections.constructor(PerformanceCheckDto.class,
                         performance.piAutoNum,
+                        performance.piBusiness,
                         performance.piInputMiddleSave
                 ));
 
@@ -100,6 +100,7 @@ public class PerformanceRepositoryCustomImpl extends QuerydslRepositorySupport i
 
         JPQLQuery<PerformanceMiddleDataDto> query = from(performance)
                 .select(Projections.constructor(PerformanceMiddleDataDto.class,
+                        performance.piBusiness,
                         performance.piFacilityType,
                         performance.piFacilityName,
                         performance.piKind,
@@ -108,8 +109,7 @@ public class PerformanceRepositoryCustomImpl extends QuerydslRepositorySupport i
                         performance.piType,
                         performance.piErectionCost,
                         performance.piSafetyLevel,
-                        performance.piUsabilityLevel,
-                        performance.piGoalLevel,
+                        performance.piUsabilityAndGoalLevel,
                         performance.piMaintenanceDelay,
                         performance.piManagement,
                         performance.piAgency,
@@ -136,7 +136,6 @@ public class PerformanceRepositoryCustomImpl extends QuerydslRepositorySupport i
         JPQLQuery<PerformanceMiddleBusinessDataDto> query = from(performance)
                 .select(Projections.constructor(PerformanceMiddleBusinessDataDto.class,
                         performance.id,
-                        performance.piBusiness,
                         performance.piBusinessType,
                         performance.piTargetAbsence,
                         performance.piBusinessClassification,
@@ -178,8 +177,7 @@ public class PerformanceRepositoryCustomImpl extends QuerydslRepositorySupport i
                         performance.piErectionCost,
 
                         performance.piSafetyLevel,
-                        performance.piUsabilityLevel,
-                        performance.piGoalLevel,
+                        performance.piUsabilityAndGoalLevel,
 
                         performance.piMaintenanceDelay,
                         performance.piManagement,
@@ -241,8 +239,7 @@ public class PerformanceRepositoryCustomImpl extends QuerydslRepositorySupport i
                         performance.piErectionCost,
 
                         performance.piSafetyLevel,
-                        performance.piUsabilityLevel,
-                        performance.piGoalLevel,
+                        performance.piUsabilityAndGoalLevel,
 
                         performance.piMaintenanceDelay,
                         performance.piManagement,
@@ -320,7 +317,7 @@ public class PerformanceRepositoryCustomImpl extends QuerydslRepositorySupport i
                         performance.piCompletionYear,
                         performance.piErectionCost,
                         performance.piSafetyLevel,
-                        performance.piGoalLevel,
+                        performance.piUsabilityAndGoalLevel,
                         performance.piBusinessType,
                         performance.piBusinessExpenses
                 ));

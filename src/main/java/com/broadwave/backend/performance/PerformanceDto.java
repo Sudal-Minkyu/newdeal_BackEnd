@@ -25,8 +25,7 @@ public class PerformanceDto {
     private String piType; // 형식구분(NULL)
     private Long piErectionCost; // 취득원가(NOTNULL)
     private String piSafetyLevel; // 안전등급(NOTNULL)
-    private String piUsabilityLevel; // 사용성등급(NOTNULL)
-    private String piGoalLevel; // 목표등급(NOTNULL)
+    private String piUsabilityAndGoalLevel; // 사용성등급(NOTNULL) , 목표안전등급
     private Double piMaintenanceDelay;  // 유지보수기간(NOTNULL)
     private String piManagement; // 관리주체(NULL)
     private String piAgency; // 관리감독기관(NULL)

@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 @Data
 public class PerformanceMiddleSaveDto {
 
+    private String piBusiness; // 사업구분(NOTNULL)
     private String piFacilityType; // 시설유형(NOTNULL)
     private String piFacilityName; // 시설유형(NULL)
     private String piKind; // 종별구분(NOTNULL)
@@ -26,8 +27,7 @@ public class PerformanceMiddleSaveDto {
     private String piType; // 형식구분(NULL)
     private Long piErectionCost; // 취득원가(NOTNULL)
     private String piSafetyLevel; // 안전등급(NOTNULL)
-    private String piUsabilityLevel; // 사용성등급(NOTNULL)
-    private String piGoalLevel; // 목표등급(NOTNULL)
+    private String piUsabilityAndGoalLevel; // 사용성등급(NOTNULL) , 목표안전등급
     private Double piMaintenanceDelay;  // 유지보수기간(NOTNULL)
     private String piManagement; // 관리주체(NULL)
     private String piAgency; // 관리감독기관(NULL)
@@ -37,4 +37,5 @@ public class PerformanceMiddleSaveDto {
     private String piRater; // 평가자이름(NULL)
     private String piRaterBelong; // 평자가 소속(NULL)
     private String piRaterPhone; // 평가자 연락처(NULL)
+
 }

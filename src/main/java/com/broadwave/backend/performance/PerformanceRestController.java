@@ -74,6 +74,7 @@ public class PerformanceRestController {
         }else{
             data.put("middleSave",1);
             data.put("piAutoNum",performance.getPiAutoNum());
+            data.put("piBusiness",performance.getPiBusiness());
         }
         return ResponseEntity.ok(res.dataSendSuccess(data));
     }
@@ -119,10 +120,8 @@ public class PerformanceRestController {
 
         List<PerformanceMiddleBusinessDataDto> performance = performanceService.findByInsertIAndAutoNum2(insert_id,autoNum);
 //        log.info("middleData performance : "+performance);
-        data.put("piBusiness",performance.get(0).getPiBusiness());
-        if(performance.get(0).getPiBusiness()!=null){
-            data.put("performance",performance);
-        }
+
+        data.put("performance",performance);
         data.put("size",performance.size());
 
         return ResponseEntity.ok(res.dataSendSuccess(data));
@@ -192,7 +191,7 @@ public class PerformanceRestController {
         if(piFacilityType==null){
             return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE021.getCode(), ResponseErrorCode.NDE021.getDesc(),null,null));
         }else if(piFacilityType.equals("보도육교") || piFacilityType.equals("지하차도") || piFacilityType.equals("절토사면")|| piFacilityType.equals("옹벽")){
-            performance.setPiUsabilityLevel("기타");
+            performance.setPiUsabilityAndGoalLevel("기타");
         }
 
         performance.setPiInputCount(1);
@@ -208,6 +207,7 @@ public class PerformanceRestController {
             String newAutoNum = keyGenerateService.keyGenerate("nd_pi_input", yyMM.format(now), currentuserid);
             performance.setPiAutoNum(newAutoNum);
             data.put("autoNum",newAutoNum);
+            data.put("businessNum",performance.getPiBusiness());
         }else{
             Optional<Performance> optionalPerformance = performanceService.findByPiAutoNumAndInsert_id(autoNum,currentuserid);
             log.info("optionalPerformance : "+optionalPerformance);
@@ -215,7 +215,6 @@ public class PerformanceRestController {
                 performance.setId(optionalPerformance.get().getId());
                 performance.setPiAutoNum(autoNum);
                 //여기서부터 비지니스 중간저장
-                performance.setPiBusiness(optionalPerformance.get().getPiBusiness());
                 performance.setPiBusinessType(optionalPerformance.get().getPiBusinessType());
                 performance.setPiTargetAbsence(optionalPerformance.get().getPiTargetAbsence());
                 performance.setPiBusinessClassification(optionalPerformance.get().getPiBusinessClassification());
@@ -227,6 +226,7 @@ public class PerformanceRestController {
                 performance.setPiBusinessPlanned(optionalPerformance.get().getPiBusinessPlanned());
                 performance.setPiWhether(optionalPerformance.get().getPiWhether());
                 data.put("autoNum", autoNum);
+                data.put("businessNum",performance.getPiBusiness());
             }else {
                 return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE019.getCode(), ResponseErrorCode.NDE019.getDesc(),ResponseErrorCode.NDE020.getCode(), ResponseErrorCode.NDE020.getDesc()));
             }
@@ -253,15 +253,11 @@ public class PerformanceRestController {
 
         Performance optionalPerformance = performanceService.findByBusiness(autoNum,insert_id);
 
-        log.info("PiBusiness : "+performanceMiddleSaveBusinessDto.getPiBusiness());
-        if(performanceMiddleSaveBusinessDto.getPiBusiness()==null){
-            return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE025.getCode(), ResponseErrorCode.NDE025.getDesc(),null,null));
-        }
-
         if(optionalPerformance == null ){
             log.info("존재하지않음.");
         }else {
             log.info("현재 일려번호 AutoNum : " + optionalPerformance.getPiAutoNum());
+            log.info("현재 사업구분 PiBusiness : " + optionalPerformance.getPiBusiness());
             System.out.println();
 
             List<PerformanceMiddleBusinessDataDto> listPerformance = performanceService.findByInsertIAndAutoNum2(insert_id,autoNum);
@@ -281,8 +277,6 @@ public class PerformanceRestController {
 
                     Performance performance = modelMapper.map(optionalPerformance, Performance.class);
 
-                    performance.setPiBusiness(performanceMiddleSaveBusinessDto.getPiBusiness());
-
                     performance.setPiTargetAbsence(performanceMiddleSaveBusinessDto.getPiTargetAbsence().get(i));
                     performance.setPiBusinessClassification(performanceMiddleSaveBusinessDto.getPiBusinessClassification().get(i));
                     performance.setPiBusinessExpenses(performanceMiddleSaveBusinessDto.getPiBusinessExpenses().get(i));
@@ -290,7 +284,7 @@ public class PerformanceRestController {
                     performance.setPiBeforeSafetyRating(performanceMiddleSaveBusinessDto.getPiBeforeSafetyRating().get(i));
                     performance.setPiAfterSafetyRating(performanceMiddleSaveBusinessDto.getPiAfterSafetyRating().get(i));
 
-                    performance.setPiWhether(performanceMiddleSaveBusinessDto.getPiWhether().get(i));
+                    performance.setPiWhether(performanceMiddleSaveBusinessDto.getPiWhether());
 
                     performance.setPiInputGreat(0);
 
@@ -339,7 +333,6 @@ public class PerformanceRestController {
                     try {
                         Performance performance = modelMapper.map(optionalPerformance, Performance.class);
 
-                        performance.setPiBusiness(performanceMiddleSaveBusinessDto.getPiBusiness());
                         performance.setPiTargetAbsence(performanceMiddleSaveBusinessDto.getPiTargetAbsence().get(i));
                         performance.setPiBusinessClassification(performanceMiddleSaveBusinessDto.getPiBusinessClassification().get(i));
                         performance.setPiBusinessExpenses(performanceMiddleSaveBusinessDto.getPiBusinessExpenses().get(i));
@@ -347,7 +340,7 @@ public class PerformanceRestController {
                         performance.setPiBeforeSafetyRating(performanceMiddleSaveBusinessDto.getPiBeforeSafetyRating().get(i));
                         performance.setPiAfterSafetyRating(performanceMiddleSaveBusinessDto.getPiAfterSafetyRating().get(i));
 
-                        performance.setPiWhether(performanceMiddleSaveBusinessDto.getPiWhether().get(i));
+                        performance.setPiWhether(performanceMiddleSaveBusinessDto.getPiWhether());
 
                         performance.setPiInputGreat(0);
 
@@ -405,7 +398,6 @@ public class PerformanceRestController {
                     try {
                         Performance performance = modelMapper.map(optionalPerformance, Performance.class);
 
-                        performance.setPiBusiness(performanceMiddleSaveBusinessDto.getPiBusiness());
                         performance.setPiTargetAbsence(performanceMiddleSaveBusinessDto.getPiTargetAbsence().get(i));
                         performance.setPiBusinessClassification(performanceMiddleSaveBusinessDto.getPiBusinessClassification().get(i));
                         performance.setPiBusinessExpenses(performanceMiddleSaveBusinessDto.getPiBusinessExpenses().get(i));
@@ -413,7 +405,7 @@ public class PerformanceRestController {
                         performance.setPiBeforeSafetyRating(performanceMiddleSaveBusinessDto.getPiBeforeSafetyRating().get(i));
                         performance.setPiAfterSafetyRating(performanceMiddleSaveBusinessDto.getPiAfterSafetyRating().get(i));
 
-                        performance.setPiWhether(performanceMiddleSaveBusinessDto.getPiWhether().get(i));
+                        performance.setPiWhether(performanceMiddleSaveBusinessDto.getPiWhether());
 
                         performance.setPiInputGreat(0);
 
@@ -504,6 +496,7 @@ public class PerformanceRestController {
         }
 
         // 가중치 셋팅
+        log.info("weightMapperDto : " + weightMapperDto);
         Weight weight = modelMapper.map(weightMapperDto, Weight.class);
         weight.setPiAutoNum(autoNum);
         weight.setInsert_id(insert_id);
@@ -548,20 +541,33 @@ public class PerformanceRestController {
 
         Sheet worksheet = workbook.getSheetAt(0); // 첫번째 시트
         // 제공한 양식 엑셀파일이 맞는지 확인 (첫번째시트)
+        String businessData = weightMapperDto.getWeightCategory();
+        String piBusiness;
+        int rowNum;
+        log.info("유형 : "+weightMapperDto.getWeightCategory());
         try {
             Row rowCheck = worksheet.getRow(2);
             Object cellDataCheck = rowCheck.getCell(2);
-            Integer rowSize = worksheet.getPhysicalNumberOfRows();
             log.info("cellDataCheck : " + cellDataCheck.toString());
+            if(businessData.equals("노후화대응")){
+                rowNum = 16;
+            }else if(businessData.equals("기준변화")){
+                rowNum = 13;
+            }else{
+                rowNum = 14;
+            }
+            Row rowBusiness = worksheet.getRow(rowNum);
+            Object rowBusinessCheck = rowBusiness.getCell(3);
+            piBusiness = rowBusinessCheck.toString().substring(0,2);
             log.info("");
             if (!cellDataCheck.toString().equals("입력정보")) {
-                return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE012.getCode(), ResponseErrorCode.NDE012.getDesc(), null, null));
-            }else if(!rowSize.equals(31)){
                 return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE012.getCode(), ResponseErrorCode.NDE012.getDesc(), null, null));
             }
         } catch (NullPointerException e) {
             return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE012.getCode(), ResponseErrorCode.NDE012.getDesc(), null, null));
         }
+
+        log.info("piBusiness : "+piBusiness);
 
         // 일련번호 카운트 생성
         log.info("일련번호 생성");
@@ -573,23 +579,33 @@ public class PerformanceRestController {
         Weight weight = modelMapper.map(weightMapperDto, Weight.class);
         log.info("가중치 : "+weight);
 
-        ArrayList<Object> excelList = new ArrayList<>();
-        List<Performance> ListPerformance = new ArrayList<>();
-        log.info("getPhysicalNumberOfRows : " + worksheet.getPhysicalNumberOfRows());
-        log.info("");
-        for (int i=3; i<7; i++){
-            Performance performance = new Performance();
-            for (int j = 3; j < worksheet.getPhysicalNumberOfRows()+1; j++) {
-                Row row = worksheet.getRow(j);
-                Cell cellData = row.getCell(i);
-                CellType ct = cellData.getCellType();
-                log.info(j+" 셀타입 : "+ct);
-                if (ct == CellType.BLANK) {
-                    log.info("이곳은 널 입니다.");
-                    break;
-                } else if(ct == CellType.NUMERIC || ct == CellType.STRING) {
-                    try {
-                        if (j == 21 || j == 9) {
+        if(piBusiness.equals("노후") && piBusiness.equals(businessData.substring(0,2))){
+            log.info("노후화 유형 엑셀파일입니다.");
+
+            ArrayList<Object> excelList = new ArrayList<>();
+            List<Performance> ListPerformance = new ArrayList<>();
+            log.info("getPhysicalNumberOfRows : " + worksheet.getPhysicalNumberOfRows());
+            log.info("");
+            for (int i=3; i<7; i++){
+                Performance performance = new Performance();
+                for (int j = 3; j < worksheet.getPhysicalNumberOfRows()+1; j++) {
+                    Row row = worksheet.getRow(j);
+                    Cell cellData = row.getCell(i);
+                    CellType ct = cellData.getCellType();
+//                    log.info( j +" 셀타입 : "+ct);
+                    if (ct == CellType.BLANK) {
+                        if(j==4 || j==6 || j==7 || j==9 || j==10 || j==11 || j==12 || j==13 || j==16 || j==17 || j==18 || j==21 || j==22 || j==23 || j==24 || j==25 || j==26 || j==27 || j==28){
+                            return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE029.getCode(), ResponseErrorCode.NDE029.getDesc(), ResponseErrorCode.NDE030.getCode(), ResponseErrorCode.NDE030.getDesc()));
+                        }else{
+                            if(j!=3){
+                                excelList.add(null);
+                            }else{
+                                log.info("이곳은 널 입니다.");
+                                break;
+                            }
+                        }
+                    } else if(ct == CellType.NUMERIC || ct == CellType.STRING) {
+                        if (j == 20 || j == 9) {
                             try {
                                 String cost = cellData.toString();
                                 if (cost.contains("E")) {
@@ -608,78 +624,387 @@ public class PerformanceRestController {
                                 log.info("숫자가 아닌 문자열 입니다.");
                                 return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE017.getCode(), ResponseErrorCode.NDE017.getDesc(), ResponseErrorCode.NDE018.getCode(), ResponseErrorCode.NDE018.getDesc()));
                             }
-                        } else {
+                        }else{
                             excelList.add(cellData);
                         }
-                    } catch (Exception e) {
-                        log.info("e : " + e);
+                    }else{
                         return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE012.getCode(), ResponseErrorCode.NDE012.getDesc(), null, null));
                     }
-                }else{
-                    return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE012.getCode(), ResponseErrorCode.NDE012.getDesc(), null, null));
+                }
+
+                log.info("==============결과==============");
+//                log.info(i-2+"번째 루트 리스트 : "+excelList);
+//                log.info(i-2+"번째 루트 리스트길이 : "+excelList.size());
+                log.info("");
+                if(excelList.size()==28) {
+                    log.info("엑셀의 성능개선사업 내용을 저장합니다.");
+
+                    performance.setPiFacilityType(excelList.get(0).toString());  // 시설유형(NOTNULL)
+                    performance.setPiFacilityName(excelList.get(1).toString());  // 시설유형
+                    if(excelList.get(2)==null){
+                        performance.setPiKind(null);
+                    }else{
+                        performance.setPiKind(excelList.get(2).toString()); // 종별구분(NOTNULL)
+                    }
+                    performance.setPiCompletionYear(Double.parseDouble(excelList.get(3).toString())); // 준공연도(NOTNULL)
+                    performance.setPiPublicYear(Double.parseDouble(excelList.get(4).toString())); // 공용연수(NOTNULL)
+                    if(excelList.get(5)==null){
+                        performance.setPiType(null);
+                    }else{
+                        performance.setPiType(excelList.get(5).toString()); // 형식구분(NULL)
+                    }
+                    performance.setPiErectionCost(Long.parseLong(excelList.get(6).toString())); // 취득원가(NOTNULL)
+                    performance.setPiSafetyLevel(excelList.get(7).toString()); // 안전등급(NOTNULL)
+                    performance.setPiUsabilityAndGoalLevel(excelList.get(8).toString()); // 목표 안전등급(NOTNULL)
+                    performance.setPiMaintenanceDelay(Double.parseDouble(excelList.get(9).toString())); // 유지보수기간(NOTNULL)
+                    if(excelList.get(10)==null){
+                        performance.setPiManagement(null);
+                    }else{
+                        performance.setPiManagement(excelList.get(10).toString()); // 관리주체(NULL)
+                    }
+                    if(excelList.get(11)==null){
+                        performance.setPiAgency(null);
+                    }else{
+                        performance.setPiAgency(excelList.get(11).toString()); // 관리감독기관(NULL)
+                    }
+
+                    performance.setPiAADT(Double.parseDouble(excelList.get(12).toString())); // 연평균일교통량(NOTNULL)
+
+                    performance.setPiBusiness(weightMapperDto.getWeightCategory()); // 사업구분(NOTNULL)
+
+                    performance.setPiBusinessType(excelList.get(14).toString()); // 사업유형(NOTNULL)
+                    if(excelList.get(15)==null){
+                        performance.setPiTargetAbsence(null);
+                    }else{
+                        performance.setPiTargetAbsence(excelList.get(15).toString()); // 대상부재(NULL)
+                    }
+                    if(excelList.get(16)==null){
+                        performance.setPiBusinessClassification(null);
+                    }else{
+                        performance.setPiBusinessClassification(excelList.get(16).toString()); // 사업분류(NOTNULL)
+                    }
+                    performance.setPiBusinessExpenses(Long.parseLong(excelList.get(17).toString())); // 사업비용(NOTNULL)
+                    performance.setPiBeforeSafetyRating(excelList.get(18).toString()); // 사업전 부재 안전등급(NOTNULL)
+                    performance.setPiAfterSafetyRating(excelList.get(19).toString()); // 사업후 부재 안전등급(NOTNULL)
+
+                    performance.setPiBusinessObligatory(Double.parseDouble(excelList.get(20).toString()));// 법에 따른 의무사업(NOTNULL)
+                    performance.setPiBusinessMandatory(Double.parseDouble(excelList.get(21).toString())); // 법정계획에 따른 의무사업(NOTNULL)
+                    performance.setPiBusinessPlanned(Double.parseDouble(excelList.get(22).toString())); // 자체계획/의결에 따른 사업(NOTNULL)
+                    performance.setPiWhether(Double.parseDouble(excelList.get(23).toString())); // 최근 1년간 민원 및 사고발생 건수(NOTNULL)
+
+                    performance.setPiRaterBaseYear(Double.parseDouble(excelList.get(24).toString())); // 평가 기준년도(NOTNULL)
+                    if(excelList.get(25)==null){
+                        performance.setPiRater(null);
+                    }else{
+                        performance.setPiRater(excelList.get(25).toString()); // 평가자이름(NULL)
+                    }
+                    if(excelList.get(26)==null){
+                        performance.setPiRaterBelong(null);
+                    }else{
+                        performance.setPiRaterBelong(excelList.get(26).toString()); // 평자가 소속(NULL)
+                    }
+                    if(excelList.get(27)==null){
+                        performance.setPiRaterPhone(null);
+                    }else{
+                        performance.setPiRaterPhone(excelList.get(27).toString()); // 평가자 연락처(NULL)
+                    }
+
+                    performance.setPiAutoNum(autoNum); // 대안 일려번호(NOTNULL)
+                    performance.setPiInputCount(i - 2);  //대안카운트(NULL)
+                    performance.setPiInputGreat(0);  //우수대안인지 0 or 1(NULL)
+                    performance.setPiInputMiddleSave(1);  //작성완료된 글인지 0 or 1(NULL)
+
+                    performance.setInsertDateTime(LocalDateTime.now()); // 작성날짜
+                    performance.setInsert_id(currentuserid); // 작성자
+
+                    excelList.clear();
+                    ListPerformance.add(performance);
                 }
             }
+    //        log.info("ListPerformance : " + ListPerformance);
 
-            log.info("==============결과==============");
-            log.info(i-2+"번째 루트 리스트 : "+excelList);
-            log.info(i-2+"번째 루트 리스트길이 : "+excelList.size());
-            log.info("");
-            if(excelList.size()==29) {
-                log.info("엑셀의 성능개선사업 내용을 저장합니다.");
-
-                performance.setPiFacilityType(excelList.get(0).toString());  // 시설유형(NOTNULL)
-                performance.setPiFacilityName(excelList.get(1).toString());  // 시설유형(NULL)
-                performance.setPiKind(excelList.get(2).toString()); // 종별구분(NOTNULL)
-                performance.setPiCompletionYear(Double.parseDouble(excelList.get(3).toString())); // 준공연도(NOTNULL)
-                performance.setPiPublicYear(Double.parseDouble(excelList.get(4).toString())); // 공용연수(NOTNULL)
-                performance.setPiType(excelList.get(5).toString()); // 형식구분(NULL)
-                performance.setPiErectionCost(Long.parseLong(excelList.get(6).toString())); // 취득원가(NOTNULL)
-                performance.setPiSafetyLevel(excelList.get(7).toString()); // 안전등급(NOTNULL)
-                performance.setPiUsabilityLevel(excelList.get(8).toString()); // 사용성등급(NOTNULL)
-                performance.setPiGoalLevel(excelList.get(9).toString()); // 목표등급(NOTNULL)
-                performance.setPiMaintenanceDelay(Double.parseDouble(excelList.get(10).toString())); // 유지보수기간(NOTNULL)
-                performance.setPiManagement(excelList.get(11).toString()); // 관리주체(NULL)
-                performance.setPiAgency(excelList.get(12).toString()); // 관리감독기관(NULL)
-
-                performance.setPiAADT(Double.parseDouble(excelList.get(13).toString())); // 연평균일교통량(NOTNULL)
-
-//                performance.setPiBusiness(excelList.get(14).toString()); // 사업구분(NOTNULL)
-                performance.setPiBusiness(weightMapperDto.getWeight_Category()); // 사업구분(NOTNULL)
-                performance.setPiBusinessType(excelList.get(14).toString()); // 사업유형(NOTNULL)
-                performance.setPiTargetAbsence(excelList.get(16).toString()); // 대상부재(NULL)
-                performance.setPiBusinessClassification(excelList.get(17).toString()); // 사업분류(NOTNULL)
-                performance.setPiBusinessExpenses(Long.parseLong(excelList.get(18).toString())); // 사업비용(NOTNULL)
-                performance.setPiBeforeSafetyRating(excelList.get(19).toString()); // 사업전 부재 안전등급(NOTNULL)
-                performance.setPiAfterSafetyRating(excelList.get(20).toString()); // 사업후 부재 안전등급(NOTNULL)
-
-                performance.setPiBusinessObligatory(Double.parseDouble(excelList.get(21).toString()));// 법에 따른 의무사업(NOTNULL)
-                performance.setPiBusinessMandatory(Double.parseDouble(excelList.get(22).toString())); // 법정계획에 따른 의무사업(NOTNULL)
-                performance.setPiBusinessPlanned(Double.parseDouble(excelList.get(23).toString())); // 자체계획/의결에 따른 사업(NOTNULL)
-                performance.setPiWhether(Double.parseDouble(excelList.get(24).toString())); // 최근 1년간 민원 및 사고발생 건수(NOTNULL)
-
-                performance.setPiRaterBaseYear(Double.parseDouble(excelList.get(25).toString())); // 평가 기준년도(NOTNULL)
-                performance.setPiRater(excelList.get(26).toString()); // 평가자이름(NULL)
-                performance.setPiRaterBelong(excelList.get(27).toString()); // 평자가 소속(NULL)
-                performance.setPiRaterPhone(excelList.get(28).toString()); // 평가자 연락처(NULL)
-
-                performance.setPiAutoNum(autoNum); // 대안 일려번호(NOTNULL)
-                performance.setPiInputCount(i - 2);  //대안카운트(NULL)
-                performance.setPiInputGreat(0);  //우수대안인지 0 or 1(NULL)
-                performance.setPiInputMiddleSave(1);  //작성완료된 글인지 0 or 1(NULL)
-
-                performance.setInsertDateTime(LocalDateTime.now()); // 작성날짜
-                performance.setInsert_id(currentuserid); // 작성자
-
-                excelList.clear();
-                ListPerformance.add(performance);
+            for (Performance performance : ListPerformance) {
+                performanceService.save(performance);
             }
-        }
-        log.info("ListPerformance : " + ListPerformance);
 
-        for (Performance performance : ListPerformance) {
-            performanceService.save(performance);
-        }
 
+        }else if(piBusiness.equals("기준") && piBusiness.equals(businessData.substring(0,2))){
+            log.info("기준변화 유형 엑셀파일입니다.");
+
+            ArrayList<Object> excelList = new ArrayList<>();
+            List<Performance> ListPerformance = new ArrayList<>();
+            log.info("getPhysicalNumberOfRows : " + worksheet.getPhysicalNumberOfRows());
+            log.info("");
+            for (int i=3; i<7; i++){
+                Performance performance = new Performance();
+                for (int j = 3; j < worksheet.getPhysicalNumberOfRows()+1; j++) {
+                    Row row = worksheet.getRow(j);
+                    Cell cellData = row.getCell(i);
+                    CellType ct = cellData.getCellType();
+//                    log.info( j +" 셀타입 : "+ct);
+                    if (ct == CellType.BLANK) {
+                        if(j==4 || j==6 || j==7 || j==9 || j==12 || j==13 || j==14 || j==17 || j==18 || j==19 || j==20 || j==21){
+                            return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE029.getCode(), ResponseErrorCode.NDE029.getDesc(), ResponseErrorCode.NDE030.getCode(), ResponseErrorCode.NDE030.getDesc()));
+                        }else{
+                            if(j!=3){
+                                excelList.add(null);
+                            }else{
+                                log.info("이곳은 널 입니다.");
+                                break;
+                            }
+                        }
+                    } else if(ct == CellType.NUMERIC || ct == CellType.STRING) {
+                        if (j == 17) {
+                            try {
+                                String cost = cellData.toString();
+                                if (cost.contains("E")) {
+                                    log.info("문자가 E가 포함되어 있습니다.");
+                                    log.info("cost : " + cost);
+                                    BigDecimal costCheck = new BigDecimal(Double.parseDouble(cost));
+                                    log.info("숫자로 변환 : " + costCheck);
+                                    excelList.add(costCheck);
+                                } else {
+                                    log.info("문자 E가 포함되어 있지 않습니다.");
+                                    log.info("cost : " + cost);
+                                    excelList.add(cellData);
+                                }
+                            } catch (Exception e) {
+                                log.info("e : " + e);
+                                log.info("숫자가 아닌 문자열 입니다.");
+                                return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE017.getCode(), ResponseErrorCode.NDE017.getDesc(), ResponseErrorCode.NDE018.getCode(), ResponseErrorCode.NDE018.getDesc()));
+                            }
+                        }else{
+                            excelList.add(cellData);
+                        }
+                    }else{
+                        return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE012.getCode(), ResponseErrorCode.NDE012.getDesc(), null, null));
+                    }
+                }
+
+                log.info("==============결과==============");
+//                log.info(i-2+"번째 루트 리스트 : "+excelList);
+//                log.info(i-2+"번째 루트 리스트길이 : "+excelList.size());
+                log.info("");
+                if(excelList.size()==22) {
+                    log.info("노후화대응의 대한 엑셀파일 성능개선사업 내용을 저장합니다.");
+
+                    performance.setPiFacilityType(excelList.get(0).toString());  // 시설유형(NOTNULL)
+                    performance.setPiFacilityName(excelList.get(1).toString());  // 시설유형(NULL)
+                    if(excelList.get(2)==null){
+                        performance.setPiKind(null);
+                    }else{
+                        performance.setPiKind(excelList.get(2).toString()); // 종별구분(NOTNULL)
+                    }
+                    performance.setPiCompletionYear(Double.parseDouble(excelList.get(3).toString())); // 준공연도(NOTNULL)
+                    performance.setPiPublicYear(Double.parseDouble(excelList.get(4).toString())); // 공용연수(NOTNULL)
+                    if(excelList.get(5)==null){
+                        performance.setPiType(null);
+                    }else{
+                        performance.setPiType(excelList.get(5).toString());  // 형식구분(NULL)
+                    }
+                    performance.setPiSafetyLevel(excelList.get(6).toString()); // 안전등급(NOTNULL)
+                    if(excelList.get(7)==null){
+                        performance.setPiManagement(null);
+                    }else{
+                        performance.setPiManagement(excelList.get(7).toString()); // 관리주체(NULL)
+                    }
+                    if(excelList.get(8)==null){
+                        performance.setPiAgency(null);
+                    }else{
+                        performance.setPiAgency(excelList.get(8).toString()); // 관리감독기관(NULL)
+                    }
+                    performance.setPiAADT(Double.parseDouble(excelList.get(9).toString())); // 연평균일교통량(NOTNULL)
+
+                    performance.setPiBusiness(weightMapperDto.getWeightCategory()); // 사업구분(NOTNULL)
+
+                    performance.setPiBusinessType(excelList.get(11).toString()); // 사업유형(NOTNULL)
+                    if(excelList.get(12)==null){
+                        performance.setPiTargetAbsence(null);
+                    }else{
+                        performance.setPiTargetAbsence(excelList.get(12).toString()); // 대상부재(NULL)
+                    }
+                    if(excelList.get(13)==null){
+                        performance.setPiBusinessClassification(null);
+                    }else{
+                        performance.setPiBusinessClassification(excelList.get(13).toString()); // 사업분류(NOTNULL)
+                    }
+                    performance.setPiBusinessExpenses(Long.parseLong(excelList.get(14).toString())); // 사업비용(NOTNULL)
+
+                    performance.setPiBusinessObligatory(Double.parseDouble(excelList.get(15).toString()));// 법에 따른 의무사업(NOTNULL)
+                    performance.setPiBusinessMandatory(Double.parseDouble(excelList.get(16).toString())); // 법정계획에 따른 의무사업(NOTNULL)
+                    performance.setPiBusinessPlanned(Double.parseDouble(excelList.get(17).toString())); // 자체계획/의결에 따른 사업(NOTNULL)
+
+                    performance.setPiRaterBaseYear(Double.parseDouble(excelList.get(18).toString())); // 평가 기준년도(NOTNULL)
+                    if(excelList.get(19)==null){
+                        performance.setPiRater(null);
+                    }else{
+                        performance.setPiRater(excelList.get(19).toString()); // 평가자이름(NULL)
+                    }
+                    if(excelList.get(20)==null){
+                        performance.setPiRaterBelong(null);
+                    }else{
+                        performance.setPiRaterBelong(excelList.get(20).toString()); // 평자가 소속(NULL)
+                    }
+                    if(excelList.get(21)==null){
+                        performance.setPiRaterPhone(null);
+                    }else{
+                        performance.setPiRaterPhone(excelList.get(21).toString()); // 평가자 연락처(NULL)
+                    }
+
+                    performance.setPiAutoNum(autoNum); // 대안 일려번호(NOTNULL)
+                    performance.setPiInputCount(i - 2);  //대안카운트(NULL)
+                    performance.setPiInputGreat(0);  //우수대안인지 0 or 1(NULL)
+                    performance.setPiInputMiddleSave(1);  //작성완료된 글인지 0 or 1(NULL)
+
+                    performance.setInsertDateTime(LocalDateTime.now()); // 작성날짜
+                    performance.setInsert_id(currentuserid); // 작성자
+
+                    excelList.clear();
+                    ListPerformance.add(performance);
+                }
+            }
+//            log.info("ListPerformance : " + ListPerformance);
+
+            for (Performance performance : ListPerformance) {
+                performanceService.save(performance);
+            }
+
+        }else if(piBusiness.equals("사용") && piBusiness.equals(businessData.substring(0,2))){
+            log.info("사용성변화 유형 엑셀파일입니다.");
+            ArrayList<Object> excelList = new ArrayList<>();
+            List<Performance> ListPerformance = new ArrayList<>();
+            log.info("getPhysicalNumberOfRows : " + worksheet.getPhysicalNumberOfRows());
+            log.info("");
+            for (int i=3; i<7; i++){
+                Performance performance = new Performance();
+                for (int j = 3; j < worksheet.getPhysicalNumberOfRows()+1; j++) {
+                    Row row = worksheet.getRow(j);
+                    Cell cellData = row.getCell(i);
+                    CellType ct = cellData.getCellType();
+//                    log.info( j +" 셀타입 : "+ct);
+                    if (ct == CellType.BLANK) {
+                        if(j==4 || j==6 || j==7 || j==9 || j==10 || j==13 || j==14 || j==15 || j==18 || j==19 || j==20 || j==21 || j==22 || j==23){
+                            return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE029.getCode(), ResponseErrorCode.NDE029.getDesc(), ResponseErrorCode.NDE030.getCode(), ResponseErrorCode.NDE030.getDesc()));
+                        }else{
+                            if(j!=3){
+                                excelList.add(null);
+                            }else{
+                                log.info("이곳은 널 입니다.");
+                                break;
+                            }
+                        }
+                    } else if(ct == CellType.NUMERIC || ct == CellType.STRING) {
+                        if (j == 18) {
+                            try {
+                                String cost = cellData.toString();
+                                if (cost.contains("E")) {
+                                    log.info("문자가 E가 포함되어 있습니다.");
+                                    log.info("cost : " + cost);
+                                    BigDecimal costCheck = new BigDecimal(Double.parseDouble(cost));
+                                    log.info("숫자로 변환 : " + costCheck);
+                                    excelList.add(costCheck);
+                                } else {
+                                    log.info("문자 E가 포함되어 있지 않습니다.");
+                                    log.info("cost : " + cost);
+                                    excelList.add(cellData);
+                                }
+                            } catch (Exception e) {
+                                log.info("e : " + e);
+                                log.info("숫자가 아닌 문자열 입니다.");
+                                return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE017.getCode(), ResponseErrorCode.NDE017.getDesc(), ResponseErrorCode.NDE018.getCode(), ResponseErrorCode.NDE018.getDesc()));
+                            }
+                        }else{
+                            excelList.add(cellData);
+                        }
+                    }else{
+                        return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE012.getCode(), ResponseErrorCode.NDE012.getDesc(), null, null));
+                    }
+                }
+                log.info("==============결과==============");
+//                log.info(i-2+"번째 루트 리스트 : "+excelList);
+//                log.info(i-2+"번째 루트 리스트길이 : "+excelList.size());
+                log.info("");
+                if(excelList.size()==24) {
+                    log.info("엑셀의 성능개선사업 내용을 저장합니다.");
+                    performance.setPiFacilityType(excelList.get(0).toString());  // 시설유형(NOTNULL)
+                    performance.setPiFacilityName(excelList.get(1).toString());  // 시설유형(NULL)
+                    if(excelList.get(2)==null){
+                        performance.setPiKind(null);
+                    }else{
+                        performance.setPiKind(excelList.get(2).toString()); // 종별구분(NOTNULL)
+                    }
+                    performance.setPiCompletionYear(Double.parseDouble(excelList.get(3).toString())); // 준공연도(NOTNULL)
+                    performance.setPiPublicYear(Double.parseDouble(excelList.get(4).toString())); // 공용연수(NOTNULL)
+                    if(excelList.get(5)==null){
+                        performance.setPiType(null);
+                    }else{
+                        performance.setPiType(excelList.get(5).toString()); // 형식구분(NULL)
+                    }
+                    performance.setPiSafetyLevel(excelList.get(6).toString()); // 안전등급(NOTNULL)
+                    performance.setPiUsabilityAndGoalLevel(excelList.get(7).toString()); // 사용성등급(NOTNULL)
+                    if(excelList.get(8)==null){
+                        performance.setPiManagement(null);
+                    }else{
+                        performance.setPiManagement(excelList.get(8).toString()); // 관리주체(NULL)
+                    }
+                    if(excelList.get(9)==null){
+                        performance.setPiAgency(null);
+                    }else{
+                        performance.setPiAgency(excelList.get(9).toString()); // 관리감독기관(NULL)
+                    }
+                    performance.setPiAADT(Double.parseDouble(excelList.get(10).toString())); // 연평균일교통량(NOTNULL)
+                    performance.setPiBusiness(weightMapperDto.getWeightCategory()); // 사업구분(NOTNULL)
+                    performance.setPiBusinessType(excelList.get(12).toString()); // 사업유형(NOTNULL)
+                    if(excelList.get(13)==null){
+                        performance.setPiTargetAbsence(null);
+                    }else{
+                        performance.setPiTargetAbsence(excelList.get(13).toString()); // 대상부재(NULL)
+                    }
+                    if(excelList.get(14)==null){
+                        performance.setPiBusinessClassification(null);
+                    }else{
+                        performance.setPiBusinessClassification(excelList.get(14).toString()); // 사업분류(NOTNULL)
+                    }
+                    performance.setPiBusinessExpenses(Long.parseLong(excelList.get(15).toString())); // 사업비용(NOTNULL)
+                    performance.setPiBusinessObligatory(Double.parseDouble(excelList.get(16).toString()));// 법에 따른 의무사업(NOTNULL)
+                    performance.setPiBusinessMandatory(Double.parseDouble(excelList.get(17).toString())); // 법정계획에 따른 의무사업(NOTNULL)
+                    performance.setPiBusinessPlanned(Double.parseDouble(excelList.get(18).toString())); // 자체계획/의결에 따른 사업(NOTNULL)
+                    performance.setPiWhether(Double.parseDouble(excelList.get(19).toString())); // 최근 1년간 민원 및 사고발생 건수(NOTNULL)
+                    performance.setPiRaterBaseYear(Double.parseDouble(excelList.get(20).toString())); // 평가 기준년도(NOTNULL)
+                    if(excelList.get(21)==null){
+                        performance.setPiRater(null);
+                    }else{
+                        performance.setPiRater(excelList.get(21).toString()); // 평가자이름(NULL)
+                    }
+                    if(excelList.get(22)==null){
+                        performance.setPiRaterBelong(null);
+                    }else{
+                        performance.setPiRaterBelong(excelList.get(22).toString()); // 평자가 소속(NULL)
+                    }
+                    if(excelList.get(23)==null){
+                        performance.setPiRaterPhone(null);
+                    }else{
+                        performance.setPiRaterPhone(excelList.get(23).toString()); // 평가자 연락처(NULL)
+                    }
+                    performance.setPiAutoNum(autoNum); // 대안 일려번호(NOTNULL)
+                    performance.setPiInputCount(i - 2);  //대안카운트(NULL)
+                    performance.setPiInputGreat(0);  //우수대안인지 0 or 1(NULL)
+                    performance.setPiInputMiddleSave(1);  //작성완료된 글인지 0 or 1(NULL)
+                    performance.setInsertDateTime(LocalDateTime.now()); // 작성날짜
+                    performance.setInsert_id(currentuserid); // 작성자
+                    excelList.clear();
+                    ListPerformance.add(performance);
+                }
+            }
+//            log.info("ListPerformance : " + ListPerformance);
+            for (Performance performance : ListPerformance) {
+                performanceService.save(performance);
+            }
+
+
+        }else{
+            return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE027.getCode(), ResponseErrorCode.NDE027.getDesc(), ResponseErrorCode.NDE028.getCode(), ResponseErrorCode.NDE028.getDesc()));
+        }
 
         weight.setPiAutoNum(autoNum);
         weight.setInsert_id(currentuserid);
@@ -759,7 +1084,7 @@ public class PerformanceRestController {
             String type = performance.get(i).getPiFacilityType();
             // 기술성 - 사용성
             if(type.equals("교량") || type.equals("터널")){
-                Map<String,String> usabilityLevel  = performanceFunctionService.usabilityLevel(performance.get(i).getPiUsabilityLevel());
+                Map<String,String> usabilityLevel  = performanceFunctionService.usabilityLevel(performance.get(i).getPiUsabilityAndGoalLevel());
                 technicality_scroeList.add(usabilityLevel.get("score"));
                 technicality_rankList.add(usabilityLevel.get("rank"));
             }
@@ -772,7 +1097,7 @@ public class PerformanceRestController {
             technicality_scroeList.add(urgency.get("score"));
             technicality_rankList.add(urgency.get("rank"));
             // 기술성 - 목표달성도
-            Map<String,String> goal  = performanceFunctionService.goal(performance.get(i).getPiAfterSafetyRating(),performance.get(i).getPiGoalLevel());
+            Map<String,String> goal  = performanceFunctionService.goal(performance.get(i).getPiAfterSafetyRating(),performance.get(i).getPiUsabilityAndGoalLevel());
             technicality_scroeList.add(goal.get("score"));
             technicality_rankList.add(goal.get("rank"));
             // 기술성 - 종합점수 및 등급
@@ -916,8 +1241,7 @@ public class PerformanceRestController {
                             updatePerformance.setPiType(optionalPerformance.get().getPiType());
                             updatePerformance.setPiErectionCost(optionalPerformance.get().getPiErectionCost());
                             updatePerformance.setPiSafetyLevel(optionalPerformance.get().getPiSafetyLevel());
-                            updatePerformance.setPiUsabilityLevel(optionalPerformance.get().getPiUsabilityLevel());
-                            updatePerformance.setPiGoalLevel(optionalPerformance.get().getPiGoalLevel());
+                            updatePerformance.setPiUsabilityAndGoalLevel(optionalPerformance.get().getPiUsabilityAndGoalLevel());
                             updatePerformance.setPiMaintenanceDelay(optionalPerformance.get().getPiMaintenanceDelay());
                             updatePerformance.setPiManagement(optionalPerformance.get().getPiManagement());
                             updatePerformance.setPiAgency(optionalPerformance.get().getPiAgency());

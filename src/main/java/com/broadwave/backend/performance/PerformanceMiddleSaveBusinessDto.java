@@ -19,8 +19,6 @@ public class PerformanceMiddleSaveBusinessDto {
 
     private Integer businessCount;
 
-    private String piBusiness; // 사업구분(NOTNULL)
-
     private String piBusinessType1; // 사업유형1(NOTNULL)
     private String piBusinessType2; // 사업유형2(NOTNULL)
     private String piBusinessType3; // 사업유형3(NOTNULL)
@@ -50,6 +48,6 @@ public class PerformanceMiddleSaveBusinessDto {
     private Double piBusinessMandatory4; // 법정계획에 따른 의무사업(NOTNULL)
     private Double piBusinessPlanned4; // 자체계획/의결에 따른 사업(NOTNULL)
 
-    private List<Double> piWhether; // 최근 1년간 민원 및 사고발생 건수(NOTNULL)
+    private Double piWhether; // 최근 1년간 민원 및 사고발생 건수(NOTNULL)
 
 }

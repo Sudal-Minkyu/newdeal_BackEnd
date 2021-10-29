@@ -20,7 +20,7 @@ public class PerformanceListDto {
     private Double piCompletionYear; // 준공연도(NOTNULL)
     private Long piErectionCost; // 취득원가(NOTNULL)
     private String piSafetyLevel; // 안전등급(NOTNULL)
-    private String piGoalLevel; // 목표등급(NOTNULL)
+    private String piUsabilityAndGoalLevel; // 사용성등급(NOTNULL) , 목표안전등급
     private String piBusinessType; // 사업유형(NOTNULL)
     private Long piBusinessExpenses; // 사업비용(NOTNULL)
 }

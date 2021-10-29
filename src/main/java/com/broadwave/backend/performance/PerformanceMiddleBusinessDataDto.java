@@ -17,7 +17,6 @@ public class PerformanceMiddleBusinessDataDto {
 
     private Long id;
 
-    private String piBusiness; // 사업구분(NOTNULL)
     private String piBusinessType; // 사업유형(NOTNULL)
     private String piTargetAbsence; // 대상부재(NULL)
     private String piBusinessClassification; // 사업분류(NOTNULL)

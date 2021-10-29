@@ -15,10 +15,15 @@ import lombok.*;
 @Setter
 public class PerformanceCheckDto {
     private String piAutoNum; // 대안 일려번호(NOTNULL)
+    private String piBusiness; // 사업구분(NOTNULL)
     private Integer piInputMiddleSave; //작성완료된 글인지 0 or 1(NULL)
 
     public String getPiAutoNum() {
         return piAutoNum;
+    }
+
+    public String getPiBusiness() {
+        return piBusiness;
     }
 
     public Integer getPiInputMiddleSave() {
