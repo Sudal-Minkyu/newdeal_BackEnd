@@ -2,6 +2,7 @@ package com.broadwave.backend.performance;
 
 import com.broadwave.backend.performance.price.PriceDto;
 import com.broadwave.backend.performance.price.PriceService;
+import com.broadwave.backend.performance.reference.ReferenceTechnicality;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,230 +29,326 @@ public class PerformanceFunctionService {
     public PerformanceFunctionService(PriceService priceService, Map<String, String> funRankScore) {
         this.priceService = priceService;
         this.funRankScore = funRankScore;
-
     }
 
 //**************************** 노후화대응 _기술성 함수 ********************************
 
     // 노후화 대응, 기준변화, 사용성변화 - 안정성 환산점수 10/29 완료
-    public Map<String, String> safetyLevel(String piSafetyLevel,int safeValue) {
+    public Map<String, String> safetyLevel(String piSafetyLevel, ReferenceTechnicality technicality , String safeValue) {
         log.info("안정성 환산점수 함수호출");
         funRankScore.clear();
         log.info("piSafetyLevel : " + piSafetyLevel);
-        if(safeValue != 0){
+        log.info("safeValue : " + safeValue);
+        if(safeValue == null){
             switch (piSafetyLevel) {
                 case "A":
-                    funRankScore.put("score", "10");
+                    funRankScore.put("score", Double.toString(technicality.getPiTechSafetyEa()));
                     funRankScore.put("rank", "E");
                     break;
                 case "B":
-                    funRankScore.put("score", "50");
+                    funRankScore.put("score", Double.toString(technicality.getPiTechSafetyDb()));
                     funRankScore.put("rank", "D");
                     break;
                 case "C":
-                    funRankScore.put("score", "70");
+                    funRankScore.put("score", Double.toString(technicality.getPiTechSafetyCc()));
                     funRankScore.put("rank", "C");
                     break;
                 case "D":
-                    funRankScore.put("score", "90");
+                    funRankScore.put("score", Double.toString(technicality.getPiTechSafetyBd()));
                     funRankScore.put("rank", "B");
                     break;
                 default:
-                    funRankScore.put("score", "100");
+                    funRankScore.put("score", Double.toString(technicality.getPiTechSafetyAe()));
                     funRankScore.put("rank", "A");
                     break;
             }
         }else{
-            int score = 100-safeValue;
+            double score = 100-Double.parseDouble(safeValue);
+            if (technicality.getPiTechSafetyAe() <= score) {
+                funRankScore.put("rank", "A");
+            } else if (technicality.getPiTechSafetyBd() <= score) {
+                funRankScore.put("rank", "B");
+            } else if (technicality.getPiTechSafetyCc() <= score) {
+                funRankScore.put("rank", "C");
+            } else if (technicality.getPiTechSafetyDb() <= score) {
+                funRankScore.put("rank", "D");
+            } else {
+                funRankScore.put("rank", "E");
+            }
             funRankScore.put("score", String.valueOf(score));
         }
         return funRankScore;
     }
 
-    // 사용성 환산점수
-    public Map<String, String> usabilityLevel(String piUsabilityLevel) {
+    // 노후화 대응, 기준변화, 사용성변화 - 노후도 환산점수 11/04 완료
+    public Map<String, String> publicYear(Double piPublicYear,ReferenceTechnicality technicality, String publicYearValue) {
+        log.info("노후도 환산점수 함수호출");
+        funRankScore.clear();
+        log.info("piPublicYear : " + piPublicYear);
+        if(publicYearValue == null) {
+            if (technicality.getPiTechOldAMin() <= piPublicYear) {
+                funRankScore.put("score", String.valueOf(technicality.getPiTechOldAScore()));
+                funRankScore.put("rank", "A");
+            } else if (technicality.getPiTechOldBMin() <= piPublicYear) {
+                funRankScore.put("score", String.valueOf(technicality.getPiTechOldBScore()));
+                funRankScore.put("rank", "B");
+            } else if (technicality.getPiTechOldCMin() <= piPublicYear) {
+                funRankScore.put("score", String.valueOf(technicality.getPiTechOldCScore()));
+                funRankScore.put("rank", "C");
+            } else if (technicality.getPiTechOldDMin() <= piPublicYear) {
+                funRankScore.put("score", String.valueOf(technicality.getPiTechOldDScore()));
+                funRankScore.put("rank", "D");
+            } else {
+                funRankScore.put("score", String.valueOf(technicality.getPiTechOldEScore()));
+                funRankScore.put("rank", "E");
+            }
+        }else{
+            double score = 100-Double.parseDouble(publicYearValue);
+            if (technicality.getPiTechOldAMin() <= score) {
+                funRankScore.put("rank", "A");
+            } else if (technicality.getPiTechOldBMin() <= score) {
+                funRankScore.put("rank", "B");
+            } else if (technicality.getPiTechOldCMin() <= score) {
+                funRankScore.put("rank", "C");
+            } else if (technicality.getPiTechOldDMin() <= score) {
+                funRankScore.put("rank", "D");
+            } else {
+                funRankScore.put("rank", "E");
+            }
+            funRankScore.put("score", String.valueOf(score));
+        }
+        return funRankScore;
+    }
+
+    // 사용성변화 - 사용성 환산점수 11/04 완료
+    public Map<String, String> usabilityLevel(String piUsabilityLevel,ReferenceTechnicality technicality) {
         log.info("사용성 환산점수 함수호출");
         funRankScore.clear();
         log.info("piUsabilityLevel : " + piUsabilityLevel);
         switch (piUsabilityLevel) {
             case "A":
-                funRankScore.put("score", "20");
-                funRankScore.put("rank", "A");
+                funRankScore.put("score", String.valueOf(technicality.getPiTechUsabilityAe()));
+                funRankScore.put("rank", "E");
                 break;
             case "B":
-                funRankScore.put("score", "50");
-                funRankScore.put("rank", "C");
+                funRankScore.put("score", String.valueOf(technicality.getPiTechUsabilityBd()));
+                funRankScore.put("rank", "D");
                 break;
             case "C":
-                funRankScore.put("score", "80");
+                funRankScore.put("score", String.valueOf(technicality.getPiTechUsabilityCc()));
+                funRankScore.put("rank", "C");
+                break;
+            case "D":
+                funRankScore.put("score", String.valueOf(technicality.getPiTechUsabilityDb()));
                 funRankScore.put("rank", "B");
                 break;
             default:
-                funRankScore.put("score", "0");
+                funRankScore.put("score", String.valueOf(technicality.getPiTechUsabilityEa()));
                 funRankScore.put("rank", "A");
                 break;
         }
         return funRankScore;
     }
 
-    // 노후도 환산점수
-    public Map<String, String> publicYear(Double piPublicYear) {
-        log.info("노후도 환산점수 함수호출");
-        funRankScore.clear();
-        log.info("piPublicYear : " + piPublicYear);
-        if (50 <= piPublicYear) {
-            funRankScore.put("score", "100");
-            funRankScore.put("rank", "A");
-        } else if (30 <= piPublicYear) {
-            funRankScore.put("score", "90");
-            funRankScore.put("rank", "B");
-        } else if (20 <= piPublicYear) {
-            funRankScore.put("score", "70");
-            funRankScore.put("rank", "C");
-        } else if (10 <= piPublicYear) {
-            funRankScore.put("score", "50");
-            funRankScore.put("rank", "D");
-        } else {
-            funRankScore.put("score", "10");
-            funRankScore.put("rank", "E");
-        }
-        return funRankScore;
-    }
-
-    // 시급성 환산점수
-    public Map<String, String> urgency(String piSafetyLevel, Double piMaintenanceDelay) {
-        log.info("시급성 환산점수 함수호출");
+    // 노후화 대응 - 지체도 환산점수 11/04 완료
+    public Map<String, String> urgency(String piSafetyLevel, Double piMaintenanceDelay,ReferenceTechnicality technicality) {
+        log.info("지체도 환산점수 함수호출");
         funRankScore.clear();
         int maintenanceDelay = Integer.parseInt(String.valueOf(Math.round(piMaintenanceDelay))); // 형변환
         String rank = piSafetyLevel + maintenanceDelay;
         log.info("rank : " + rank);
         switch (rank) {
             case "A0":
-            case "B0":
+                funRankScore.put("score", String.valueOf(technicality.getPiTechRetardationA0()));
+                funRankScore.put("rank", rank);
             case "A1":
+                funRankScore.put("score", String.valueOf(technicality.getPiTechRetardationA1()));
+                funRankScore.put("rank", rank);
             case "A2":
-                funRankScore.put("score", "0");
+                funRankScore.put("score", String.valueOf(technicality.getPiTechRetardationA2()));
                 funRankScore.put("rank", rank);
-                break;
-            case "B1":
             case "A3":
-                funRankScore.put("score", "10");
+                funRankScore.put("score", String.valueOf(technicality.getPiTechRetardationA3()));
                 funRankScore.put("rank", rank);
-                break;
-            case "B2":
             case "A4":
-                funRankScore.put("score", "20");
+                funRankScore.put("score", String.valueOf(technicality.getPiTechRetardationA4()));
                 funRankScore.put("rank", rank);
-                break;
-            case "C0":
+            case "B0":
+                funRankScore.put("score", String.valueOf(technicality.getPiTechRetardationB0()));
+                funRankScore.put("rank", rank);
+            case "B1":
+                funRankScore.put("score", String.valueOf(technicality.getPiTechRetardationB1()));
+                funRankScore.put("rank", rank);
+            case "B2":
+                funRankScore.put("score", String.valueOf(technicality.getPiTechRetardationB2()));
+                funRankScore.put("rank", rank);
             case "B3":
-                funRankScore.put("score", "30");
+                funRankScore.put("score", String.valueOf(technicality.getPiTechRetardationB3()));
                 funRankScore.put("rank", rank);
-                break;
             case "B4":
-                funRankScore.put("score", "40");
+                funRankScore.put("score", String.valueOf(technicality.getPiTechRetardationB4()));
                 funRankScore.put("rank", rank);
-                break;
+            case "C0":
+                funRankScore.put("score", String.valueOf(technicality.getPiTechRetardationC0()));
+                funRankScore.put("rank", rank);
             case "C1":
-                funRankScore.put("score", "50");
+                funRankScore.put("score", String.valueOf(technicality.getPiTechRetardationC1()));
                 funRankScore.put("rank", rank);
-                break;
             case "C2":
-                funRankScore.put("score", "60");
+                funRankScore.put("score", String.valueOf(technicality.getPiTechRetardationC2()));
                 funRankScore.put("rank", rank);
-                break;
             case "C3":
-                funRankScore.put("score", "70");
+                funRankScore.put("score", String.valueOf(technicality.getPiTechRetardationC3()));
                 funRankScore.put("rank", rank);
-                break;
-            case "D0":
             case "C4":
-                funRankScore.put("score", "80");
+                funRankScore.put("score", String.valueOf(technicality.getPiTechRetardationC4()));
                 funRankScore.put("rank", rank);
-                break;
+            case "D0":
+                funRankScore.put("score", String.valueOf(technicality.getPiTechRetardationD0()));
+                funRankScore.put("rank", rank);
             case "D1":
-                funRankScore.put("score", "90");
+                funRankScore.put("score", String.valueOf(technicality.getPiTechRetardationD1()));
                 funRankScore.put("rank", rank);
-                break;
+            case "D2":
+                funRankScore.put("score", String.valueOf(technicality.getPiTechRetardationD2()));
+                funRankScore.put("rank", rank);
+            case "D3":
+                funRankScore.put("score", String.valueOf(technicality.getPiTechRetardationD3()));
+                funRankScore.put("rank", rank);
+            case "D4":
+                funRankScore.put("score", String.valueOf(technicality.getPiTechRetardationD4()));
+                funRankScore.put("rank", rank);
+            case "E0":
+                funRankScore.put("score", String.valueOf(technicality.getPiTechRetardationE0()));
+                funRankScore.put("rank", rank);
+            case "E1":
+                funRankScore.put("score", String.valueOf(technicality.getPiTechRetardationE1()));
+                funRankScore.put("rank", rank);
+            case "E2":
+                funRankScore.put("score", String.valueOf(technicality.getPiTechRetardationE2()));
+                funRankScore.put("rank", rank);
+            case "E3":
+                funRankScore.put("score", String.valueOf(technicality.getPiTechRetardationE3()));
+                funRankScore.put("rank", rank);
             default:
-                funRankScore.put("score", "100");
+                funRankScore.put("score", String.valueOf(technicality.getPiTechRetardationE4()));
                 funRankScore.put("rank", rank);
                 break;
         }
         return funRankScore;
     }
 
-    // 목표성능 달성도 환산점수
-    public Map<String, String> goal(String afterSafetyRating, String piGoalLevel) {
+    // 노후화 대응 - 목표성능 달성도 환산점수 11/04 완료
+    public Map<String, String> goal(String afterSafetyRating, String piGoalLevel, ReferenceTechnicality technicality) {
         log.info("목표성늘 달성도 환산점수 함수호출");
         funRankScore.clear();
         String rank = afterSafetyRating + piGoalLevel;
         log.info("rank : " + rank);
         switch (rank) {
-            case "CA":
-            case "DA":
-            case "EA":
-            case "DB":
-            case "EB":
-            case "DC":
-            case "EC":
-                funRankScore.put("score", "0");
+            case "AA":
+                funRankScore.put("score", String.valueOf(technicality.getPiTechPerformanceAa()));
                 funRankScore.put("rank", rank);
                 break;
-            case "CB":
-                funRankScore.put("score", "20");
+            case "AB":
+                funRankScore.put("score", String.valueOf(technicality.getPiTechPerformanceAb()));
+                funRankScore.put("rank", rank);
+                break;
+            case "AC":
+                funRankScore.put("score", String.valueOf(technicality.getPiTechPerformanceAc()));
                 funRankScore.put("rank", rank);
                 break;
             case "BA":
-                funRankScore.put("score", "30");
+                funRankScore.put("score", String.valueOf(technicality.getPiTechPerformanceBa()));
                 funRankScore.put("rank", rank);
                 break;
             case "BB":
-            case "CC":
-                funRankScore.put("score", "70");
+                funRankScore.put("score", String.valueOf(technicality.getPiTechPerformanceBb()));
                 funRankScore.put("rank", rank);
                 break;
             case "BC":
-                funRankScore.put("score", "80");
+                funRankScore.put("score", String.valueOf(technicality.getPiTechPerformanceBc()));
+                funRankScore.put("rank", rank);
+                break;
+            case "CA":
+                funRankScore.put("score", String.valueOf(technicality.getPiTechPerformanceCa()));
+                funRankScore.put("rank", rank);
+                break;
+            case "CB":
+                funRankScore.put("score", String.valueOf(technicality.getPiTechPerformanceCb()));
+                funRankScore.put("rank", rank);
+                break;
+            case "CC":
+                funRankScore.put("score", String.valueOf(technicality.getPiTechPerformanceCc()));
+                funRankScore.put("rank", rank);
+                break;
+            case "DA":
+                funRankScore.put("score", String.valueOf(technicality.getPiTechPerformanceDa()));
+                funRankScore.put("rank", rank);
+                break;
+            case "DB":
+                funRankScore.put("score", String.valueOf(technicality.getPiTechPerformanceDb()));
+                funRankScore.put("rank", rank);
+                break;
+            case "DC":
+                funRankScore.put("score", String.valueOf(technicality.getPiTechPerformanceDc()));
+                funRankScore.put("rank", rank);
+            case "EA":
+                funRankScore.put("score", String.valueOf(technicality.getPiTechPerformanceEa()));
+                funRankScore.put("rank", rank);
+                break;
+            case "EB":
+                funRankScore.put("score", String.valueOf(technicality.getPiTechPerformanceEb()));
                 funRankScore.put("rank", rank);
                 break;
             default:
-                funRankScore.put("score", "100");
+                funRankScore.put("score", String.valueOf(technicality.getPiTechPerformanceEc()));
                 funRankScore.put("rank", rank);
                 break;
         }
         return funRankScore;
     }
 
-    // 기술성 종합 환산점수,환산랭크
-    public Map<String, String> technicality_allScoreRank(String type, List<String> scroeList, Double piWeightSafe,Double piWeightUsability, Double piWeightOld, Double piWeightUrgency, Double piWeightGoal){
+    // 노후화 대응, 기준변화, 사용성변화 - 기술성 종합 환산점수,환산랭크 11/04 완료
+    public Map<String, String> technicality_allScoreRank(String type, List<String> scroeList, Double piWeightSafe,Double piWeightUsability, Double piWeightOld, Double piWeightUrgency, Double piWeightGoal, String piBusiness){
         log.info("기술성 종합 환산점수 함수호출");
         funRankScore.clear();
         double allScore;
         String allRank;
+        log.info("scroeList : "+scroeList);
+
         try{
-            double a = Double.parseDouble(scroeList.get(0))*piWeightSafe;
-            double b;
-            double c;
-            double d;
-            double e = 0.0;
-            if(type.equals("교량") || type.equals("터널")){
-                e = Double.parseDouble(scroeList.get(1))*piWeightUsability;
-                b = Double.parseDouble(scroeList.get(2))*piWeightOld;
-                c = Double.parseDouble(scroeList.get(3))*piWeightUrgency;
-                d = Double.parseDouble(scroeList.get(4))*piWeightGoal;
+
+            if(piBusiness.equals("노후화대응")){
+
+            }else if(piBusiness.equals("기준변화")){
+
             }else{
-                b = Double.parseDouble(scroeList.get(1))*piWeightOld;
-                c = Double.parseDouble(scroeList.get(2))*piWeightUrgency;
-                d = Double.parseDouble(scroeList.get(3))*piWeightGoal;
+
             }
-            allScore = a+b+c+d+e;
 
-            allRank = allScoreRankReturn(allScore);
-
-            funRankScore.put("score",String.valueOf(allScore));
-            funRankScore.put("rank", allRank);
-            return funRankScore;
+//            double a = Double.parseDouble(scroeList.get(0))*piWeightSafe;
+//            double b;
+//            double c;
+//            double d;
+//            double e = 0.0;
+//            if(type.equals("교량") || type.equals("터널")){
+//                e = Double.parseDouble(scroeList.get(1))*piWeightUsability;
+//                b = Double.parseDouble(scroeList.get(2))*piWeightOld;
+//                c = Double.parseDouble(scroeList.get(3))*piWeightUrgency;
+//                d = Double.parseDouble(scroeList.get(4))*piWeightGoal;
+//            }else{
+//                b = Double.parseDouble(scroeList.get(1))*piWeightOld;
+//                c = Double.parseDouble(scroeList.get(2))*piWeightUrgency;
+//                d = Double.parseDouble(scroeList.get(3))*piWeightGoal;
+//            }
+//            allScore = a+b+c+d+e;
+//
+//            allRank = allScoreRankReturn(allScore);
+//
+//            funRankScore.put("score",String.valueOf(allScore));
+//            funRankScore.put("rank", allRank);
+//            return funRankScore;
+            return null;
         }catch (Exception e){
             log.info("기술성 종합 환산점수 예외발생 : "+e);
             return null;
