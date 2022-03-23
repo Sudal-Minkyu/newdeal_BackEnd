@@ -36,7 +36,13 @@ public class SaltRestController {
         AjaxResponse res = new AjaxResponse();
         HashMap<String, Object> data = new HashMap<>();
 
+        log.info("seaCheck"+seaCheck);
+        log.info("seaArea : "+seaArea);
+        log.info("seaDistance : "+seaDistance);
+        log.info("seaHeight : "+seaHeight);
+
         String[] seaAreaList = seaArea.split("_");
+        log.info("seaAreaList : "+seaAreaList);
         double locationNum = 0;
         String seaNum = "11";
 
@@ -57,21 +63,21 @@ public class SaltRestController {
         }
 
         if(seaCheck.equals("1")){
-//            log.info("동해안");
+            log.info("동해안");
             if(seaNum.equals("11")){
                 dataResult = locationNum*7.7911*Math.pow(seaDistance,-0.4458)*seaHeight;
             }else{
                 dataResult = locationNum*10.929*Math.pow(seaDistance,-0.5193)*seaHeight;
             }
         }else if(seaCheck.equals("2")){
-//            log.info("서해안");
+            log.info("서해안");
             if(seaNum.equals("21")){
                 dataResult = locationNum*6.9438*Math.pow(seaDistance,-0.4208)*seaHeight;
             }else{
                 dataResult = locationNum*5.536*Math.pow(seaDistance,-0.3716)*seaHeight;
             }
         }else{
-//            log.info("남해안");
+            log.info("남해안");
             if(seaNum.equals("31")){
                 dataResult = locationNum*1.784*Math.pow(seaDistance,-0.1257)*seaHeight;
             }else{
@@ -79,11 +85,13 @@ public class SaltRestController {
             }
         }
 
-//        log.info("dataResult : "+dataResult);
-//        log.info("해안거리(m) : "+seaDistance);
-//        log.info("높이(m) : "+seaHeight);
+        log.info("dataResult : "+dataResult);
+        dataResult = Math.round(dataResult*100)/100.0;
+        log.info("소수점처리 : "+dataResult);
+        log.info("해안거리(m) : "+seaDistance);
+        log.info("높이(m) : "+seaHeight);
 
-        data.put("dataResult",Math.round(dataResult*100)/100.0);
+        data.put("dataResult",dataResult);
 
         return ResponseEntity.ok(res.dataSendSuccess(data));
     }
