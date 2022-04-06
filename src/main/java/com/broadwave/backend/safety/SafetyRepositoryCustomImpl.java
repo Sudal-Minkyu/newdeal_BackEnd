@@ -1,6 +1,7 @@
 package com.broadwave.backend.safety;
 
 import com.broadwave.backend.safety.safetyDtos.SafetyInfoDto;
+import com.broadwave.backend.safety.safetyDtos.SafetyInsertListDto;
 import com.broadwave.backend.safety.safetyDtos.SafetyListDto;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPQLQuery;
@@ -23,7 +24,7 @@ public class SafetyRepositoryCustomImpl extends QuerydslRepositorySupport implem
 
     // 계측 기반 안전성 추정 데이터 - 교량 리스트 검색 Query
     @Override
-    public List<SafetyListDto> findBySafetyList(String sfForm, String sfRank, String sfName){
+    public List<SafetyListDto> findBySafetyList(String sfForm, String sfRank, String sfName) {
 
         QSafety safety = QSafety.safety;
 
@@ -55,7 +56,7 @@ public class SafetyRepositoryCustomImpl extends QuerydslRepositorySupport implem
     }
 
     @Override
-    public SafetyInfoDto findBySafetyInfo(Long id){
+    public SafetyInfoDto findBySafetyInfo(Long id) {
 
         QSafety safety = QSafety.safety;
 
@@ -77,6 +78,19 @@ public class SafetyRepositoryCustomImpl extends QuerydslRepositorySupport implem
         query.where(safety.id.eq(id));
 
         return query.fetchOne();
+    }
+
+    @Override
+    public List<SafetyInsertListDto> findBySafetyInsertList() {
+
+        QSafety safety = QSafety.safety;
+
+        JPQLQuery<SafetyInsertListDto> query = from(safety)
+                .select(Projections.constructor(SafetyInsertListDto.class,
+                        safety.id,
+                        safety.sfName
+                ));
+        return query.fetch();
     }
 
 }

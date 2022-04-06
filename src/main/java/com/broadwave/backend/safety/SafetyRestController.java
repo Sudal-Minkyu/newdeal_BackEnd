@@ -1,5 +1,6 @@
 package com.broadwave.backend.safety;
 
+import com.broadwave.backend.safety.calculation.CalculationSet;
 import com.broadwave.backend.safety.service.CalculationService;
 import com.broadwave.backend.safety.service.SafetyService;
 import com.broadwave.backend.safety.safetyDtos.SafetyMapperDto;
@@ -42,10 +43,28 @@ public class SafetyRestController {
         return safetyService.bridgeDataList(sfForm, sfRank, sfName, request);
     }
 
-    // NEWDEAL 계측 기반 안전성 추정 데이터가져오기
+    // NEWDEAL 계측 기반 안전성 추정 데이터 가져오기
     @GetMapping("calculationDate")
     public ResponseEntity<Map<String,Object>> calculationDate(@RequestParam("id")Long id, HttpServletRequest request) {
         return calculationService.calculationDate(id, request);
+    }
+
+    // NEWDEAL 계측 기반 안전성 추정 데이터 저장
+    @PostMapping("calculationSave")
+    public ResponseEntity<Map<String,Object>> calculationSave(@RequestBody CalculationSet calculationSet, HttpServletRequest request) {
+        return calculationService.calculationSave(calculationSet, request);
+    }
+
+    // NEWDEAL 저장되어있는 교량 조회
+    @GetMapping("bridgeList")
+    public ResponseEntity<Map<String,Object>> bridgeList() {
+        return calculationService.bridgeList();
+    }
+
+    // NEWDEAL 계측 기반 안전성 추정 아웃풋
+    @GetMapping("safetyCalculationOutputInfo")
+    public ResponseEntity<Map<String,Object>> safetyCalculationOutputInfo(@RequestParam("id")Long id, HttpServletRequest request) {
+        return safetyService.safetyCalculationOutputInfo(id, request);
     }
 
 }

@@ -11,4 +11,8 @@ public interface CalculationRepositoryCustom {
 
     List<CalculationListDto> findByCalculationList(Long id);
 
+    List<CalculationTempDto> findByCalculationTempChart(Long id);
+
+    List<CalculationCapDto> findByCalculationCapChart(Long id);
+
 }

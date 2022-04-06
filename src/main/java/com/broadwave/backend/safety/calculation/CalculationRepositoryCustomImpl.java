@@ -20,7 +20,7 @@ public class CalculationRepositoryCustomImpl extends QuerydslRepositorySupport i
     }
 
     @Override
-    public List<CalculationListDto> findByCalculationList(Long id){
+    public List<CalculationListDto> findByCalculationList(Long id) {
 
         QCalculation calculation = QCalculation.calculation;
 
@@ -33,6 +33,41 @@ public class CalculationRepositoryCustomImpl extends QuerydslRepositorySupport i
                 ));
 
         query.where(calculation.sfId.id.eq(id));
+        query.groupBy(calculation.calYyyymmdd).orderBy(calculation.calYyyymmdd.desc());
+
+        return query.fetch();
+    }
+
+    @Override
+    public List<CalculationTempDto> findByCalculationTempChart(Long id) {
+
+        QCalculation calculation = QCalculation.calculation;
+
+        JPQLQuery<CalculationTempDto> query = from(calculation)
+                .select(Projections.constructor(CalculationTempDto.class,
+                        calculation.calYyyymmdd,
+                        calculation.calTemperature
+                ));
+
+        query.where(calculation.sfId.id.eq(id));
+        query.groupBy(calculation.calYyyymmdd).orderBy(calculation.calYyyymmdd.asc());
+
+        return query.fetch();
+    }
+
+    @Override
+    public List<CalculationCapDto> findByCalculationCapChart(Long id) {
+
+        QCalculation calculation = QCalculation.calculation;
+
+        JPQLQuery<CalculationCapDto> query = from(calculation)
+                .select(Projections.constructor(CalculationCapDto.class,
+                        calculation.calYyyymmdd,
+                        calculation.calCapacity
+                ));
+
+        query.where(calculation.sfId.id.eq(id));
+        query.groupBy(calculation.calYyyymmdd).orderBy(calculation.calYyyymmdd.asc());
 
         return query.fetch();
     }

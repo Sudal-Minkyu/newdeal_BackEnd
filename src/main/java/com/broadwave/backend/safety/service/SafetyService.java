@@ -3,6 +3,8 @@ package com.broadwave.backend.safety.service;
 import com.broadwave.backend.common.AjaxResponse;
 import com.broadwave.backend.safety.Safety;
 import com.broadwave.backend.safety.SafetyRepository;
+import com.broadwave.backend.safety.calculation.*;
+import com.broadwave.backend.safety.safetyDtos.SafetyInfoDto;
 import com.broadwave.backend.safety.safetyDtos.SafetyListDto;
 import com.broadwave.backend.safety.safetyDtos.SafetyMapperDto;
 import lombok.extern.slf4j.Slf4j;
@@ -30,11 +32,12 @@ public class SafetyService {
 
     private final ModelMapper modelMapper;
     private final SafetyRepository safetyRepository;
-
+    private final CalculationRepository calculationRepository;
     @Autowired
-    public SafetyService(ModelMapper modelMapper, SafetyRepository safetyRepository){
+    public SafetyService(ModelMapper modelMapper, SafetyRepository safetyRepository, CalculationRepository calculationRepository){
         this.modelMapper = modelMapper;
         this.safetyRepository = safetyRepository;
+        this.calculationRepository = calculationRepository;
     }
 
     // NEWDEAL 계측 기반 안전성 추정 데이터 제공 저장
@@ -50,6 +53,10 @@ public class SafetyService {
         log.info("insert_id : "+insert_id);
 
         Safety safety;
+
+        if(safetyMapperDto.getId() == null){
+            safetyMapperDto.setId(0L);
+        }
         Optional<Safety> optionalSafety = safetyRepository.findById(safetyMapperDto.getId());
         if(optionalSafety.isPresent()){
             log.info("수정입니다.");
@@ -98,5 +105,34 @@ public class SafetyService {
 
         return ResponseEntity.ok(res.dataSendSuccess(data));
     }
+
+    // NEWDEAL 계측 기반 안전성 추정 아웃풋
+    public ResponseEntity<Map<String, Object>> safetyCalculationOutputInfo(Long id, HttpServletRequest request) {
+        log.info("calculationDate 호출성공");
+
+        AjaxResponse res = new AjaxResponse();
+        HashMap<String, Object> data = new HashMap<>();
+
+        String JWT_AccessToken = request.getHeader("JWT_AccessToken");
+        String insert_id = request.getHeader("insert_id");
+
+        log.info("JWT_AccessToken : "+JWT_AccessToken);
+        log.info("insert_id : "+insert_id);
+
+        SafetyInfoDto safetyInfoDto = safetyRepository.findBySafetyInfo(id);
+        data.put("safetyInfo",safetyInfoDto);
+
+        List<CalculationListDto> calculationListDtoList = calculationRepository.findByCalculationList(id);
+        data.put("gridListData",calculationListDtoList);
+
+        List<CalculationTempDto> calculationTempDtos = calculationRepository.findByCalculationTempChart(id);
+        data.put("temperatureData", calculationTempDtos);
+
+        List<CalculationCapDto> calculationCapDtoList = calculationRepository.findByCalculationCapChart(id);
+        data.put("capacityData",calculationCapDtoList);
+
+        return ResponseEntity.ok(res.dataSendSuccess(data));
+    }
+
 
 }

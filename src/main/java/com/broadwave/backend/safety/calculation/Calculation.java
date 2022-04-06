@@ -46,4 +46,10 @@ public class Calculation {
     @Column(name="insert_id")
     private String insert_id;
 
+    @Column(name="modify_date")
+    private LocalDateTime modifyDateTime;
+
+    @Column(name="modify_id")
+    private String modify_id;
+
 }
