@@ -4,11 +4,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
-import java.util.List;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
@@ -24,7 +21,8 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/**")
-                .allowedOrigins(front_protocol+"://localhost:8010",front_protocol+"://"+front_url,front_protocol+"://192.168.0.24:8010",front_protocol+"://192.168.0.25:8010") // 허용 url 지겸님 ip http://192.168.0.24:8010
+                // 허용 url 지겸님 ip http://192.168.0.140:8010, url 책임 ip http://192.168.0.16:8010, url 낙원 ip http://192.168.0.132:8010,
+                .allowedOrigins(front_protocol+"://localhost:8010", front_protocol+"://"+front_url, front_protocol+"://192.168.0.140:8010", front_protocol+"://192.168.0.132:8010", front_protocol+"://192.168.0.16:8010")
                 .allowedHeaders("JWT_AccessToken","insert_id");
     }
 
