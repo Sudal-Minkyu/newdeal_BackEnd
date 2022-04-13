@@ -61,6 +61,7 @@ public class CalculationService {
 
     // NEWDEAL 계측 기반 안전성 추정 데이터 저장
     public ResponseEntity<Map<String, Object>> calculationSave(CalculationSet calculationSet, HttpServletRequest request) {
+        log.info("calculationSave 호출성공");
 
         AjaxResponse res = new AjaxResponse();
 
@@ -128,7 +129,7 @@ public class CalculationService {
             }
 
             // 안전성 추정 데이터 삭제 시작
-            if(calculationSet.getDeleteList().size()!=0){
+            if(calculationSet.getDeleteList() != null && calculationSet.getDeleteList().size() != 0){
                 calculationRepository.calculationDelete(calculationSet.getDeleteList());
             }
 
@@ -144,7 +145,7 @@ public class CalculationService {
         HashMap<String, Object> data = new HashMap<>();
 
         List<SafetyInsertListDto> safetyInsertListDtos = safetyRepository.findBySafetyInsertList();
-        data.put("gridListData",safetyInsertListDtos);
+        data.put("safetyList",safetyInsertListDtos);
 
         return ResponseEntity.ok(res.dataSendSuccess(data));
     }

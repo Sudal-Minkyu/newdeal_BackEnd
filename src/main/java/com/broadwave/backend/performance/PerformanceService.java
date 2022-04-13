@@ -1,6 +1,7 @@
 package com.broadwave.backend.performance;
 
 import com.broadwave.backend.keygenerate.KeyGenerateService;
+import com.broadwave.backend.performance.performanceDtos.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -41,7 +42,7 @@ public class PerformanceService {
         return performanceRepositoryCustom.findByInsertId(insert_id);
     }
 
-    public  PerformanceMiddleDataDto findByInsertIAndAutoNum(String insert_id, String autoNum) {
+    public PerformanceMiddleDataDto findByInsertIAndAutoNum(String insert_id, String autoNum) {
         return performanceRepositoryCustom.findByInsertIAndAutoNum(insert_id,autoNum);
     }
 

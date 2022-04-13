@@ -33,7 +33,7 @@ public class CalculationRepositoryCustomImpl extends QuerydslRepositorySupport i
                 ));
 
         query.where(calculation.sfId.id.eq(id));
-        query.groupBy(calculation.calYyyymmdd).orderBy(calculation.calYyyymmdd.desc());
+        query.groupBy(calculation.calYyyymmdd).orderBy(calculation.calYyyymmdd.asc());
 
         return query.fetch();
     }

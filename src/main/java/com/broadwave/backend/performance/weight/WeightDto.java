@@ -19,10 +19,11 @@ public class WeightDto {
     private Double piWeightSafe; // 안정성 가중치(NOTNULL)
     private Double piWeightUsability; // 사용성 가중치(NOTNULL)
     private Double piWeightOld; // 노후도 가중치(NULL)
-    private Double piWeightUrgency; // 시급성 가중치(NOTNULL)
+    private Double piWeightUrgency; // 지체도 가중치(NOTNULL)
     private Double piWeightGoal; // 목표달성도 가중치(NOTNULL)
-    private Double piWeightSafeUtility; // 안전효용 개선 가중치(NOTNULL)
-    private Double piWeightCostUtility; // 자산가치 개선 가중치(NULL)
+
+    private Double piWeightSafeUtility; // 안전효용 개선 가중치(NOTNULL) , 사업규모 가중치
+    private Double piWeightCostUtility; // 자산가치 개선 가중치(NULL), 사업효율 가중치
     private Double piWeightBusiness; // 사업추진 타당성 가중치(NOTNULL)
     private Double piWeightComplaint; // 민원 및 사고 대응성 가중치(NOTNULL)
     private Double piWeightBusinessEffect; // 사업효과 범용성 가중치(NOTNULL)

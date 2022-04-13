@@ -1,4 +1,4 @@
-package com.broadwave.backend.performance;
+package com.broadwave.backend.performance.performanceDtos;
 
 import lombok.*;
 

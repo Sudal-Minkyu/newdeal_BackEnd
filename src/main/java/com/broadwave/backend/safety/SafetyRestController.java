@@ -66,7 +66,7 @@ public class SafetyRestController {
     public ResponseEntity<Map<String,Object>> safetyCalculationOutputInfo(@RequestParam("id")Long id, HttpServletRequest request) {
         return safetyService.safetyCalculationOutputInfo(id, request);
     }
-
+    
 }
 
 

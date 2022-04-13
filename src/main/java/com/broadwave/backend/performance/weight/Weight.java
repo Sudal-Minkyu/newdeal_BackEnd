@@ -40,7 +40,7 @@ public class Weight {
     private Double piWeightOld; // 노후도 가중치(NULL)
 
     @Column(name="pi_weight_urgency")
-    private Double piWeightUrgency; // 시급성 가중치(NOTNULL)
+    private Double piWeightUrgency; // 지체도 가중치(NOTNULL)
 
     @Column(name="pi_weight_goal")
     private Double piWeightGoal; // 목표달성도 가중치(NOTNULL)

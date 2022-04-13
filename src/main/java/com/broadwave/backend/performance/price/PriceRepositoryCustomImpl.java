@@ -57,7 +57,11 @@ public class PriceRepositoryCustomImpl extends QuerydslRepositorySupport impleme
                         price.piYear,
                         price.piPrice
                 ));
-        query.where(price.piYear.eq(piYear));
+        if(piYear == null){
+            query.orderBy(price.id.desc()).limit(1);
+        }else{
+            query.where(price.piYear.eq(piYear));
+        }
         return query.fetchOne();
     }
 

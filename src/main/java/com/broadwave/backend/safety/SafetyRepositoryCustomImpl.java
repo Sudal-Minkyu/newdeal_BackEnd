@@ -40,15 +40,15 @@ public class SafetyRepositoryCustomImpl extends QuerydslRepositorySupport implem
 
                 ));
 
-        if(sfForm != null && !sfForm.isEmpty() ){
+        if(!sfForm.equals("00")) {
             query.where(safety.sfForm.eq(sfForm));
         }
 
-        if(sfRank != null && !sfRank.isEmpty() ){
+        if(!sfRank.equals("00")) {
             query.where(safety.sfRank.eq(sfRank));
         }
 
-        if(sfName != null && !sfName.isEmpty() ){
+        if(sfName != null && !sfName.isEmpty() ) {
             query.where(safety.sfName.likeIgnoreCase("%"+sfName+"%"));
         }
 
@@ -66,10 +66,10 @@ public class SafetyRepositoryCustomImpl extends QuerydslRepositorySupport implem
                         safety.id,
                         safety.sfName,
                         safety.sfForm,
+                        safety.sfRank,
                         safety.sfLength,
                         safety.sfWidth,
                         safety.sfNum,
-                        safety.sfRank,
                         safety.sfCompletionYear,
                         safety.sfFactor
 

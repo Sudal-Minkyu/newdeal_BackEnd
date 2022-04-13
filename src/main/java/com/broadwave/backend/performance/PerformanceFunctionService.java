@@ -2,6 +2,7 @@ package com.broadwave.backend.performance;
 
 import com.broadwave.backend.performance.price.PriceDto;
 import com.broadwave.backend.performance.price.PriceService;
+import com.broadwave.backend.performance.reference.ReferenceEconomy;
 import com.broadwave.backend.performance.reference.ReferenceTechnicality;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,7 @@ public class PerformanceFunctionService {
         this.funRankScore = funRankScore;
     }
 
-//**************************** 노후화대응 _기술성 함수 ********************************
+//**************************** 기술성 함수 ********************************
 
     // 노후화 대응, 기준변화, 사용성변화 - 안정성 환산점수 10/29 완료
     public Map<String, String> safetyLevel(String piSafetyLevel, ReferenceTechnicality technicality , String safeValue) {
@@ -155,86 +156,112 @@ public class PerformanceFunctionService {
         log.info("지체도 환산점수 함수호출");
         funRankScore.clear();
         int maintenanceDelay = Integer.parseInt(String.valueOf(Math.round(piMaintenanceDelay))); // 형변환
+        log.info("maintenanceDelay : "+maintenanceDelay);
+
         String rank = piSafetyLevel + maintenanceDelay;
         log.info("rank : " + rank);
         switch (rank) {
             case "A0":
                 funRankScore.put("score", String.valueOf(technicality.getPiTechRetardationA0()));
                 funRankScore.put("rank", rank);
+                break;
             case "A1":
                 funRankScore.put("score", String.valueOf(technicality.getPiTechRetardationA1()));
                 funRankScore.put("rank", rank);
+                break;
             case "A2":
                 funRankScore.put("score", String.valueOf(technicality.getPiTechRetardationA2()));
                 funRankScore.put("rank", rank);
+                break;
             case "A3":
                 funRankScore.put("score", String.valueOf(technicality.getPiTechRetardationA3()));
                 funRankScore.put("rank", rank);
+                break;
             case "A4":
                 funRankScore.put("score", String.valueOf(technicality.getPiTechRetardationA4()));
                 funRankScore.put("rank", rank);
+                break;
             case "B0":
                 funRankScore.put("score", String.valueOf(technicality.getPiTechRetardationB0()));
                 funRankScore.put("rank", rank);
+                break;
             case "B1":
                 funRankScore.put("score", String.valueOf(technicality.getPiTechRetardationB1()));
                 funRankScore.put("rank", rank);
+                break;
             case "B2":
                 funRankScore.put("score", String.valueOf(technicality.getPiTechRetardationB2()));
                 funRankScore.put("rank", rank);
             case "B3":
                 funRankScore.put("score", String.valueOf(technicality.getPiTechRetardationB3()));
                 funRankScore.put("rank", rank);
+                break;
             case "B4":
                 funRankScore.put("score", String.valueOf(technicality.getPiTechRetardationB4()));
                 funRankScore.put("rank", rank);
+                break;
             case "C0":
                 funRankScore.put("score", String.valueOf(technicality.getPiTechRetardationC0()));
                 funRankScore.put("rank", rank);
+                break;
             case "C1":
                 funRankScore.put("score", String.valueOf(technicality.getPiTechRetardationC1()));
                 funRankScore.put("rank", rank);
+                break;
             case "C2":
                 funRankScore.put("score", String.valueOf(technicality.getPiTechRetardationC2()));
                 funRankScore.put("rank", rank);
+                break;
             case "C3":
                 funRankScore.put("score", String.valueOf(technicality.getPiTechRetardationC3()));
                 funRankScore.put("rank", rank);
+                break;
             case "C4":
                 funRankScore.put("score", String.valueOf(technicality.getPiTechRetardationC4()));
                 funRankScore.put("rank", rank);
+                break;
             case "D0":
                 funRankScore.put("score", String.valueOf(technicality.getPiTechRetardationD0()));
                 funRankScore.put("rank", rank);
+                break;
             case "D1":
                 funRankScore.put("score", String.valueOf(technicality.getPiTechRetardationD1()));
                 funRankScore.put("rank", rank);
+                break;
             case "D2":
                 funRankScore.put("score", String.valueOf(technicality.getPiTechRetardationD2()));
                 funRankScore.put("rank", rank);
             case "D3":
                 funRankScore.put("score", String.valueOf(technicality.getPiTechRetardationD3()));
                 funRankScore.put("rank", rank);
+                break;
             case "D4":
                 funRankScore.put("score", String.valueOf(technicality.getPiTechRetardationD4()));
                 funRankScore.put("rank", rank);
+                break;
             case "E0":
                 funRankScore.put("score", String.valueOf(technicality.getPiTechRetardationE0()));
                 funRankScore.put("rank", rank);
+                break;
             case "E1":
                 funRankScore.put("score", String.valueOf(technicality.getPiTechRetardationE1()));
                 funRankScore.put("rank", rank);
+                break;
             case "E2":
                 funRankScore.put("score", String.valueOf(technicality.getPiTechRetardationE2()));
                 funRankScore.put("rank", rank);
+                break;
             case "E3":
                 funRankScore.put("score", String.valueOf(technicality.getPiTechRetardationE3()));
                 funRankScore.put("rank", rank);
+                break;
             default:
                 funRankScore.put("score", String.valueOf(technicality.getPiTechRetardationE4()));
                 funRankScore.put("rank", rank);
                 break;
         }
+        log.info("funRankScore : "+funRankScore);
+
         return funRankScore;
     }
 
@@ -309,16 +336,33 @@ public class PerformanceFunctionService {
     }
 
     // 노후화 대응, 기준변화, 사용성변화 - 기술성 종합 환산점수,환산랭크 11/04 완료
-    public Map<String, String> technicality_allScoreRank(String type, List<String> scroeList, Double piWeightSafe,Double piWeightUsability, Double piWeightOld, Double piWeightUrgency, Double piWeightGoal, String piBusiness){
+    public Map<String, String> technicality_allScoreRank(String type, List<String> scroeList, Double piWeightSafe,Double piWeightUsability, Double piWeightOld, Double piWeightUrgency, Double piWeightGoal, String piBusiness, ReferenceTechnicality technicality){
         log.info("기술성 종합 환산점수 함수호출");
         funRankScore.clear();
-        double allScore;
-        String allRank;
+        log.info("");
+        log.info("type : " + type);
+//        log.info("piWeightSafe 안정성가중치 : " + piWeightSafe);
+//        log.info("piWeightOld 노후도 가중치 : " + piWeightOld);
+//        log.info("piWeightUrgency 지체도 가중치 : " + piWeightUrgency);
+//        log.info("piWeightGoal 목표달성도 가중치 : " + piWeightGoal);
+//
+//        log.info("piWeightUsability 사용성 가중치 -> 사용성변화에만 사용 : " + piWeightUsability);
+
+        log.info("piBusiness : " + piBusiness);
+
+        double allScore = 0;
+        String allRank = null;
         log.info("scroeList : "+scroeList);
 
         try{
 
             if(piBusiness.equals("노후화대응")){
+
+                double safeScore = Double.parseDouble(scroeList.get(0)) * piWeightSafe;
+                double oldScore = Double.parseDouble(scroeList.get(1)) * piWeightOld;
+                double urgencyScore = Double.parseDouble(scroeList.get(2)) * piWeightUrgency;
+                double goalScore = Double.parseDouble(scroeList.get(3)) * piWeightGoal;
+                allScore = safeScore+oldScore+urgencyScore+goalScore;
 
             }else if(piBusiness.equals("기준변화")){
 
@@ -326,29 +370,31 @@ public class PerformanceFunctionService {
 
             }
 
-//            double a = Double.parseDouble(scroeList.get(0))*piWeightSafe;
-//            double b;
-//            double c;
-//            double d;
-//            double e = 0.0;
-//            if(type.equals("교량") || type.equals("터널")){
-//                e = Double.parseDouble(scroeList.get(1))*piWeightUsability;
-//                b = Double.parseDouble(scroeList.get(2))*piWeightOld;
-//                c = Double.parseDouble(scroeList.get(3))*piWeightUrgency;
-//                d = Double.parseDouble(scroeList.get(4))*piWeightGoal;
-//            }else{
-//                b = Double.parseDouble(scroeList.get(1))*piWeightOld;
-//                c = Double.parseDouble(scroeList.get(2))*piWeightUrgency;
-//                d = Double.parseDouble(scroeList.get(3))*piWeightGoal;
-//            }
-//            allScore = a+b+c+d+e;
-//
-//            allRank = allScoreRankReturn(allScore);
-//
-//            funRankScore.put("score",String.valueOf(allScore));
-//            funRankScore.put("rank", allRank);
-//            return funRankScore;
-            return null;
+            if (technicality.getPiTechGoalAPlusMin() < allScore && technicality.getPiTechGoalAPlusMax() >= allScore) {
+                allRank = "A+";
+            } else if (technicality.getPiTechGoalAMinusMin() < allScore && technicality.getPiTechGoalAMinusMax() >= allScore) {
+                allRank = "A0";
+            } else if (technicality.getPiTechGoalBPlusMin() < allScore && technicality.getPiTechGoalBPlusMax() >= allScore) {
+                allRank = "B+";
+            } else if (technicality.getPiTechGoalBMinusMin() < allScore && technicality.getPiTechGoalBMinusMax() >= allScore) {
+                allRank = "B0";
+            } else if (technicality.getPiTechGoalCPlusMin() < allScore && technicality.getPiTechGoalCPlusMax() >= allScore) {
+                allRank = "C+";
+            } else if (technicality.getPiTechGoalCMinusMin() < allScore && technicality.getPiTechGoalCMinusMax() >= allScore) {
+                allRank = "C0";
+            } else if (technicality.getPiTechGoalDPlusMin() < allScore && technicality.getPiTechGoalDPlusMax() >= allScore) {
+                allRank = "D+";
+            } else if (technicality.getPiTechGoalDMinusMin() < allScore && technicality.getPiTechGoalDMinusMax() >= allScore) {
+                allRank = "D0";
+            } else {
+                allRank = "E";
+            }
+
+            funRankScore.put("score", String.valueOf(Math.round(allScore*10)/10.0));
+            funRankScore.put("rank", allRank);
+
+            return funRankScore;
+
         }catch (Exception e){
             log.info("기술성 종합 환산점수 예외발생 : "+e);
             return null;
@@ -357,10 +403,10 @@ public class PerformanceFunctionService {
 
 //*****************************************************************************
 
-//++++++++++++++++ 노후화_경제성 함수 +++++++++++++++++++
+//++++++++++++++++ 경제성 함수 +++++++++++++++++++
 
     // 자산가치 개선 효율성 환산점수
-    public Map<String, String> assetValue(String piFacilityType, Long piErectionCost, Long piBusinessExpenses, Double piCompletionYear, Double piRaterBaseYear,
+    public Map<String, String> assetValue(ReferenceEconomy economy, String piFacilityType, Long piErectionCost, Long piBusinessExpenses, Double piCompletionYear, Double piRaterBaseYear,
                                           String piBeforeSafetyRating, String piAfterSafetyRating ) {
         log.info("자산가치 개선 효율성 환산점수 함수호출");
         funRankScore.clear();
@@ -373,14 +419,22 @@ public class PerformanceFunctionService {
         try{
             PriceDto completionPriceDto = priceService.findByPiYearCustom((double) Math.round(piCompletionYear));
             PriceDto nowPriceDto = priceService.findByPiYearCustom((double) Math.round(piRaterBaseYear)-1);
-//            log.info("completionPriceDto : " + completionPriceDto);
-//            log.info("nowPriceDto : " + nowPriceDto);
             completionExchangeRate = completionPriceDto.getPiPrice(); // 준공연도 물가배수 환산율
-            nowExchangeRate = nowPriceDto.getPiPrice(); // 현재 물가배수 환산율
+            if(nowPriceDto == null){
+                nowPriceDto = priceService.findByPiYearCustom(null);
+                nowExchangeRate = nowPriceDto.getPiPrice(); // 현재 물가배수 환산율
+            }else{
+                nowExchangeRate = nowPriceDto.getPiPrice(); // 현재 물가배수 환산율
+            }
+
+            log.info("completionExchangeRate : " + completionExchangeRate);
+            log.info("nowExchangeRate : " + nowExchangeRate);
+
         }catch (NullPointerException e){
             log.info("기준년도의 환산율이 존재하지 않습니다. 관리자에게 문의바람.");
             return null;
         }
+
         priceIndex = Math.round(nowExchangeRate/completionExchangeRate*100)/100.0; // 조정 물가지수
         log.info("조정 물가지수 : "+priceIndex);
         costRepurchase = piErectionCost*priceIndex; // 재조 달원가
@@ -394,55 +448,55 @@ public class PerformanceFunctionService {
 
         double usefulLife; // 내용연수 쓰이는데가 없음.
         if (piFacilityType.equals("교량")) {
-            usefulLife = 20.0;
+            usefulLife = economy.getPiEcoFacilityA();
         }else if(piFacilityType.equals("보도육교")){
-            usefulLife = 20.0;
+            usefulLife = economy.getPiEcoFacilityB();
         }else if(piFacilityType.equals("터널")){
-            usefulLife = 20.0;
+            usefulLife = economy.getPiEcoFacilityC();
         }else if(piFacilityType.equals("지하터널")){
-            usefulLife = 20.0;
+            usefulLife = economy.getPiEcoFacilityD();
         }else if(piFacilityType.equals("옹벽")){
-            usefulLife = 20.0;
+            usefulLife = economy.getPiEcoFacilityE();
         }else if(piFacilityType.equals("절토사면")){
-            usefulLife = 20.0;
+            usefulLife = economy.getPiEcoFacilityF();
         }else{
-            usefulLife = 20.0;
+            usefulLife = economy.getPiEcoFacilityG();
         }
 
         double beforeLifeRate; // 사업전 잔존수명률
         double afterLifeRate; // 사업후 잔존수명률
         switch (piBeforeSafetyRating) {
             case "A":
-                beforeLifeRate = 95.0;
+                beforeLifeRate = economy.getPiEcoLifeA();
                 break;
             case "B":
-                beforeLifeRate = 75.0;
+                beforeLifeRate = economy.getPiEcoLifeB();
                 break;
             case "C":
-                beforeLifeRate = 50.0;
+                beforeLifeRate = economy.getPiEcoLifeC();
                 break;
             case "D":
-                beforeLifeRate = 30.0;
+                beforeLifeRate = economy.getPiEcoLifeD();
                 break;
             default:
-                beforeLifeRate = 5.0;
+                beforeLifeRate = economy.getPiEcoLifeE();
                 break;
         }
         switch (piAfterSafetyRating) {
             case "A":
-                afterLifeRate = 95.0;
+                afterLifeRate = economy.getPiEcoLifeA();
                 break;
             case "B":
-                afterLifeRate = 75.0;
+                afterLifeRate = economy.getPiEcoLifeB();
                 break;
             case "C":
-                afterLifeRate = 50.0;
+                afterLifeRate = economy.getPiEcoLifeC();
                 break;
             case "D":
-                afterLifeRate = 30.0;
+                afterLifeRate = economy.getPiEcoLifeD();
                 break;
             default:
-                afterLifeRate = 5.0;
+                afterLifeRate = economy.getPiEcoLifeE();
                 break;
         }
 
@@ -462,20 +516,20 @@ public class PerformanceFunctionService {
         double Improving = Math.round(assetValue/piBusinessExpenses*100)/100.0; // 자산가치 개선 효율성
 //        log.info("자산가치 개선 효율성 : " + Improving);
 
-        if(5<=Improving){
-            funRankScore.put("score", "100");
+        if(economy.getPiEcoAssetAMin()<=Improving){
+            funRankScore.put("score", String.valueOf(economy.getPiEcoAssetAScore()));
             funRankScore.put("rank", "A");
-        }else if(4<=Improving){
-            funRankScore.put("score", "80");
+        }else if(economy.getPiEcoAssetBMin() <= Improving && Improving< economy.getPiEcoAssetBMax()){
+            funRankScore.put("score",  String.valueOf(economy.getPiEcoAssetBScore()));
             funRankScore.put("rank", "B");
-        }else if(3<=Improving){
-            funRankScore.put("score", "70");
+        }else if(economy.getPiEcoAssetCMin() <= Improving && Improving< economy.getPiEcoAssetCMax()){
+            funRankScore.put("score",  String.valueOf(economy.getPiEcoAssetCScore()));
             funRankScore.put("rank", "C");
-        }else if(2<=Improving){
-            funRankScore.put("score", "50");
+        }else if(economy.getPiEcoAssetDMin() <= Improving && Improving< economy.getPiEcoAssetDMax()){
+            funRankScore.put("score",  String.valueOf(economy.getPiEcoAssetDScore()));
             funRankScore.put("rank", "D");
         }else{
-            funRankScore.put("score", "30");
+            funRankScore.put("score",  String.valueOf(economy.getPiEcoAssetEScore()));
             funRankScore.put("rank", "E");
         }
 
@@ -483,7 +537,7 @@ public class PerformanceFunctionService {
     }
 
     // 안전효용 개선 효율성 환산점수
-    public Map<String, String> safetyUtility(String piAfterSafetyRating, String piBeforeSafetyRating, Double piAADT, Long piBusinessExpenses) {
+    public Map<String, String> safetyUtility(ReferenceEconomy economy, String piAfterSafetyRating, String piBeforeSafetyRating, Double piAADT, Long piBusinessExpenses) {
         log.info("안전효용 개선 효율성 환산점수 함수호출");
         funRankScore.clear();
         log.info("piAfterSafetyRating : " + piAfterSafetyRating);
@@ -496,51 +550,64 @@ public class PerformanceFunctionService {
         double safeIndices; // 안전효용 개선 효율성 지수
 
         switch (safeRank) {
-            case "AE":
-                safeScore = 100.0;
-                break;
-            case "AD":
-                safeScore = 90.0;
-                break;
-            case "AC":
-            case "BE":
-                safeScore = 80.0;
-                break;
-            case "BD":
-                safeScore = 70.0;
-                break;
-            case "BC":
-            case "CE":
-                safeScore = 50.0;
-                break;
-            case "CD":
-                safeScore = 30.0;
+            case "AA":
+                safeScore = economy.getPiEcoUtilityAa();
                 break;
             case "AB":
-                safeScore = 20.0;
+                safeScore = economy.getPiEcoUtilityBa();
+                break;
+            case "AC":
+                safeScore = economy.getPiEcoUtilityCa();
+                break;
+            case "AD":
+                safeScore = economy.getPiEcoUtilityDa();
+                break;
+            case "AE":
+                safeScore = economy.getPiEcoUtilityEa();
                 break;
             case "BB":
-            case "DE":
-                safeScore = 10.0;
+                safeScore = economy.getPiEcoUtilityBb();
                 break;
-            case "AA":
-                safeScore = 5.0;
+            case "BC":
+                safeScore = economy.getPiEcoUtilityCb();
+                break;
+            case "BD":
+                safeScore = economy.getPiEcoUtilityDb();
+                break;
+            case "BE":
+                safeScore = economy.getPiEcoUtilityEb();
+                break;
+            case "CC":
+                safeScore = economy.getPiEcoUtilityCc();
+                break;
+            case "CD":
+                safeScore = economy.getPiEcoUtilityDc();
+                break;
+            case "CE":
+                safeScore = economy.getPiEcoUtilityEc();
+                break;
+            case "DD":
+                safeScore = economy.getPiEcoUtilityDd();
+                break;
+            case "DE":
+                safeScore = economy.getPiEcoUtilityEd();
                 break;
             default:
-                safeScore = 0.0;
+                safeScore = economy.getPiEcoUtilityEe();
                 break;
         }
 
-        if(40001 <= piAADT){
-            aadtScore = 10.0;
-        }else if(20000 <= piAADT){
-            aadtScore = 8.0;
-        }else if(10000 <= piAADT){
-            aadtScore = 4.0;
-        }else if(5000 <= piAADT){
-            aadtScore = 2.0;
+
+        if(economy.getPiEcoTrafficAMin() <= piAADT){
+            aadtScore = economy.getPiEcoTrafficAScore();
+        }else if(economy.getPiEcoTrafficBMin() <= piAADT && piAADT< economy.getPiEcoTrafficBMax()){
+            aadtScore = economy.getPiEcoTrafficBScore();
+        }else if(economy.getPiEcoTrafficCMin() <= piAADT && piAADT< economy.getPiEcoTrafficCMax()){
+            aadtScore = economy.getPiEcoTrafficCScore();
+        }else if(economy.getPiEcoTrafficDMin() <= piAADT && piAADT< economy.getPiEcoTrafficDMax()){
+            aadtScore = economy.getPiEcoTrafficDScore();
         }else{
-            aadtScore = 1.0;
+            aadtScore = economy.getPiEcoTrafficEScore();
         }
 
         log.info("safeScore : "+safeScore);
@@ -550,29 +617,113 @@ public class PerformanceFunctionService {
         safeIndices = safeScore*aadtScore/(piBusinessExpenses/100000000.0);
         log.info("safeIndices : "+safeIndices);
 
-        if (2 <= safeIndices) {
-            funRankScore.put("score", "100");
+        if(economy.getPiEcoImproAMin() <= safeIndices){
+            funRankScore.put("score",  String.valueOf(economy.getPiEcoImproAScore()));
             funRankScore.put("rank", "A");
-        } else if (1.5 <= safeIndices) {
-            funRankScore.put("score", "80");
+        }else if(economy.getPiEcoImproBMin() <= safeIndices && safeIndices< economy.getPiEcoImproBMax()){
+            funRankScore.put("score",  String.valueOf(economy.getPiEcoImproBScore()));
             funRankScore.put("rank", "B");
-        } else if (1 <= safeIndices) {
-            funRankScore.put("score", "70");
+        }else if(economy.getPiEcoImproCMin() <= safeIndices && safeIndices< economy.getPiEcoImproCMax()){
+            funRankScore.put("score",  String.valueOf(economy.getPiEcoImproCScore()));
             funRankScore.put("rank", "C");
-        } else if (0.5 <= safeIndices) {
-            funRankScore.put("score", "50");
+        }else if(economy.getPiEcoImproDMin() <= safeIndices && safeIndices< economy.getPiEcoImproDMax()){
+            funRankScore.put("score",  String.valueOf(economy.getPiEcoImproDScore()));
             funRankScore.put("rank", "D");
-        } else {
-            funRankScore.put("score", "30");
+        }else {
+            funRankScore.put("score",  String.valueOf(economy.getPiEcoImproEScore()));
             funRankScore.put("rank", "E");
         }
         return funRankScore;
     }
 
+    // 기준변화, 사용성변화 - 경제성 - 사업규모 등급
+    public Map<String, String> businessScale(ReferenceEconomy economy, Long piBusinessExpenses, Double cost) {
+        log.info("사업규모 등급 함수호출");
+        funRankScore.clear();
+
+        log.info("piBusinessExpenses : "+piBusinessExpenses);
+        log.info("cost : "+cost);
+
+        // 사업비용 단위
+        double businessCostUnit = piBusinessExpenses/cost;
+        log.info("사업비용 단위 : "+businessCostUnit);
+
+        if(businessCostUnit <= economy.getPiEcoScaleBaseA()){
+            funRankScore.put("score", String.valueOf(economy.getPiEcoScaleScoreA()));
+            funRankScore.put("rank", "A");
+        }else if(businessCostUnit <= economy.getPiEcoScaleBaseB()){
+            funRankScore.put("score",  String.valueOf(economy.getPiEcoScaleScoreB()));
+            funRankScore.put("rank", "B");
+        }else if(businessCostUnit <= economy.getPiEcoScaleBaseC()){
+            funRankScore.put("score",  String.valueOf(economy.getPiEcoScaleScoreC()));
+            funRankScore.put("rank", "C");
+        }else if(businessCostUnit <= economy.getPiEcoScaleBaseD()){
+            funRankScore.put("score",  String.valueOf(economy.getPiEcoScaleScoreD()));
+            funRankScore.put("rank", "D");
+        }else{
+            funRankScore.put("score",  String.valueOf(economy.getPiEcoScaleScoreE()));
+            funRankScore.put("rank", "E");
+        }
+
+        return funRankScore;
+    }
+
+    // 기준변화, 사용성변화 - 경제성 - 사업효율 등급
+    public Map<String, String> businessEfficiency(ReferenceEconomy economy, String piFacilityType, Long piBusinessExpenses, Double piAADT) {
+        log.info("사업효율 등급 함수호출");
+        funRankScore.clear();
+
+        log.info("piBusinessExpenses : "+piBusinessExpenses);
+        log.info("piAADT : "+piAADT);
+
+        double usefulLife;
+        if (piFacilityType.equals("교량")) {
+            usefulLife = economy.getPiEcoFacilityA();
+        }else if(piFacilityType.equals("보도육교")){
+            usefulLife = economy.getPiEcoFacilityB();
+        }else if(piFacilityType.equals("터널")){
+            usefulLife = economy.getPiEcoFacilityC();
+        }else if(piFacilityType.equals("지하터널")){
+            usefulLife = economy.getPiEcoFacilityD();
+        }else if(piFacilityType.equals("옹벽")){
+            usefulLife = economy.getPiEcoFacilityE();
+        }else if(piFacilityType.equals("절토사면")){
+            usefulLife = economy.getPiEcoFacilityF();
+        }else{
+            usefulLife = economy.getPiEcoFacilityG();
+        }
+
+        // 사업효율 단위
+        double businessEfficiencyUnit = piBusinessExpenses/(piAADT*usefulLife*365);
+        log.info("사업효율 단위 : "+businessEfficiencyUnit);
+
+        if(businessEfficiencyUnit <= economy.getPiEcoEfficiencyBaseA()){
+            funRankScore.put("score", String.valueOf(economy.getPiEcoEfficiencyScoreA()));
+            funRankScore.put("rank", "A");
+        }else if(businessEfficiencyUnit <= economy.getPiEcoEfficiencyBaseB()){
+            funRankScore.put("score", String.valueOf(economy.getPiEcoEfficiencyScoreB()));
+            funRankScore.put("rank", "B");
+        }else if(businessEfficiencyUnit <= economy.getPiEcoEfficiencyBaseC()){
+            funRankScore.put("score", String.valueOf(economy.getPiEcoEfficiencyScoreC()));
+            funRankScore.put("rank", "C");
+        }else if(businessEfficiencyUnit <= economy.getPiEcoEfficiencyBaseD()){
+            funRankScore.put("score", String.valueOf(economy.getPiEcoEfficiencyScoreD()));
+            funRankScore.put("rank", "D");
+        }else{
+            funRankScore.put("score", String.valueOf(economy.getPiEcoEfficiencyScoreE()));
+            funRankScore.put("rank", "E");
+        }
+
+        return funRankScore;
+    }
+
     // 경제성 종합 환산점수,환산랭크
-    public Map<String, String> economy_allScoreRank(List<String> economy_scroeList, Double piWeightSafeUtility, Double piWeightCostUtility) {
+    public Map<String, String> economy_allScoreRank(ReferenceEconomy economy, List<String> economy_scroeList, Double piWeightSafeUtility, Double piWeightCostUtility) {
         log.info("경제성 종합 환산점수,환산랭크 함수호출");
         funRankScore.clear();
+
+        log.info("piWeightSafeUtility : "+piWeightSafeUtility);
+        log.info("piWeightCostUtility : "+piWeightCostUtility);
 
         double allScore;
         String allRank;
@@ -581,7 +732,25 @@ public class PerformanceFunctionService {
             Double b = Double.parseDouble(economy_scroeList.get(1))*piWeightCostUtility;
             allScore = a+b;
 
-            allRank = allScoreRankReturn(allScore);
+            if (economy.getPiEcoGoalAPlusMin() <= allScore) {
+                allRank = "A+";
+            } else if (economy.getPiEcoGoalAMinusMin() <= allScore) {
+                allRank = "A0";
+            } else if (economy.getPiEcoGoalBPlusMin() <= allScore) {
+                allRank = "B+";
+            } else if (economy.getPiEcoGoalBMinusMin() <= allScore) {
+                allRank = "B0";
+            } else if (economy.getPiEcoGoalCPlusMin() <= allScore) {
+                allRank = "C+";
+            } else if (economy.getPiEcoGoalCMinusMin() <= allScore) {
+                allRank = "C0";
+            } else if (economy.getPiEcoGoalDPlusMin() <= allScore) {
+                allRank = "D+";
+            } else if (economy.getPiEcoGoalDMinusMin() <= allScore) {
+                allRank = "D0";
+            } else {
+                allRank = "E";
+            }
 
             funRankScore.put("score",String.valueOf(allScore));
             funRankScore.put("rank", allRank);
@@ -591,6 +760,10 @@ public class PerformanceFunctionService {
             return null;
         }
     }
+
+
+
+
 
 //+++++++++++++++++++++++++++++++++++++++++++++
 

@@ -1,7 +1,6 @@
 package com.broadwave.backend.performance;
 
-import com.broadwave.backend.performance.price.PriceDto;
-import com.broadwave.backend.performance.price.QPrice;
+import com.broadwave.backend.performance.performanceDtos.*;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPQLQuery;
 import org.springframework.data.domain.Page;
@@ -94,7 +93,7 @@ public class PerformanceRepositoryCustomImpl extends QuerydslRepositorySupport i
     }
 
     @Override
-    public  PerformanceMiddleDataDto findByInsertIAndAutoNum(String insert_id,String autoNum){
+    public PerformanceMiddleDataDto findByInsertIAndAutoNum(String insert_id, String autoNum){
 
         QPerformance performance = QPerformance.performance;
 
@@ -305,7 +304,7 @@ public class PerformanceRepositoryCustomImpl extends QuerydslRepositorySupport i
     }
 
     @Override
-    public Page<PerformanceListDto> findByPerformanceList(String piFacilityType, String piKind,String piFacilityName,String insert_id, Pageable pageable) {
+    public Page<PerformanceListDto> findByPerformanceList(String piFacilityType, String piKind, String piFacilityName, String insert_id, Pageable pageable) {
 
         QPerformance performance  = QPerformance.performance;
 

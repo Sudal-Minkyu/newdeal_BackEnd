@@ -20,15 +20,4 @@ public class CalculationTempDto {
     private String calYyyymmdd; // 계측일시
     private Double calTemperature; // 온도
 
-    public StringBuffer getCalYyyymmdd() {
-        if(calYyyymmdd != null && !calYyyymmdd.equals("")){
-            StringBuffer getCalYyyymmdd = new StringBuffer(calYyyymmdd);
-            getCalYyyymmdd.insert(4,'-');
-            getCalYyyymmdd.insert(7,'-');
-            return getCalYyyymmdd;
-        }else{
-            return null;
-        }
-    }
-
 }

@@ -3,6 +3,7 @@ package com.broadwave.backend.performance;
 import com.broadwave.backend.common.AjaxResponse;
 import com.broadwave.backend.common.ResponseErrorCode;
 import com.broadwave.backend.keygenerate.KeyGenerateService;
+import com.broadwave.backend.performance.performanceDtos.*;
 import com.broadwave.backend.performance.reference.ReferenceEconomy;
 import com.broadwave.backend.performance.reference.ReferencePolicy;
 import com.broadwave.backend.performance.reference.ReferenceService;
@@ -181,7 +182,7 @@ public class PerformanceRestController {
 
     // NEWDEAL 성능개선사업평가 Performance1 중간저장 세이브
     @PostMapping("/middleSaveUpdate/{autoNum}")
-    public ResponseEntity<Map<String,Object>> middleSaveUpdate(@ModelAttribute PerformanceMiddleSaveDto performanceMiddleSaveDto,@PathVariable String autoNum, HttpServletRequest request) {
+    public ResponseEntity<Map<String,Object>> middleSaveUpdate(@ModelAttribute PerformanceMiddleSaveDto performanceMiddleSaveDto, @PathVariable String autoNum, HttpServletRequest request) {
 
         log.info("middleSaveUpdate 호출성공");
         AjaxResponse res = new AjaxResponse();
@@ -247,7 +248,7 @@ public class PerformanceRestController {
 
     // NEWDEAL 성능개선사업평가 Performance2 중간저장 세이브
     @PostMapping("/middleSaveUpdateBusiness/{autoNum}")
-    public ResponseEntity<Map<String,Object>> middleSaveUpdateBusiness(@ModelAttribute PerformanceMiddleSaveBusinessDto performanceMiddleSaveBusinessDto,@PathVariable String autoNum, HttpServletRequest request) {
+    public ResponseEntity<Map<String,Object>> middleSaveUpdateBusiness(@ModelAttribute PerformanceMiddleSaveBusinessDto performanceMiddleSaveBusinessDto, @PathVariable String autoNum, HttpServletRequest request) {
 
         log.info("middleSaveUpdate 호출성공");
         AjaxResponse res = new AjaxResponse();
@@ -1086,8 +1087,9 @@ public class PerformanceRestController {
         String piBusinessType = null;
         String safeValue = null;
         String publicYearValue = null;
-        for(int i=0; i<performance.size(); i++){
 
+        for(int i=0; i<performance.size(); i++){
+//        for(int i=0; i<1; i++){
             technicality_scroeList = new ArrayList<>();
             technicality_rankList = new ArrayList<>();
 
@@ -1101,6 +1103,9 @@ public class PerformanceRestController {
 
             // 노후화 대응, 기준변화, 사용성변화 - 안정성 환산점수 10/29 완료
             Map<String,String> safetyLevel;
+            log.info("");
+            log.info("@@@@@ 시작 @@@@@");
+            log.info("");
             if(piBusinessType.startsWith("유지")) {
                 log.info("유지보수임");
                 safetyLevel  = performanceFunctionService.safetyLevel(performance.get(i).getPiSafetyLevel(),technicality,safeValue);
@@ -1114,7 +1119,7 @@ public class PerformanceRestController {
                 technicality_rankList.add(safetyLevel.get("rank"));
             }
 
-            // 노후화 대응, 기준변화, 사용성변화 - 노후도 환산점수 11/04 완료
+            // 노후화 대응, 기준변화, 사용성변화 - 기술성 - 노후도 환산점수 11/04 완료
             Map<String,String> publicYear;
             if(piBusinessType.startsWith("유지")) {
                 publicYear  = performanceFunctionService.publicYear(performance.get(i).getPiPublicYear(),technicality,publicYearValue);
@@ -1131,16 +1136,15 @@ public class PerformanceRestController {
 
             if(piBusiness.equals("노후화대응")){
 
-            // 노후화 대응 - 지체도 환산점수 11/04 완료
-            Map<String,String> urgency  = performanceFunctionService.urgency(performance.get(i).getPiSafetyLevel(), performance.get(i).getPiMaintenanceDelay(), technicality);
-            technicality_scroeList.add(urgency.get("score"));
-            technicality_rankList.add(urgency.get("rank"));
+                // 노후화 대응 - 기술성 - 지체도 환산점수 11/04 완료
+                Map<String,String> urgency  = performanceFunctionService.urgency(performance.get(i).getPiSafetyLevel(), performance.get(i).getPiMaintenanceDelay(), technicality);
+                technicality_scroeList.add(urgency.get("score"));
+                technicality_rankList.add(urgency.get("rank"));
 
-            // 노후화 대응 - 목표성능 달성도 환산점수 11/04 완료
-            Map<String,String> goal  = performanceFunctionService.goal(performance.get(i).getPiAfterSafetyRating(),performance.get(i).getPiUsabilityAndGoalLevel(), technicality);
-            technicality_scroeList.add(goal.get("score"));
-            technicality_rankList.add(goal.get("rank"));
-
+                // 노후화 대응 - 기술성 - 목표성능 달성도 환산점수 11/04 완료
+                Map<String,String> goal  = performanceFunctionService.goal(performance.get(i).getPiAfterSafetyRating(),performance.get(i).getPiUsabilityAndGoalLevel(), technicality);
+                technicality_scroeList.add(goal.get("score"));
+                technicality_rankList.add(goal.get("rank"));
 
 
 
@@ -1150,49 +1154,74 @@ public class PerformanceRestController {
             }else{
 
 
-                // 사용성변화 - 사용성 환산점수 11/04 완료
+                // 사용성변화 - 기술성 - 사용성 환산점수 11/04 완료
                 if(type.equals("교량") || type.equals("터널")){
                     Map<String,String> usabilityLevel  = performanceFunctionService.usabilityLevel(performance.get(i).getPiUsabilityAndGoalLevel(), technicality);
                     technicality_scroeList.add(usabilityLevel.get("score"));
                     technicality_rankList.add(usabilityLevel.get("rank"));
+                }else{
+                    technicality_scroeList.add("0");
+                    technicality_rankList.add("E");
                 }
 
             }
 
             log.info("technicality_rankList : "+technicality_rankList);
             log.info("technicality_scroeList : "+technicality_scroeList);
+
             // 노후화 대응, 기준변화, 사용성변화 - 기술성 종합 환산점수,환산랭크 11/04 완료
             Map<String, String> technicalityAllScoreRank = performanceFunctionService.technicality_allScoreRank(type,technicality_scroeList,
-                    weight.getPiWeightSafe(),weight.getPiWeightUsability(), weight.getPiWeightOld(), weight.getPiWeightUrgency(), weight.getPiWeightGoal(),
-                    piBusiness);
+                    weight.getPiWeightSafe(),weight.getPiWeightUsability(), weight.getPiWeightOld(), weight.getPiWeightUrgency(), weight.getPiWeightGoal(), piBusiness, technicality);
             technicality_scroeList.add(technicalityAllScoreRank.get("score"));
             technicality_rankList.add(technicalityAllScoreRank.get("rank"));
+            log.info("technicality_rankList : "+technicality_rankList);
+            log.info("technicality_scroeList : "+technicality_scroeList);
+
+            log.info("");
+            log.info("economy_rankList : "+economy_rankList);
+            log.info("economy_scroeList : "+economy_scroeList);
+
+            if(piBusiness.equals("노후화대응")){
+
+                // 노후화대응 - 경제성 - 자산가치 개선 효율성 - 22/04/13 - 검토 : 문제없음
+                Map<String, String> assetValue = performanceFunctionService.assetValue(economy, performance.get(i).getPiFacilityType(), performance.get(i).getPiErectionCost(), performance.get(i).getPiBusinessExpenses() ,performance.get(i).getPiCompletionYear(), performance.get(i).getPiRaterBaseYear(), performance.get(i).getPiBeforeSafetyRating(), performance.get(i).getPiAfterSafetyRating());
+                if(assetValue==null){
+                    return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE022.getCode(), ResponseErrorCode.NDE022.getDesc(), ResponseErrorCode.NDE023.getCode(), ResponseErrorCode.NDE023.getDesc()));
+                }
+                economy_scroeList.add(assetValue.get("score"));
+                economy_rankList.add(assetValue.get("rank"));
+
+                // 노후화대응 - 경제성 - 안전효용 개선 효율성 - 22/04/13 - 검토 : 문제없음
+                Map<String, String> safetyUtility = performanceFunctionService.safetyUtility(economy, performance.get(i).getPiAfterSafetyRating(),performance.get(i).getPiBeforeSafetyRating(),performance.get(i).getPiAADT(),performance.get(i).getPiBusinessExpenses());
+                economy_scroeList.add(safetyUtility.get("score"));
+                economy_rankList.add(safetyUtility.get("rank"));
+
+            }else{
+
+                // 기준변화, 사용성변화 - 경제성 - 사업효율 등급
+                Map<String, String> businessEfficiency = performanceFunctionService.businessEfficiency(economy, performance.get(i).getPiFacilityType(), performance.get(i).getPiBusinessExpenses(), performance.get(i).getPiAADT());
+                economy_scroeList.add(businessEfficiency.get("score"));
+                economy_rankList.add(businessEfficiency.get("rank"));
+
+                Double cost = 5000000000.0; // 단위비용
+                // 기준변화, 사용성변화 - 경제성 - 사업규모 등급
+                Map<String, String> businessScale = performanceFunctionService.businessScale(economy, performance.get(i).getPiBusinessExpenses(), cost);
+                economy_scroeList.add(businessScale.get("score"));
+                economy_rankList.add(businessScale.get("rank"));
+
+            }
+
+            // 노후화대응, 기준변화, 사용성변화 - 경제성 종합점수 및 등급 - 22/04/13 - 검토 : 문제없음
+            Map<String, String> economyAllScoreRank = performanceFunctionService.economy_allScoreRank(economy, economy_scroeList,weight.getPiWeightSafeUtility(), weight.getPiWeightCostUtility());
+            economy_scroeList.add(economyAllScoreRank.get("score"));
+            economy_rankList.add(economyAllScoreRank.get("rank"));
+
+            log.info("economy_rankList : "+economy_rankList);
+            log.info("economy_scroeList : "+economy_scroeList);
 
 
 
-
-
-
-
-
-
-
-//
-//            // 경제성 - 자산가치 개선 효율성
-//            Map<String, String> assetValue = performanceFunctionService.assetValue(performance.get(i).getPiFacilityType(), performance.get(i).getPiErectionCost(), performance.get(i).getPiBusinessExpenses() ,performance.get(i).getPiCompletionYear(), performance.get(i).getPiRaterBaseYear(), performance.get(i).getPiBeforeSafetyRating(), performance.get(i).getPiAfterSafetyRating());
-//            if(assetValue==null){
-//                return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE022.getCode(), ResponseErrorCode.NDE022.getDesc(), ResponseErrorCode.NDE023.getCode(), ResponseErrorCode.NDE023.getDesc()));
-//            }
-//            economy_scroeList.add(assetValue.get("score"));
-//            economy_rankList.add(assetValue.get("rank"));
-//            // 경제성 - 안전효용 개선 효율성
-//            Map<String, String> safetyUtility = performanceFunctionService.safetyUtility(performance.get(i).getPiAfterSafetyRating(),performance.get(i).getPiBeforeSafetyRating(),performance.get(i).getPiAADT(),performance.get(i).getPiBusinessExpenses());
-//            economy_scroeList.add(safetyUtility.get("score"));
-//            economy_rankList.add(safetyUtility.get("rank"));
-//            // 경제성 - 종합점수 및 등급
-//            Map<String, String> economyAllScoreRank = performanceFunctionService.economy_allScoreRank(economy_scroeList,weight.getPiWeightSafeUtility(), weight.getPiWeightCostUtility());
-//            economy_scroeList.add(economyAllScoreRank.get("score"));
-//            economy_rankList.add(economyAllScoreRank.get("rank"));
+//            ReferencePolicy policy = referenceService.policyData("policy");
 //
 //            // 정책성 - 사업추진 타당성
 //            Map<String, String> businessFeasibility = performanceFunctionService.BusinessFeasibility(performance.get(i).getPiBusinessObligatory(), performance.get(i).getPiBusinessMandatory(), performance.get(i).getPiBusinessPlanned());
