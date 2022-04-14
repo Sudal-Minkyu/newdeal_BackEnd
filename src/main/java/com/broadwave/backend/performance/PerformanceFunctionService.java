@@ -3,6 +3,7 @@ package com.broadwave.backend.performance;
 import com.broadwave.backend.performance.price.PriceDto;
 import com.broadwave.backend.performance.price.PriceService;
 import com.broadwave.backend.performance.reference.ReferenceEconomy;
+import com.broadwave.backend.performance.reference.ReferencePolicy;
 import com.broadwave.backend.performance.reference.ReferenceTechnicality;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +35,7 @@ public class PerformanceFunctionService {
 
 //**************************** 기술성 함수 ********************************
 
-    // 노후화 대응, 기준변화, 사용성변화 - 안정성 환산점수 10/29 완료
+    // 노후화 대응, 기준변화, 사용성변화 - 안정성 환산점수 21/10/29 완료
     public Map<String, String> safetyLevel(String piSafetyLevel, ReferenceTechnicality technicality , String safeValue) {
         log.info("안정성 환산점수 함수호출");
         funRankScore.clear();
@@ -81,7 +82,7 @@ public class PerformanceFunctionService {
         return funRankScore;
     }
 
-    // 노후화 대응, 기준변화, 사용성변화 - 노후도 환산점수 11/04 완료
+    // 노후화 대응, 기준변화, 사용성변화 - 노후도 환산점수 21/11/04 완료
     public Map<String, String> publicYear(Double piPublicYear,ReferenceTechnicality technicality, String publicYearValue) {
         log.info("노후도 환산점수 함수호출");
         funRankScore.clear();
@@ -636,7 +637,7 @@ public class PerformanceFunctionService {
         return funRankScore;
     }
 
-    // 기준변화, 사용성변화 - 경제성 - 사업규모 등급
+    // 기준변화, 사용성변화 - 경제성 - 사업규모 등급 22/04/14 완료
     public Map<String, String> businessScale(ReferenceEconomy economy, Long piBusinessExpenses, Double cost) {
         log.info("사업규모 등급 함수호출");
         funRankScore.clear();
@@ -668,7 +669,7 @@ public class PerformanceFunctionService {
         return funRankScore;
     }
 
-    // 기준변화, 사용성변화 - 경제성 - 사업효율 등급
+    // 기준변화, 사용성변화 - 경제성 - 사업효율 등급 22/04/14 완료
     public Map<String, String> businessEfficiency(ReferenceEconomy economy, String piFacilityType, Long piBusinessExpenses, Double piAADT) {
         log.info("사업효율 등급 함수호출");
         funRankScore.clear();
@@ -761,16 +762,12 @@ public class PerformanceFunctionService {
         }
     }
 
-
-
-
-
 //+++++++++++++++++++++++++++++++++++++++++++++
 
 //================ 노후화_정책성 함수 ===================
 
     // 사업추진 타당성 환산점수
-    public Map<String, String> BusinessFeasibility(Double piBusinessObligatory,Double piBusinessMandatory,Double piBusinessPlanned) {
+    public Map<String, String> BusinessFeasibility(ReferencePolicy policy, Double piBusinessObligatory, Double piBusinessMandatory, Double piBusinessPlanned) {
         log.info("사업추진 타당성 환산점수 함수호출");
         funRankScore.clear();
         log.info("piBusinessObligatory : " + piBusinessObligatory);
@@ -778,80 +775,113 @@ public class PerformanceFunctionService {
         log.info("piBusinessPlanned : " + piBusinessPlanned);
 
         if(piBusinessObligatory==1){
-            funRankScore.put("score", "100");
+            funRankScore.put("score",String.valueOf(policy.getPiPolicyValidityA()));
             funRankScore.put("rank", "A");
         }else if(piBusinessMandatory==1){
-            funRankScore.put("score", "80");
+            funRankScore.put("score",String.valueOf(policy.getPiPolicyValidityB()));
             funRankScore.put("rank", "B");
         }else if(piBusinessPlanned==1){
-            funRankScore.put("score", "30");
+            funRankScore.put("score",String.valueOf(policy.getPiPolicyValidityC()));
             funRankScore.put("rank", "C");
         }else{
-            funRankScore.put("score", "0");
+            funRankScore.put("score",String.valueOf(policy.getPiPolicyValidityD()));
             funRankScore.put("rank", "D");
-        }
-        return funRankScore;
-    }
-
-    // 민원 및 사고 대응성 환산점수
-    public Map<String, String> ComplaintResponsiveness(Double piWhether) {
-        log.info("민원 및 사고 대응성 환산점수 함수호출");
-        funRankScore.clear();
-        log.info("piWhether : " + piWhether);
-
-        if(3 <= piWhether){
-            funRankScore.put("score", "100");
-            funRankScore.put("rank", "A");
-        }else if(1 <= piWhether){
-            funRankScore.put("score", "50");
-            funRankScore.put("rank", "B");
-        }else{
-            funRankScore.put("score", "30");
-            funRankScore.put("rank", "C");
         }
         return funRankScore;
     }
 
     // 사업효과 범용성 환산점수
-    public Map<String, String> businessEffect(Double piAADT) {
+    public Map<String, String> businessEffect(ReferencePolicy policy, Double piAADT) {
         log.info("사업효과 범용성 환산점수 함수호출");
         funRankScore.clear();
         log.info("piAADT : " + piAADT);
-        if (40001 <= piAADT) {
-            funRankScore.put("score", "100");
+        if (policy.getPiPolicyVersatilityAMin() <= piAADT) {
+            funRankScore.put("score",String.valueOf(policy.getPiPolicyVersatilityAScore()));
             funRankScore.put("rank", "A");
-        } else if (20000 <= piAADT) {
-            funRankScore.put("score", "80");
+        } else if(policy.getPiPolicyVersatilityBMin() <= piAADT && piAADT< policy.getPiPolicyVersatilityBMax()){
+            funRankScore.put("score",String.valueOf(policy.getPiPolicyVersatilityBScore()));
             funRankScore.put("rank", "B");
-        } else if (10000 <= piAADT) {
-            funRankScore.put("score", "60");
+        } else if(policy.getPiPolicyVersatilityCMin() <= piAADT && piAADT< policy.getPiPolicyVersatilityCMax()){
+            funRankScore.put("score",String.valueOf(policy.getPiPolicyVersatilityCScore()));
             funRankScore.put("rank", "C");
-        } else if (5000 <= piAADT) {
-            funRankScore.put("score", "50");
+        } else if(policy.getPiPolicyVersatilityDMin() <= piAADT && piAADT< policy.getPiPolicyVersatilityDMax()){
+            funRankScore.put("score",String.valueOf(policy.getPiPolicyVersatilityDScore()));
             funRankScore.put("rank", "D");
         } else {
-            funRankScore.put("score", "30");
+            funRankScore.put("score",String.valueOf(policy.getPiPolicyVersatilityEScore()));
             funRankScore.put("rank", "E");
+        }
+
+        return funRankScore;
+    }
+
+    // 민원 및 사고 대응성 환산점수
+    public Map<String, String> ComplaintResponsiveness(ReferencePolicy policy, Double piWhether) {
+        log.info("민원 및 사고 대응성 환산점수 함수호출");
+        funRankScore.clear();
+        log.info("piWhether : " + piWhether);
+
+        if(policy.getPiPolicyResponValueA() <= piWhether){
+            funRankScore.put("score",String.valueOf(policy.getPiPolicyResponScoreA()));
+            funRankScore.put("rank", "A");
+        }else if(policy.getPiPolicyResponValueB() <= piWhether){
+            funRankScore.put("score",String.valueOf(policy.getPiPolicyResponScoreB()));
+            funRankScore.put("rank", "B");
+        }else{
+            funRankScore.put("score",String.valueOf(policy.getPiPolicyResponScoreC()));
+            funRankScore.put("rank", "C");
         }
         return funRankScore;
     }
 
     // 정책성 종합 환산점수,환산랭크
-    public Map<String, String> policy_allScoreRank(List<String> policy_scroeList, Double piWeightBusiness, Double piWeightComplaint, Double piWeightBusinessEffect) {
+    public Map<String, String> policy_allScoreRank(ReferencePolicy policy, String piBusiness,List<String> policy_scroeList, Double piWeightBusiness, Double piWeightComplaint, Double piWeightBusinessEffect) {
         log.info("정책성 종합 환산점수,환산랭크 함수호출");
         funRankScore.clear();
+
+        log.info("사업추진 타당성 : " + piWeightBusiness);
+        log.info("사업효과 범용성 : " + piWeightBusinessEffect);
+        log.info("민원 및 사고 대응성 : " + piWeightComplaint);
 
         double allScore;
         String allRank;
         try{
-            Double a = Double.parseDouble(policy_scroeList.get(0))*piWeightBusiness;
-            Double b = Double.parseDouble(policy_scroeList.get(1))*piWeightComplaint;
-            Double c = Double.parseDouble(policy_scroeList.get(2))*piWeightBusinessEffect;
-            allScore = a+b+c;
+            double a;
+            double b;
+            double c;
 
-            allRank = allScoreRankReturn(allScore);
+            if(piBusiness.equals("기준변화")){
+                a = Double.parseDouble(policy_scroeList.get(0))*piWeightBusiness;
+                b = Double.parseDouble(policy_scroeList.get(1))*piWeightBusinessEffect;
+                allScore = a+b;
+            }else{
+                a = Double.parseDouble(policy_scroeList.get(0))*piWeightBusiness;
+                b = Double.parseDouble(policy_scroeList.get(1))*piWeightBusinessEffect;
+                c = Double.parseDouble(policy_scroeList.get(2))*piWeightComplaint;
+                allScore = a+b+c;
+            }
 
-            funRankScore.put("score",String.valueOf(allScore));
+            if (policy.getPiPolicyGoalAPlusMin() <= allScore) {
+                allRank = "A+";
+            } else if (policy.getPiPolicyGoalAMinusMin() <= allScore) {
+                allRank = "A0";
+            } else if (policy.getPiPolicyGoalBPlusMin() <= allScore) {
+                allRank = "B+";
+            } else if (policy.getPiPolicyGoalBMinusMin() <= allScore) {
+                allRank = "B0";
+            } else if (policy.getPiPolicyGoalCPlusMin() <= allScore) {
+                allRank = "C+";
+            } else if (policy.getPiPolicyGoalCMinusMin() <= allScore) {
+                allRank = "C0";
+            } else if (policy.getPiPolicyGoalDPlusMin() <= allScore) {
+                allRank = "D+";
+            } else if (policy.getPiPolicyGoalDMinusMin() <= allScore) {
+                allRank = "D0";
+            } else {
+                allRank = "E";
+            }
+
+            funRankScore.put("score",String.valueOf(Math.round(allScore*10)/10.0));
             funRankScore.put("rank", allRank);
             return funRankScore;
         }catch (Exception e){
