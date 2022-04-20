@@ -23,7 +23,7 @@ import java.util.Map;
 @Service
 public class PerformanceFunctionService {
 
-    private PriceService priceService;
+    private final PriceService priceService;
     private final Map<String, String> funRankScore;
 
 
@@ -268,10 +268,14 @@ public class PerformanceFunctionService {
 
     // 노후화 대응 - 목표성능 달성도 환산점수 11/04 완료
     public Map<String, String> goal(String afterSafetyRating, String piGoalLevel, ReferenceTechnicality technicality) {
-        log.info("목표성늘 달성도 환산점수 함수호출");
+        log.info("목표성능 달성도 환산점수 함수호출");
         funRankScore.clear();
+
+        log.info("afterSafetyRating : " + afterSafetyRating);
+        log.info("piGoalLevel : " + piGoalLevel);
+
         String rank = afterSafetyRating + piGoalLevel;
-        log.info("rank : " + rank);
+        log.info("목표성능 rank : " + rank);
         switch (rank) {
             case "AA":
                 funRankScore.put("score", String.valueOf(technicality.getPiTechPerformanceAa()));
@@ -367,7 +371,16 @@ public class PerformanceFunctionService {
 
             }else if(piBusiness.equals("기준변화")){
 
+                double safeScore = Double.parseDouble(scroeList.get(0)) * piWeightSafe;
+                double oldScore = Double.parseDouble(scroeList.get(1)) * piWeightOld;
+                allScore = safeScore+oldScore;
+
             }else{
+
+                double safeScore = Double.parseDouble(scroeList.get(0)) * piWeightSafe;
+                double urgencyScore = Double.parseDouble(scroeList.get(1)) * piWeightUrgency;
+                double usabilityScore = Double.parseDouble(scroeList.get(2)) * piWeightUsability;
+                allScore = safeScore+urgencyScore+usabilityScore;
 
             }
 
@@ -894,13 +907,19 @@ public class PerformanceFunctionService {
 
 //================ 종합평가표 함수 ===================
 
+    // 노후화유형, 사용성변화, 기준변화
     // 종합평가표 함수
-    public Map<String, Object> all_ScoreRank(List<String> all_scroeList, Double technicality, Double economy, Double policy, Double piWeightCriticalScore) {
+    public Map<String, Object> all_ScoreRank(ReferenceTechnicality referenceTechnicality, List<String> all_scroeList, Double technicality, Double economy, Double policy, Double piWeightCriticalScore) {
         log.info("종합평가표 함수호출");
 
         Map<String, Object> allRankScore = new HashMap<>();
 
+        log.info("referenceTechnicality : " + referenceTechnicality);
         log.info("all_scroeList : " + all_scroeList);
+
+        log.info("technicality : " + technicality);
+        log.info("economy : " + economy);
+        log.info("policy : " + policy);
         log.info("piWeightCriticalScore : " + piWeightCriticalScore);
 
         Double allScore;
@@ -913,7 +932,25 @@ public class PerformanceFunctionService {
             Double c = Double.parseDouble(all_scroeList.get(2))*policy;
             allScore = a+b+c;
 
-            allRank = allScoreRankReturn(allScore);
+            if (referenceTechnicality.getPiTechGoalAPlusMin() < allScore && referenceTechnicality.getPiTechGoalAPlusMax() >= allScore) {
+                allRank = "A+";
+            } else if (referenceTechnicality.getPiTechGoalAMinusMin() < allScore && referenceTechnicality.getPiTechGoalAMinusMax() >= allScore) {
+                allRank = "A0";
+            } else if (referenceTechnicality.getPiTechGoalBPlusMin() < allScore && referenceTechnicality.getPiTechGoalBPlusMax() >= allScore) {
+                allRank = "B+";
+            } else if (referenceTechnicality.getPiTechGoalBMinusMin() < allScore && referenceTechnicality.getPiTechGoalBMinusMax() >= allScore) {
+                allRank = "B0";
+            } else if (referenceTechnicality.getPiTechGoalCPlusMin() < allScore && referenceTechnicality.getPiTechGoalCPlusMax() >= allScore) {
+                allRank = "C+";
+            } else if (referenceTechnicality.getPiTechGoalCMinusMin() < allScore && referenceTechnicality.getPiTechGoalCMinusMax() >= allScore) {
+                allRank = "C0";
+            } else if (referenceTechnicality.getPiTechGoalDPlusMin() < allScore && referenceTechnicality.getPiTechGoalDPlusMax() >= allScore) {
+                allRank = "D+";
+            } else if (referenceTechnicality.getPiTechGoalDMinusMin() < allScore && referenceTechnicality.getPiTechGoalDMinusMax() >= allScore) {
+                allRank = "D0";
+            } else {
+                allRank = "E";
+            }
 
             allRankScore.put("score",Math.round(allScore*1000)/1000.0);
             allRankScore.put("rank", allRank);
@@ -935,30 +972,30 @@ public class PerformanceFunctionService {
 
 //########################### 그외 #############################
 
-    // 종합 스코어점수의 랭크반환
-    public String allScoreRankReturn(Double allScore){
-        String allRank;
-        if (90 <= allScore) {
-            allRank = "A+";
-        } else if (80 <= allScore) {
-            allRank = "A0";
-        } else if (70 <= allScore) {
-            allRank = "B+";
-        } else if (60 <= allScore) {
-            allRank = "B0";
-        }else if (55 <= allScore) {
-            allRank = "C+";
-        } else if (50 <= allScore) {
-            allRank = "C0";
-        } else if (45 <= allScore) {
-            allRank = "D+";
-        } else if (40 <= allScore) {
-            allRank = "D0";
-        } else {
-            allRank = "E";
-        }
-        return allRank;
-    }
+//    // 종합 스코어점수의 랭크반환
+//    public String allScoreRankReturn(Double allScore){
+//        String allRank;
+//        if (90 <= allScore) {
+//            allRank = "A+";
+//        } else if (80 <= allScore) {
+//            allRank = "A0";
+//        } else if (70 <= allScore) {
+//            allRank = "B+";
+//        } else if (60 <= allScore) {
+//            allRank = "B0";
+//        }else if (55 <= allScore) {
+//            allRank = "C+";
+//        } else if (50 <= allScore) {
+//            allRank = "C0";
+//        } else if (45 <= allScore) {
+//            allRank = "D+";
+//        } else if (40 <= allScore) {
+//            allRank = "D0";
+//        } else {
+//            allRank = "E";
+//        }
+//        return allRank;
+//    }
 
 //############################################################
 
