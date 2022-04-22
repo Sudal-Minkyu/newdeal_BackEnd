@@ -1,6 +1,14 @@
 package com.broadwave.backend.performance.reference;
 
 import com.broadwave.backend.common.AjaxResponse;
+import com.broadwave.backend.performance.reference.economy.ReferenceEconomy;
+import com.broadwave.backend.performance.reference.economy.ReferenceEconomyMapperDto;
+import com.broadwave.backend.performance.reference.policy.ReferencePolicy;
+import com.broadwave.backend.performance.reference.policy.ReferencePolicyMapperDto;
+import com.broadwave.backend.performance.reference.technicality.ReferenceTechnicality;
+import com.broadwave.backend.performance.reference.technicality.ReferenceTechnicalityMapperDto;
+import com.broadwave.backend.performance.reference.weightSetting.ReferenceWeight;
+import com.broadwave.backend.performance.reference.weightSetting.ReferenceWeightMapperDto;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +43,7 @@ public class ReferenceRestController {
     @PostMapping("/techSave")
     public ResponseEntity<Map<String,Object>> techSave(@ModelAttribute ReferenceTechnicalityMapperDto referenceTechnicalityMapperDto, HttpServletRequest request) {
 
-//        log.info("기술성 셋팅 함수 호출");
+        log.info("기술성 셋팅 techSave 함수 호출");
         AjaxResponse res = new AjaxResponse();
 
         String JWT_AccessToken = request.getHeader("JWT_AccessToken");
@@ -78,7 +86,8 @@ public class ReferenceRestController {
     @PostMapping("/ecoSave")
     public ResponseEntity<Map<String,Object>> ecoSave(@ModelAttribute ReferenceEconomyMapperDto referenceEconomyMapperDto, HttpServletRequest request) {
 
-//        log.info("기술성 셋팅 함수 호출");
+        log.info("기술성 셋팅 ecoSave 함수 호출");
+
         AjaxResponse res = new AjaxResponse();
 
         String JWT_AccessToken = request.getHeader("JWT_AccessToken");
@@ -121,7 +130,8 @@ public class ReferenceRestController {
     @PostMapping("/policySave")
     public ResponseEntity<Map<String,Object>> policySave(@ModelAttribute ReferencePolicyMapperDto referencePolicyMapperDto, HttpServletRequest request) {
 
-//        log.info("기술성 셋팅 함수 호출");
+        log.info("기술성 셋팅 policySave 함수 호출");
+
         AjaxResponse res = new AjaxResponse();
 
         String JWT_AccessToken = request.getHeader("JWT_AccessToken");
@@ -155,6 +165,50 @@ public class ReferenceRestController {
         ReferencePolicy policy = referenceService.policyData("policy");
 //        log.info("policy : " + policy);
         data.put("policy",policy);
+
+        return ResponseEntity.ok(res.dataSendSuccess(data));
+
+    }
+
+    // NEWDEAL 성능개선사업평가 참조테이블 설정 - 가중치 셋팅 함수
+    @PostMapping("/weightSettingSave")
+    public ResponseEntity<Map<String,Object>> weightSettingSave(@ModelAttribute ReferenceWeightMapperDto referenceWeightMapperDto, HttpServletRequest request) {
+
+        log.info("가중치 셋팅 weightSettingSave 함수 호출");
+
+        AjaxResponse res = new AjaxResponse();
+
+        String JWT_AccessToken = request.getHeader("JWT_AccessToken");
+        String currentuserid = request.getHeader("insert_id");
+        log.info("JWT_AccessToken : " + JWT_AccessToken);
+
+        ReferenceWeight referenceWeight = modelMapper.map(referenceWeightMapperDto, ReferenceWeight.class);
+
+        referenceWeight.setId("weight");
+        referenceWeight.setModify_id(currentuserid);
+        referenceWeight.setModify_date(LocalDateTime.now());
+
+//        log.info("referenceWeight : " + referenceWeight);
+
+        referenceService.weightSettingSave(referenceWeight);
+
+        return ResponseEntity.ok(res.success());
+
+    }
+
+    // NEWDEAL 성능개선사업평가 참조테이블 설정 - 가중치 데이터호출
+    @GetMapping("/weightSettingData")
+    public ResponseEntity<Map<String,Object>> weighthSettingData(HttpServletRequest request) {
+
+        AjaxResponse res = new AjaxResponse();
+        HashMap<String, Object> data = new HashMap<>();
+
+        String JWT_AccessToken = request.getHeader("JWT_AccessToken");
+        log.info("JWT_AccessToken : " + JWT_AccessToken);
+
+        ReferenceWeight weight = referenceService.findByWeightSettingData("weight");
+        log.info("weight : " + weight);
+        data.put("weight",weight);
 
         return ResponseEntity.ok(res.dataSendSuccess(data));
 

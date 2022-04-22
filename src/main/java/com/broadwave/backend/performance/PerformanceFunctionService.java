@@ -2,13 +2,16 @@ package com.broadwave.backend.performance;
 
 import com.broadwave.backend.performance.price.PriceDto;
 import com.broadwave.backend.performance.price.PriceService;
-import com.broadwave.backend.performance.reference.ReferenceEconomy;
-import com.broadwave.backend.performance.reference.ReferencePolicy;
-import com.broadwave.backend.performance.reference.ReferenceTechnicality;
+import com.broadwave.backend.performance.reference.economy.ReferenceEconomy;
+import com.broadwave.backend.performance.reference.policy.ReferencePolicy;
+import com.broadwave.backend.performance.reference.technicality.ReferenceTechnicality;
+import com.broadwave.backend.performance.reference.weightSetting.ReferenceWeight;
+import com.broadwave.backend.performance.weight.WeightDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -83,42 +86,27 @@ public class PerformanceFunctionService {
     }
 
     // 노후화 대응, 기준변화, 사용성변화 - 노후도 환산점수 21/11/04 완료
-    public Map<String, String> publicYear(Double piPublicYear,ReferenceTechnicality technicality, String publicYearValue) {
+    public Map<String, String> publicYear(Double piPublicYear,ReferenceTechnicality technicality) {
         log.info("노후도 환산점수 함수호출");
         funRankScore.clear();
         log.info("piPublicYear : " + piPublicYear);
-        if(publicYearValue == null) {
-            if (technicality.getPiTechOldAMin() <= piPublicYear) {
-                funRankScore.put("score", String.valueOf(technicality.getPiTechOldAScore()));
-                funRankScore.put("rank", "A");
-            } else if (technicality.getPiTechOldBMin() <= piPublicYear) {
-                funRankScore.put("score", String.valueOf(technicality.getPiTechOldBScore()));
-                funRankScore.put("rank", "B");
-            } else if (technicality.getPiTechOldCMin() <= piPublicYear) {
-                funRankScore.put("score", String.valueOf(technicality.getPiTechOldCScore()));
-                funRankScore.put("rank", "C");
-            } else if (technicality.getPiTechOldDMin() <= piPublicYear) {
-                funRankScore.put("score", String.valueOf(technicality.getPiTechOldDScore()));
-                funRankScore.put("rank", "D");
-            } else {
-                funRankScore.put("score", String.valueOf(technicality.getPiTechOldEScore()));
-                funRankScore.put("rank", "E");
-            }
-        }else{
-            double score = 100-Double.parseDouble(publicYearValue);
-            if (technicality.getPiTechOldAMin() <= score) {
-                funRankScore.put("rank", "A");
-            } else if (technicality.getPiTechOldBMin() <= score) {
-                funRankScore.put("rank", "B");
-            } else if (technicality.getPiTechOldCMin() <= score) {
-                funRankScore.put("rank", "C");
-            } else if (technicality.getPiTechOldDMin() <= score) {
-                funRankScore.put("rank", "D");
-            } else {
-                funRankScore.put("rank", "E");
-            }
-            funRankScore.put("score", String.valueOf(score));
+        if (technicality.getPiTechOldAMin() <= piPublicYear) {
+            funRankScore.put("score", String.valueOf(technicality.getPiTechOldAScore()));
+            funRankScore.put("rank", "A");
+        } else if (technicality.getPiTechOldBMin() <= piPublicYear) {
+            funRankScore.put("score", String.valueOf(technicality.getPiTechOldBScore()));
+            funRankScore.put("rank", "B");
+        } else if (technicality.getPiTechOldCMin() <= piPublicYear) {
+            funRankScore.put("score", String.valueOf(technicality.getPiTechOldCScore()));
+            funRankScore.put("rank", "C");
+        } else if (technicality.getPiTechOldDMin() <= piPublicYear) {
+            funRankScore.put("score", String.valueOf(technicality.getPiTechOldDScore()));
+            funRankScore.put("rank", "D");
+        } else {
+            funRankScore.put("score", String.valueOf(technicality.getPiTechOldEScore()));
+            funRankScore.put("rank", "E");
         }
+
         return funRankScore;
     }
 
@@ -378,9 +366,13 @@ public class PerformanceFunctionService {
             }else{
 
                 double safeScore = Double.parseDouble(scroeList.get(0)) * piWeightSafe;
-                double urgencyScore = Double.parseDouble(scroeList.get(1)) * piWeightUrgency;
+                double oldScore = Double.parseDouble(scroeList.get(1)) * piWeightOld;
                 double usabilityScore = Double.parseDouble(scroeList.get(2)) * piWeightUsability;
-                allScore = safeScore+urgencyScore+usabilityScore;
+                log.info("사용성변화 기술성 계산 : "+safeScore);
+                log.info("사용성변화 기술성 계산 : "+oldScore);
+                log.info("사용성변화 기술성 계산 : "+usabilityScore);
+                allScore = safeScore+oldScore+usabilityScore;
+                log.info("사용성변화 기술성 계산 : "+allScore);
 
             }
 
@@ -972,30 +964,334 @@ public class PerformanceFunctionService {
 
 //########################### 그외 #############################
 
-//    // 종합 스코어점수의 랭크반환
-//    public String allScoreRankReturn(Double allScore){
-//        String allRank;
-//        if (90 <= allScore) {
-//            allRank = "A+";
-//        } else if (80 <= allScore) {
-//            allRank = "A0";
-//        } else if (70 <= allScore) {
-//            allRank = "B+";
-//        } else if (60 <= allScore) {
-//            allRank = "B0";
-//        }else if (55 <= allScore) {
-//            allRank = "C+";
-//        } else if (50 <= allScore) {
-//            allRank = "C0";
-//        } else if (45 <= allScore) {
-//            allRank = "D+";
-//        } else if (40 <= allScore) {
-//            allRank = "D0";
-//        } else {
-//            allRank = "E";
-//        }
-//        return allRank;
-//    }
+    // 가중치 변경여부, 최소-최대 범위내 지정 리스트 호출
+    public List<List<String>> weightResultList(String type, String piBusiness, WeightDto weight, ReferenceWeight weightSetting) {
+        log.info("가중치 변경여부, 최소-최대 범위내 지정 리스트 함수호출");
+
+        List<List<String>> weightResultList = new ArrayList<>();
+        List<String> standardWeightList = new ArrayList<>(); // 기준가중치 리스트
+        List<String> changeYseNoList = new ArrayList<>(); // 가중치 변경여부
+        List<String> rangeMinMaxList = new ArrayList<>(); // 최소-최대 범위내 지정 리스트 호출
+
+
+        log.info("piBusiness : " + piBusiness);
+
+        if(piBusiness.equals("노후화대응")){
+
+            // 안전성
+            standardWeightList.add(String.valueOf(weightSetting.getPiOldSafetyStan()));
+            if(weightSetting.getPiOldSafetyStan().equals(weight.getPiWeightSafe())){
+                changeYseNoList.add("No");
+            }else{
+                changeYseNoList.add("Yes");
+            }
+            if(weightSetting.getPiOldSafetyMin() < weight.getPiWeightSafe() &&  weight.getPiWeightSafe() < weightSetting.getPiOldSafetyMax()){
+                rangeMinMaxList.add("부합");
+            }else{
+                rangeMinMaxList.add("불부합");
+            }
+
+            // 노후도
+            standardWeightList.add(String.valueOf(weightSetting.getPiOldOldStan()));
+            if(weightSetting.getPiOldOldStan().equals(weight.getPiWeightOld())){
+                changeYseNoList.add("No");
+            }else{
+                changeYseNoList.add("Yes");
+            }
+            if(weightSetting.getPiOldOldMin() < weight.getPiWeightOld() &&  weight.getPiWeightOld() < weightSetting.getPiOldOldMax()){
+                rangeMinMaxList.add("부합");
+            }else{
+                rangeMinMaxList.add("불부합");
+            }
+
+            // 지체도
+            standardWeightList.add(String.valueOf(weightSetting.getPiOldUrgencyStan()));
+            if(weightSetting.getPiOldUrgencyStan().equals(weight.getPiWeightUrgency())){
+                changeYseNoList.add("No");
+            }else{
+                changeYseNoList.add("Yes");
+            }
+            if(weightSetting.getPiOldUrgencyMin() < weight.getPiWeightUrgency() &&  weight.getPiWeightUrgency() < weightSetting.getPiOldUrgencyMax()){
+                rangeMinMaxList.add("부합");
+            }else{
+                rangeMinMaxList.add("불부합");
+            }
+
+            // 목표달성도
+            standardWeightList.add(String.valueOf(weightSetting.getPiOldGoalStan()));
+            if(weightSetting.getPiOldGoalStan().equals(weight.getPiWeightGoal())){
+                changeYseNoList.add("No");
+            }else{
+                changeYseNoList.add("Yes");
+            }
+            if(weightSetting.getPiOldGoalMin() < weight.getPiWeightGoal() &&  weight.getPiWeightGoal() < weightSetting.getPiOldGoalMax()){
+                rangeMinMaxList.add("부합");
+            }else{
+                rangeMinMaxList.add("불부합");
+            }
+
+            // 안전효용 개선 효율성
+            standardWeightList.add(String.valueOf(weightSetting.getPiOldSafeUtilityStan()));
+            if(weightSetting.getPiOldSafeUtilityStan().equals(weight.getPiWeightSafeUtility())){
+                changeYseNoList.add("No");
+            }else{
+                changeYseNoList.add("Yes");
+            }
+            if(weightSetting.getPiOldSafeUtilityMin() < weight.getPiWeightSafeUtility() &&  weight.getPiWeightSafeUtility() < weightSetting.getPiOldSafeUtilityMax()){
+                rangeMinMaxList.add("부합");
+            }else{
+                rangeMinMaxList.add("불부합");
+            }
+
+            // 자산가치 개선 효율성
+            standardWeightList.add(String.valueOf(weightSetting.getPiOldCostUtilityStan()));
+            if(weightSetting.getPiOldCostUtilityStan().equals(weight.getPiWeightCostUtility())){
+                changeYseNoList.add("No");
+            }else{
+                changeYseNoList.add("Yes");
+            }
+            if(weightSetting.getPiOldCostUtilityMin() < weight.getPiWeightCostUtility() &&  weight.getPiWeightCostUtility() < weightSetting.getPiOldCostUtilityMax()){
+                rangeMinMaxList.add("부합");
+            }else{
+                rangeMinMaxList.add("불부합");
+            }
+
+            // 사업추진 타당성
+            standardWeightList.add(String.valueOf(weightSetting.getPiOldBusinessStan()));
+            if(weightSetting.getPiOldBusinessStan().equals(weight.getPiWeightBusiness())){
+                changeYseNoList.add("No");
+            }else{
+                changeYseNoList.add("Yes");
+            }
+            if(weightSetting.getPiOldBusinessMin() < weight.getPiWeightBusiness() &&  weight.getPiWeightBusiness() < weightSetting.getPiOldBusinessMax()){
+                rangeMinMaxList.add("부합");
+            }else{
+                rangeMinMaxList.add("불부합");
+            }
+
+            // 민원 및 사고 대응성
+            standardWeightList.add(String.valueOf(weightSetting.getPiOldComplaintStan()));
+            if(weightSetting.getPiOldComplaintStan().equals(weight.getPiWeightComplaint())){
+                changeYseNoList.add("No");
+            }else{
+                changeYseNoList.add("Yes");
+            }
+            if(weightSetting.getPiOldComplaintMin() < weight.getPiWeightComplaint() &&  weight.getPiWeightComplaint() < weightSetting.getPiOldComplaintMax()){
+                rangeMinMaxList.add("부합");
+            }else{
+                rangeMinMaxList.add("불부합");
+            }
+
+            // 사업효과 범용성
+            standardWeightList.add(String.valueOf(weightSetting.getPiOldBusinessEffectStan()));
+            if(weightSetting.getPiOldBusinessEffectStan().equals(weight.getPiWeightBusinessEffect())){
+                changeYseNoList.add("No");
+            }else{
+                changeYseNoList.add("Yes");
+            }
+            if(weightSetting.getPiOldBusinessEffectMin() < weight.getPiWeightBusinessEffect() &&  weight.getPiWeightBusinessEffect() < weightSetting.getPiOldBusinessEffectMax()){
+                rangeMinMaxList.add("부합");
+            }else{
+                rangeMinMaxList.add("불부합");
+            }
+
+
+        }else if(piBusiness.equals("사용성변화")){
+
+            // 안전성
+            standardWeightList.add(String.valueOf(weightSetting.getPiUseSafetyStan()));
+            if(weightSetting.getPiUseSafetyStan().equals(weight.getPiWeightSafe())){
+                changeYseNoList.add("No");
+            }else{
+                changeYseNoList.add("Yes");
+            }
+            if(weightSetting.getPiUseSafetyMin() < weight.getPiWeightSafe() &&  weight.getPiWeightSafe() < weightSetting.getPiUseSafetyMax()){
+                rangeMinMaxList.add("부합");
+            }else{
+                rangeMinMaxList.add("불부합");
+            }
+
+            if(type.equals("교량") || type.equals("터널")){
+                // 사용성
+                standardWeightList.add(String.valueOf(weightSetting.getPiUseUsabilityStan()));
+                if(weightSetting.getPiUseUsabilityStan().equals(weight.getPiWeightUsability())){
+                    changeYseNoList.add("No");
+                }else{
+                    changeYseNoList.add("Yes");
+                }
+                if(weightSetting.getPiUseUsabilityMin() < weight.getPiWeightUsability() &&  weight.getPiWeightUsability() < weightSetting.getPiUseUsabilityMax()){
+                    rangeMinMaxList.add("부합");
+                }else{
+                    rangeMinMaxList.add("불부합");
+                }
+            }
+
+            // 노후도
+            standardWeightList.add(String.valueOf(weightSetting.getPiUseOldStan()));
+            if(weightSetting.getPiUseOldStan().equals(weight.getPiWeightOld())){
+                changeYseNoList.add("No");
+            }else{
+                changeYseNoList.add("Yes");
+            }
+            if(weightSetting.getPiUseOldMin() < weight.getPiWeightOld() &&  weight.getPiWeightOld() < weightSetting.getPiUseOldMax()){
+                rangeMinMaxList.add("부합");
+            }else{
+                rangeMinMaxList.add("불부합");
+            }
+
+            // 사업규모 등급
+            standardWeightList.add(String.valueOf(weightSetting.getPiUseBusinessScaleRankStan()));
+            if(weightSetting.getPiUseBusinessScaleRankStan().equals(weight.getPiWeightSafeUtility())){
+                changeYseNoList.add("No");
+            }else{
+                changeYseNoList.add("Yes");
+            }
+            if(weightSetting.getPiUseBusinessScaleRankMin() < weight.getPiWeightSafeUtility() &&  weight.getPiWeightSafeUtility() < weightSetting.getPiUseBusinessScaleRankMax()){
+                rangeMinMaxList.add("부합");
+            }else{
+                rangeMinMaxList.add("불부합");
+            }
+
+            // 사업효율 등급
+            standardWeightList.add(String.valueOf(weightSetting.getPiUseBusinessEffectRankStan()));
+            if(weightSetting.getPiUseBusinessEffectRankStan().equals(weight.getPiWeightCostUtility())){
+                changeYseNoList.add("No");
+            }else{
+                changeYseNoList.add("Yes");
+            }
+            if(weightSetting.getPiUseBusinessEffectRankMin() < weight.getPiWeightCostUtility() &&  weight.getPiWeightCostUtility() < weightSetting.getPiUseBusinessEffectRankMax()){
+                rangeMinMaxList.add("부합");
+            }else{
+                rangeMinMaxList.add("불부합");
+            }
+
+            // 사업추진 타당성
+            standardWeightList.add(String.valueOf(weightSetting.getPiUseBusinessStan()));
+            if(weightSetting.getPiUseBusinessStan().equals(weight.getPiWeightBusiness())){
+                changeYseNoList.add("No");
+            }else{
+                changeYseNoList.add("Yes");
+            }
+            if(weightSetting.getPiUseBusinessMin() < weight.getPiWeightBusiness() &&  weight.getPiWeightBusiness() < weightSetting.getPiUseBusinessMax()){
+                rangeMinMaxList.add("부합");
+            }else{
+                rangeMinMaxList.add("불부합");
+            }
+
+            // 민원 및 사고 대응성
+            standardWeightList.add(String.valueOf(weightSetting.getPiUseComplaintStan()));
+            if(weightSetting.getPiUseComplaintStan().equals(weight.getPiWeightComplaint())){
+                changeYseNoList.add("No");
+            }else{
+                changeYseNoList.add("Yes");
+            }
+            if(weightSetting.getPiUseComplaintMin() < weight.getPiWeightComplaint() &&  weight.getPiWeightComplaint() < weightSetting.getPiUseComplaintMax()){
+                rangeMinMaxList.add("부합");
+            }else{
+                rangeMinMaxList.add("불부합");
+            }
+
+            // 사업효과 범용성
+            standardWeightList.add(String.valueOf(weightSetting.getPiUseBusinessEffectStan()));
+            if(weightSetting.getPiUseBusinessEffectStan().equals(weight.getPiWeightBusinessEffect())){
+                changeYseNoList.add("No");
+            }else{
+                changeYseNoList.add("Yes");
+            }
+            if(weightSetting.getPiUseBusinessEffectMin() < weight.getPiWeightBusinessEffect() &&  weight.getPiWeightBusinessEffect() < weightSetting.getPiUseBusinessEffectMax()){
+                rangeMinMaxList.add("부합");
+            }else{
+                rangeMinMaxList.add("불부합");
+            }
+
+        }else{
+
+            // 안전성
+            standardWeightList.add(String.valueOf(weightSetting.getPiBaseSafetyStan()));
+            if(weightSetting.getPiBaseSafetyStan().equals(weight.getPiWeightSafe())){
+                changeYseNoList.add("No");
+            }else{
+                changeYseNoList.add("Yes");
+            }
+            if(weightSetting.getPiBaseSafetyMin() < weight.getPiWeightSafe() &&  weight.getPiWeightSafe() < weightSetting.getPiBaseSafetyMax()){
+                rangeMinMaxList.add("부합");
+            }else{
+                rangeMinMaxList.add("불부합");
+            }
+
+            // 노후도
+            standardWeightList.add(String.valueOf(weightSetting.getPiBaseOldStan()));
+            if(weightSetting.getPiBaseOldStan().equals(weight.getPiWeightOld())){
+                changeYseNoList.add("No");
+            }else{
+                changeYseNoList.add("Yes");
+            }
+            if(weightSetting.getPiBaseOldMin() < weight.getPiWeightOld() &&  weight.getPiWeightOld() < weightSetting.getPiBaseOldMax()){
+                rangeMinMaxList.add("부합");
+            }else{
+                rangeMinMaxList.add("불부합");
+            }
+
+            // 사업규모 등급
+            standardWeightList.add(String.valueOf(weightSetting.getPiBaseBusinessScaleRankStan()));
+            if(weightSetting.getPiBaseBusinessScaleRankStan().equals(weight.getPiWeightSafeUtility())){
+                changeYseNoList.add("No");
+            }else{
+                changeYseNoList.add("Yes");
+            }
+            if(weightSetting.getPiBaseBusinessScaleRankMin() < weight.getPiWeightSafeUtility() &&  weight.getPiWeightSafeUtility() < weightSetting.getPiBaseBusinessScaleRankMax()){
+                rangeMinMaxList.add("부합");
+            }else{
+                rangeMinMaxList.add("불부합");
+            }
+
+            // 사업효율 등급
+            standardWeightList.add(String.valueOf(weightSetting.getPiBaseBusinessEffectRankStan()));
+            if(weightSetting.getPiBaseBusinessEffectRankStan().equals(weight.getPiWeightCostUtility())){
+                changeYseNoList.add("No");
+            }else{
+                changeYseNoList.add("Yes");
+            }
+            if(weightSetting.getPiBaseBusinessEffectRankMin() < weight.getPiWeightCostUtility() &&  weight.getPiWeightCostUtility() < weightSetting.getPiBaseBusinessEffectRankMax()){
+                rangeMinMaxList.add("부합");
+            }else{
+                rangeMinMaxList.add("불부합");
+            }
+
+            // 사업추진 타당성
+            standardWeightList.add(String.valueOf(weightSetting.getPiBaseBusinessStan()));
+            if(weightSetting.getPiBaseBusinessStan().equals(weight.getPiWeightBusiness())){
+                changeYseNoList.add("No");
+            }else{
+                changeYseNoList.add("Yes");
+            }
+            if(weightSetting.getPiBaseBusinessMin() < weight.getPiWeightBusiness() &&  weight.getPiWeightBusiness() < weightSetting.getPiBaseBusinessMax()){
+                rangeMinMaxList.add("부합");
+            }else{
+                rangeMinMaxList.add("불부합");
+            }
+
+            // 사업효과 범용성
+            standardWeightList.add(String.valueOf(weightSetting.getPiBaseBusinessEffectStan()));
+            if(weightSetting.getPiBaseBusinessEffectStan().equals(weight.getPiWeightBusinessEffect())){
+                changeYseNoList.add("No");
+            }else{
+                changeYseNoList.add("Yes");
+            }
+            if(weightSetting.getPiBaseBusinessEffectMin() < weight.getPiWeightBusinessEffect() &&  weight.getPiWeightBusinessEffect() < weightSetting.getPiBaseBusinessEffectMax()){
+                rangeMinMaxList.add("부합");
+            }else{
+                rangeMinMaxList.add("불부합");
+            }
+
+        }
+
+        weightResultList.add(standardWeightList);
+        weightResultList.add(changeYseNoList);
+        weightResultList.add(rangeMinMaxList);
+
+        return weightResultList;
+     }
 
 //############################################################
 

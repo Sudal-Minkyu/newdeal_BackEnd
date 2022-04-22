@@ -1,4 +1,4 @@
-package com.broadwave.backend.performance.reference;
+package com.broadwave.backend.performance.reference.policy;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

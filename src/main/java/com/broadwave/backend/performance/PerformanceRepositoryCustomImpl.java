@@ -98,6 +98,7 @@ public class PerformanceRepositoryCustomImpl extends QuerydslRepositorySupport i
         QPerformance performance = QPerformance.performance;
 
         JPQLQuery<PerformanceMiddleDataDto> query = from(performance)
+                .where(performance.insert_id.eq(insert_id).and(performance.piAutoNum.eq(autoNum))).groupBy(performance.piAutoNum).orderBy(performance.id.asc()).limit(1)
                 .select(Projections.constructor(PerformanceMiddleDataDto.class,
                         performance.piBusiness,
                         performance.piFacilityType,
@@ -120,10 +121,8 @@ public class PerformanceRepositoryCustomImpl extends QuerydslRepositorySupport i
                 ));
 
         // 검색조건필터
-        query.where(performance.insert_id.eq(insert_id));
-        query.where(performance.piInputMiddleSave.eq(0));
-        query.where(performance.piAutoNum.eq(autoNum));
-        query.where(performance.piInputCount.eq(1));
+//        query.where(performance.piInputMiddleSave.eq(0));
+//        query.where(performance.piInputCount.eq(1));
         return query.fetchOne();
     }
 
@@ -133,6 +132,7 @@ public class PerformanceRepositoryCustomImpl extends QuerydslRepositorySupport i
         QPerformance performance = QPerformance.performance;
 
         JPQLQuery<PerformanceMiddleBusinessDataDto> query = from(performance)
+                .where(performance.insert_id.eq(insert_id).and(performance.piAutoNum.eq(autoNum)))
                 .select(Projections.constructor(PerformanceMiddleBusinessDataDto.class,
                         performance.id,
                         performance.piBusinessType,
@@ -149,7 +149,7 @@ public class PerformanceRepositoryCustomImpl extends QuerydslRepositorySupport i
 
         // 검색조건필터
         query.where(performance.insert_id.eq(insert_id));
-        query.where(performance.piInputMiddleSave.eq(0));
+//        query.where(performance.piInputMiddleSave.eq(0));
         query.where(performance.piAutoNum.eq(autoNum));
 
         return query.fetch();
@@ -225,6 +225,7 @@ public class PerformanceRepositoryCustomImpl extends QuerydslRepositorySupport i
         QPerformance performance = QPerformance.performance;
 
         JPQLQuery<Performance> query = from(performance)
+                .where(performance.insert_id.eq(insert_id).and(performance.piAutoNum.eq(autoNum))).groupBy(performance.piAutoNum).orderBy(performance.id.asc()).limit(1)
                 .select(Projections.constructor(Performance.class,
                         performance.id,
 
@@ -274,10 +275,8 @@ public class PerformanceRepositoryCustomImpl extends QuerydslRepositorySupport i
                 ));
 
         // 검색조건필터
-        query.where(performance.insert_id.eq(insert_id));
-        query.where(performance.piInputMiddleSave.eq(0));
-        query.where(performance.piAutoNum.eq(autoNum));
-        query.where(performance.piInputCount.eq(1));
+//        query.where(performance.piInputMiddleSave.eq(0));
+//        query.where(performance.piInputCount.eq(1));
 
         return query.fetchOne();
     }
@@ -295,7 +294,7 @@ public class PerformanceRepositoryCustomImpl extends QuerydslRepositorySupport i
 
         // 검색조건필터
         query.where(performance.insert_id.eq(insert_id));
-        query.where(performance.piInputMiddleSave.eq(0));
+//        query.where(performance.piInputMiddleSave.eq(0));
         query.where(performance.piAutoNum.eq(autoNum));
         query.where(performance.piInputCount.eq(count));
 

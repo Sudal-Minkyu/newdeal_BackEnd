@@ -4,10 +4,11 @@ import com.broadwave.backend.common.AjaxResponse;
 import com.broadwave.backend.common.ResponseErrorCode;
 import com.broadwave.backend.keygenerate.KeyGenerateService;
 import com.broadwave.backend.performance.performanceDtos.*;
-import com.broadwave.backend.performance.reference.ReferenceEconomy;
-import com.broadwave.backend.performance.reference.ReferencePolicy;
+import com.broadwave.backend.performance.reference.economy.ReferenceEconomy;
+import com.broadwave.backend.performance.reference.policy.ReferencePolicy;
 import com.broadwave.backend.performance.reference.ReferenceService;
-import com.broadwave.backend.performance.reference.ReferenceTechnicality;
+import com.broadwave.backend.performance.reference.technicality.ReferenceTechnicality;
+import com.broadwave.backend.performance.reference.weightSetting.ReferenceWeight;
 import com.broadwave.backend.performance.weight.Weight;
 import com.broadwave.backend.performance.weight.WeightDto;
 import com.broadwave.backend.performance.weight.WeightMapperDto;
@@ -30,6 +31,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**
@@ -91,7 +93,7 @@ public class PerformanceRestController {
     public ResponseEntity<Map<String,Object>> middleData(@RequestParam("autoNum")String autoNum,HttpServletRequest request) {
 
         log.info("middleData 호출성공");
-
+        log.info("autoNum : "+autoNum);
         AjaxResponse res = new AjaxResponse();
         HashMap<String, Object> data = new HashMap<>();
 
@@ -108,6 +110,7 @@ public class PerformanceRestController {
         }else{
             return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE019.getCode(), ResponseErrorCode.NDE019.getDesc(), ResponseErrorCode.NDE020.getCode(), ResponseErrorCode.NDE020.getDesc()));
         }
+
         return ResponseEntity.ok(res.dataSendSuccess(data));
     }
 
@@ -184,6 +187,7 @@ public class PerformanceRestController {
     @PostMapping("/middleSaveUpdate/{autoNum}")
     public ResponseEntity<Map<String,Object>> middleSaveUpdate(@ModelAttribute PerformanceMiddleSaveDto performanceMiddleSaveDto, @PathVariable String autoNum, HttpServletRequest request) {
 
+        log.info("NEWDEAL 성능개선사업평가 Performance1 중간저장 세이브");
         log.info("middleSaveUpdate 호출성공");
         AjaxResponse res = new AjaxResponse();
         HashMap<String, Object> data = new HashMap<>();
@@ -201,18 +205,17 @@ public class PerformanceRestController {
             performance.setPiUsabilityAndGoalLevel("기타");
         }
 
-        performance.setPiInputCount(1);
-        performance.setPiInputGreat(0);
-        performance.setPiInputMiddleSave(0);
-        performance.setInsert_id(currentuserid);
-        performance.setInsertDateTime(LocalDateTime.now());
-
         if(autoNum.equals("null")){
             log.info("일련번호 생성");
             Date now = new Date();
             SimpleDateFormat yyMM = new SimpleDateFormat("yyMM");
             String newAutoNum = keyGenerateService.keyGenerate("nd_pi_input", yyMM.format(now), currentuserid);
             performance.setPiAutoNum(newAutoNum);
+            performance.setPiInputMiddleSave(0);
+            performance.setPiInputCount(1);
+            performance.setInsert_id(currentuserid);
+            performance.setInsertDateTime(LocalDateTime.now());
+
             data.put("autoNum",newAutoNum);
             data.put("businessNum",performance.getPiBusiness());
         }else{
@@ -221,7 +224,8 @@ public class PerformanceRestController {
             if(optionalPerformance.isPresent()){
                 performance.setId(optionalPerformance.get().getId());
                 performance.setPiAutoNum(autoNum);
-                //여기서부터 비지니스 중간저장
+
+                //여기서부터 비지니스 중간저장 및 수정
                 performance.setPiBusinessType(optionalPerformance.get().getPiBusinessType());
                 performance.setPiTargetAbsence(optionalPerformance.get().getPiTargetAbsence());
                 performance.setPiBusinessClassification(optionalPerformance.get().getPiBusinessClassification());
@@ -232,6 +236,13 @@ public class PerformanceRestController {
                 performance.setPiBusinessMandatory(optionalPerformance.get().getPiBusinessMandatory());
                 performance.setPiBusinessPlanned(optionalPerformance.get().getPiBusinessPlanned());
                 performance.setPiWhether(optionalPerformance.get().getPiWhether());
+
+                performance.setPiInputCount(optionalPerformance.get().getPiInputCount());
+                performance.setPiInputGreat(optionalPerformance.get().getPiInputGreat());
+                performance.setPiInputMiddleSave(optionalPerformance.get().getPiInputMiddleSave());
+                performance.setModify_id(currentuserid);
+                performance.setModifyDateTime(LocalDateTime.now());
+
                 data.put("autoNum", autoNum);
                 data.put("businessNum",performance.getPiBusiness());
             }else {
@@ -250,7 +261,8 @@ public class PerformanceRestController {
     @PostMapping("/middleSaveUpdateBusiness/{autoNum}")
     public ResponseEntity<Map<String,Object>> middleSaveUpdateBusiness(@ModelAttribute PerformanceMiddleSaveBusinessDto performanceMiddleSaveBusinessDto, @PathVariable String autoNum, HttpServletRequest request) {
 
-        log.info("middleSaveUpdate 호출성공");
+        log.info("NEWDEAL 성능개선사업평가 Performance2 중간저장 세이브");
+        log.info("middleSaveUpdateBusiness 호출성공");
         AjaxResponse res = new AjaxResponse();
         HashMap<String, Object> data = new HashMap<>();
         String JWT_AccessToken = request.getHeader("JWT_AccessToken");
@@ -1057,10 +1069,13 @@ public class PerformanceRestController {
         ReferenceTechnicality technicality = referenceService.techData("tech");
         ReferenceEconomy economy = referenceService.ecoData("eco");
         ReferencePolicy policy = referenceService.policyData("policy");
+        ReferenceWeight weightSetting = referenceService.findByWeightSettingData("weight");
+
         log.info("");
         log.info("기술성 technicality : " + technicality);
         log.info("경제성 economy : " + economy);
         log.info("정책성 policy : " + policy);
+        log.info("셋팅된 가중치 referenceWeight : " + weightSetting); // 여기서부터 -> 유형의 따라 불부합,부합, Yes,No 리스트데이터 send
 
         // 기술성 점수리스트, 등급리스트
         List<String> technicality_scroeList;
@@ -1084,9 +1099,12 @@ public class PerformanceRestController {
         String piBusiness = performance.get(0).getPiBusiness();
         String type = performance.get(0).getPiFacilityType();
 
+        data.put("nowYear",LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy")));
+        List<List<String>> weightResultList = performanceFunctionService.weightResultList(type, piBusiness, weight, weightSetting); // 가중치 변경여부, 최소-최대 범위내 지정 리스트 호출
+        data.put("weightResultList",weightResultList);
+
         String piBusinessType;
         String safeValue = null;
-        String publicYearValue = null;
 
         for(int i=0; i<performance.size(); i++){
 //        for(int i=0; i<1; i++){
@@ -1121,18 +1139,9 @@ public class PerformanceRestController {
 
             // 노후화 대응, 기준변화, 사용성변화 - 기술성 - 노후도 환산점수 11/04 완료
             Map<String,String> publicYear;
-            if(piBusinessType.startsWith("유지")) {
-                publicYear  = performanceFunctionService.publicYear(performance.get(i).getPiPublicYear(),technicality,publicYearValue);
-                technicality_scroeList.add(publicYear.get("score"));
-                technicality_rankList.add(publicYear.get("rank"));
-            }else{
-                publicYear  = performanceFunctionService.publicYear(performance.get(i).getPiPublicYear(),technicality,null);
-                publicYearValue = publicYear.get("score");
-                technicality_scroeList.add(publicYear.get("score"));
-                technicality_rankList.add(publicYear.get("rank"));
-            }
-
-
+            publicYear  = performanceFunctionService.publicYear(performance.get(i).getPiPublicYear(),technicality);
+            technicality_scroeList.add(publicYear.get("score"));
+            technicality_rankList.add(publicYear.get("rank"));
 
             if(piBusiness.equals("노후화대응")){
 
@@ -1166,9 +1175,6 @@ public class PerformanceRestController {
             technicality_scroeList.add(technicalityAllScoreRank.get("score"));
             technicality_rankList.add(technicalityAllScoreRank.get("rank"));
 
-
-
-
             if(piBusiness.equals("노후화대응")){
 
                 // 노후화대응 - 경제성 - 자산가치 개선 효율성 - 22/04/13 - 검토 : 문제없음
@@ -1186,16 +1192,16 @@ public class PerformanceRestController {
 
             }else{
 
-                // 기준변화, 사용성변화 - 경제성 - 사업효율 등급
-                Map<String, String> businessEfficiency = performanceFunctionService.businessEfficiency(economy, performance.get(i).getPiFacilityType(), performance.get(i).getPiBusinessExpenses(), performance.get(i).getPiAADT());
-                economy_scroeList.add(businessEfficiency.get("score"));
-                economy_rankList.add(businessEfficiency.get("rank"));
-
                 Double cost = 5000000000.0; // 단위비용
                 // 기준변화, 사용성변화 - 경제성 - 사업규모 등급
                 Map<String, String> businessScale = performanceFunctionService.businessScale(economy, performance.get(i).getPiBusinessExpenses(), cost);
                 economy_scroeList.add(businessScale.get("score"));
                 economy_rankList.add(businessScale.get("rank"));
+
+                // 기준변화, 사용성변화 - 경제성 - 사업효율 등급
+                Map<String, String> businessEfficiency = performanceFunctionService.businessEfficiency(economy, performance.get(i).getPiFacilityType(), performance.get(i).getPiBusinessExpenses(), performance.get(i).getPiAADT());
+                economy_scroeList.add(businessEfficiency.get("score"));
+                economy_rankList.add(businessEfficiency.get("rank"));
 
             }
 
@@ -1259,6 +1265,9 @@ public class PerformanceRestController {
         log.info("정책성 환산점수 리스트 : " + policy_scroeMap);
         log.info("정책성 환산등급 리스트 : " + policy_rankMap);
         log.info("");
+
+        data.put("piBusiness",piBusiness);
+        data.put("typeName",performance.get(0).getPiFacilityType());
 
         // 가중치, 대안리스트, 대안갯수
         data.put("weightList",weight);
@@ -1346,7 +1355,6 @@ public class PerformanceRestController {
         log.info("종합평가표 사업성 : " + all_businessMap);
         log.info("종합평가표 우수대안 : " + all_greate);
 
-        data.put("typeName",performance.get(0).getPiFacilityType());
         data.put("allScroeMap",all_scroeMap);
         data.put("allRankMap",all_rankMap);
         data.put("allBusinessMap",all_businessMap);

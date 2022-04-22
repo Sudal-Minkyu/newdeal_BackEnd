@@ -1,10 +1,8 @@
-package com.broadwave.backend.performance.reference;
+package com.broadwave.backend.performance.reference.technicality;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-
-import java.util.Optional;
 
 @Repository
 public interface ReferenceTechnicalityRepository extends JpaRepository<ReferenceTechnicality,Long> {

@@ -46,10 +46,10 @@ public class Weight {
     private Double piWeightGoal; // 목표달성도 가중치(NOTNULL)
 
     @Column(name="pi_weight_safe_utility")
-    private Double piWeightSafeUtility; // 안전효용 개선 가중치(NOTNULL)
+    private Double piWeightSafeUtility; // 안전효용 개선 가중치(NOTNULL), 사업규모 등급
 
     @Column(name="pi_weight_cost_utility")
-    private Double piWeightCostUtility; // 자산가치 개선 가중치(NULL)
+    private Double piWeightCostUtility; // 자산가치 개선 가중치(NULL), 사업효율 등급
 
     @Column(name="pi_weight_business")
     private Double piWeightBusiness; // 사업추진 타당성 가중치(NOTNULL)

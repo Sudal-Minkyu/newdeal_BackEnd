@@ -1,4 +1,4 @@
-package com.broadwave.backend.performance.reference;
+package com.broadwave.backend.performance.reference.economy;
 
 import lombok.*;
 
