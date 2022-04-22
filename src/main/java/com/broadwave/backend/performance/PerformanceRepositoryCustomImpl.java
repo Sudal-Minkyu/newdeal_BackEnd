@@ -313,9 +313,9 @@ public class PerformanceRepositoryCustomImpl extends QuerydslRepositorySupport i
                         performance.piFacilityType,
                         performance.piFacilityName,
                         performance.piCompletionYear,
-                        performance.piErectionCost,
+                        performance.piType,
+                        performance.piBusiness,
                         performance.piSafetyLevel,
-                        performance.piUsabilityAndGoalLevel,
                         performance.piBusinessType,
                         performance.piBusinessExpenses
                 ));
@@ -335,7 +335,7 @@ public class PerformanceRepositoryCustomImpl extends QuerydslRepositorySupport i
         query.where(performance.piInputGreat.eq(1)); // 2. 우수 대안만 리스트로 출력한다.
         query.where(performance.piInputMiddleSave.eq(1)); // 3. 중간저장된 글이 아닌 완전히 작성된 대안만 출력한다.
 
-        query.orderBy(performance.id.desc());
+        query.groupBy(performance.piAutoNum).orderBy(performance.id.asc()).distinct();
 
         final List<PerformanceListDto> performanceListDtos = Objects.requireNonNull(getQuerydsl()).applyPagination(pageable, query).fetch();
         return new PageImpl<>(performanceListDtos, pageable, query.fetchCount());

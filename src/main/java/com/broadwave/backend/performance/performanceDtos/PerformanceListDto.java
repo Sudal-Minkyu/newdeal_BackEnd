@@ -18,9 +18,9 @@ public class PerformanceListDto {
     private String piFacilityType; // 시설유형(NOTNULL)
     private String piFacilityName; // 시설명(NULL)
     private Double piCompletionYear; // 준공연도(NOTNULL)
-    private Long piErectionCost; // 취득원가(NOTNULL)
+    private String piType; // 형식구분(NULL)
+    private String piBusiness; // 사업구분(NOTNULL)
     private String piSafetyLevel; // 안전등급(NOTNULL)
-    private String piUsabilityAndGoalLevel; // 사용성등급(NOTNULL) , 목표안전등급
     private String piBusinessType; // 사업유형(NOTNULL)
     private Long piBusinessExpenses; // 사업비용(NOTNULL)
 }
