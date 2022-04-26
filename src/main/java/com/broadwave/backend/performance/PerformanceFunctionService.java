@@ -923,28 +923,31 @@ public class PerformanceFunctionService {
             Double b = Double.parseDouble(all_scroeList.get(1))*economy;
             Double c = Double.parseDouble(all_scroeList.get(2))*policy;
             allScore = a+b+c;
+            allScore = Math.round(allScore*1000)/1000.0;
 
-            if (referenceTechnicality.getPiTechGoalAPlusMin() < allScore && referenceTechnicality.getPiTechGoalAPlusMax() >= allScore) {
+            if (referenceTechnicality.getPiTechGoalAPlusMin() < allScore ) {
                 allRank = "A+";
-            } else if (referenceTechnicality.getPiTechGoalAMinusMin() < allScore && referenceTechnicality.getPiTechGoalAMinusMax() >= allScore) {
+            } else if (referenceTechnicality.getPiTechGoalAMinusMin() < allScore ) {
                 allRank = "A0";
-            } else if (referenceTechnicality.getPiTechGoalBPlusMin() < allScore && referenceTechnicality.getPiTechGoalBPlusMax() >= allScore) {
+            } else if (referenceTechnicality.getPiTechGoalBPlusMin() < allScore) {
                 allRank = "B+";
-            } else if (referenceTechnicality.getPiTechGoalBMinusMin() < allScore && referenceTechnicality.getPiTechGoalBMinusMax() >= allScore) {
+            } else if (referenceTechnicality.getPiTechGoalBMinusMin() < allScore) {
                 allRank = "B0";
-            } else if (referenceTechnicality.getPiTechGoalCPlusMin() < allScore && referenceTechnicality.getPiTechGoalCPlusMax() >= allScore) {
+            } else if (referenceTechnicality.getPiTechGoalCPlusMin() < allScore ) {
                 allRank = "C+";
-            } else if (referenceTechnicality.getPiTechGoalCMinusMin() < allScore && referenceTechnicality.getPiTechGoalCMinusMax() >= allScore) {
+            } else if (referenceTechnicality.getPiTechGoalCMinusMin() < allScore) {
                 allRank = "C0";
-            } else if (referenceTechnicality.getPiTechGoalDPlusMin() < allScore && referenceTechnicality.getPiTechGoalDPlusMax() >= allScore) {
+            } else if (referenceTechnicality.getPiTechGoalDPlusMin() < allScore ) {
                 allRank = "D+";
-            } else if (referenceTechnicality.getPiTechGoalDMinusMin() < allScore && referenceTechnicality.getPiTechGoalDMinusMax() >= allScore) {
+            } else if (referenceTechnicality.getPiTechGoalDMinusMin() < allScore) {
                 allRank = "D0";
-            } else {
+            } else  if (referenceTechnicality.getPiTechGoalEMax() >= allScore){
                 allRank = "E";
+            } else{
+                allRank = "에러";
             }
 
-            allRankScore.put("score",Math.round(allScore*1000)/1000.0);
+            allRankScore.put("score",allScore);
             allRankScore.put("rank", allRank);
 
             if(piWeightCriticalScore<=allScore){
@@ -998,7 +1001,7 @@ public class PerformanceFunctionService {
             }else{
                 changeYseNoList.add("Yes");
             }
-            if(weightSetting.getPiOldOldMin() < weight.getPiWeightOld() &&  weight.getPiWeightOld() < weightSetting.getPiOldOldMax()){
+            if(weightSetting.getPiOldOldMin() < weight.getPiWeightOld() && weight.getPiWeightOld() < weightSetting.getPiOldOldMax()){
                 rangeMinMaxList.add("부합");
             }else{
                 rangeMinMaxList.add("불부합");
@@ -1011,7 +1014,7 @@ public class PerformanceFunctionService {
             }else{
                 changeYseNoList.add("Yes");
             }
-            if(weightSetting.getPiOldUrgencyMin() < weight.getPiWeightUrgency() &&  weight.getPiWeightUrgency() < weightSetting.getPiOldUrgencyMax()){
+            if(weightSetting.getPiOldUrgencyMin() < weight.getPiWeightUrgency() && weight.getPiWeightUrgency() < weightSetting.getPiOldUrgencyMax()){
                 rangeMinMaxList.add("부합");
             }else{
                 rangeMinMaxList.add("불부합");
@@ -1050,7 +1053,7 @@ public class PerformanceFunctionService {
             }else{
                 changeYseNoList.add("Yes");
             }
-            if(weightSetting.getPiOldCostUtilityMin() < weight.getPiWeightCostUtility() &&  weight.getPiWeightCostUtility() < weightSetting.getPiOldCostUtilityMax()){
+            if(weightSetting.getPiOldCostUtilityMin() < weight.getPiWeightCostUtility() && weight.getPiWeightCostUtility() < weightSetting.getPiOldCostUtilityMax()){
                 rangeMinMaxList.add("부합");
             }else{
                 rangeMinMaxList.add("불부합");
@@ -1063,7 +1066,7 @@ public class PerformanceFunctionService {
             }else{
                 changeYseNoList.add("Yes");
             }
-            if(weightSetting.getPiOldBusinessMin() < weight.getPiWeightBusiness() &&  weight.getPiWeightBusiness() < weightSetting.getPiOldBusinessMax()){
+            if(weightSetting.getPiOldBusinessMin() < weight.getPiWeightBusiness() && weight.getPiWeightBusiness() < weightSetting.getPiOldBusinessMax()){
                 rangeMinMaxList.add("부합");
             }else{
                 rangeMinMaxList.add("불부합");
@@ -1076,7 +1079,7 @@ public class PerformanceFunctionService {
             }else{
                 changeYseNoList.add("Yes");
             }
-            if(weightSetting.getPiOldComplaintMin() < weight.getPiWeightComplaint() &&  weight.getPiWeightComplaint() < weightSetting.getPiOldComplaintMax()){
+            if(weightSetting.getPiOldComplaintMin() < weight.getPiWeightComplaint() && weight.getPiWeightComplaint() < weightSetting.getPiOldComplaintMax()){
                 rangeMinMaxList.add("부합");
             }else{
                 rangeMinMaxList.add("불부합");
@@ -1105,7 +1108,7 @@ public class PerformanceFunctionService {
             }else{
                 changeYseNoList.add("Yes");
             }
-            if(weightSetting.getPiUseSafetyMin() < weight.getPiWeightSafe() &&  weight.getPiWeightSafe() < weightSetting.getPiUseSafetyMax()){
+            if(weightSetting.getPiUseSafetyMin() < weight.getPiWeightSafe() && weight.getPiWeightSafe() < weightSetting.getPiUseSafetyMax()){
                 rangeMinMaxList.add("부합");
             }else{
                 rangeMinMaxList.add("불부합");
@@ -1119,7 +1122,7 @@ public class PerformanceFunctionService {
                 }else{
                     changeYseNoList.add("Yes");
                 }
-                if(weightSetting.getPiUseUsabilityMin() < weight.getPiWeightUsability() &&  weight.getPiWeightUsability() < weightSetting.getPiUseUsabilityMax()){
+                if(weightSetting.getPiUseUsabilityMin() < weight.getPiWeightUsability() || weight.getPiWeightUsability() < weightSetting.getPiUseUsabilityMax()){
                     rangeMinMaxList.add("부합");
                 }else{
                     rangeMinMaxList.add("불부합");
@@ -1133,7 +1136,7 @@ public class PerformanceFunctionService {
             }else{
                 changeYseNoList.add("Yes");
             }
-            if(weightSetting.getPiUseOldMin() < weight.getPiWeightOld() &&  weight.getPiWeightOld() < weightSetting.getPiUseOldMax()){
+            if(weightSetting.getPiUseOldMin() < weight.getPiWeightOld() ||  weight.getPiWeightOld() < weightSetting.getPiUseOldMax()){
                 rangeMinMaxList.add("부합");
             }else{
                 rangeMinMaxList.add("불부합");
@@ -1146,7 +1149,7 @@ public class PerformanceFunctionService {
             }else{
                 changeYseNoList.add("Yes");
             }
-            if(weightSetting.getPiUseBusinessScaleRankMin() < weight.getPiWeightSafeUtility() &&  weight.getPiWeightSafeUtility() < weightSetting.getPiUseBusinessScaleRankMax()){
+            if(weightSetting.getPiUseBusinessScaleRankMin() < weight.getPiWeightSafeUtility() ||  weight.getPiWeightSafeUtility() < weightSetting.getPiUseBusinessScaleRankMax()){
                 rangeMinMaxList.add("부합");
             }else{
                 rangeMinMaxList.add("불부합");
@@ -1159,7 +1162,7 @@ public class PerformanceFunctionService {
             }else{
                 changeYseNoList.add("Yes");
             }
-            if(weightSetting.getPiUseBusinessEffectRankMin() < weight.getPiWeightCostUtility() &&  weight.getPiWeightCostUtility() < weightSetting.getPiUseBusinessEffectRankMax()){
+            if(weightSetting.getPiUseBusinessEffectRankMin() < weight.getPiWeightCostUtility() ||  weight.getPiWeightCostUtility() < weightSetting.getPiUseBusinessEffectRankMax()){
                 rangeMinMaxList.add("부합");
             }else{
                 rangeMinMaxList.add("불부합");
@@ -1172,7 +1175,7 @@ public class PerformanceFunctionService {
             }else{
                 changeYseNoList.add("Yes");
             }
-            if(weightSetting.getPiUseBusinessMin() < weight.getPiWeightBusiness() &&  weight.getPiWeightBusiness() < weightSetting.getPiUseBusinessMax()){
+            if(weightSetting.getPiUseBusinessMin() < weight.getPiWeightBusiness() ||  weight.getPiWeightBusiness() < weightSetting.getPiUseBusinessMax()){
                 rangeMinMaxList.add("부합");
             }else{
                 rangeMinMaxList.add("불부합");
@@ -1185,7 +1188,7 @@ public class PerformanceFunctionService {
             }else{
                 changeYseNoList.add("Yes");
             }
-            if(weightSetting.getPiUseComplaintMin() < weight.getPiWeightComplaint() &&  weight.getPiWeightComplaint() < weightSetting.getPiUseComplaintMax()){
+            if(weightSetting.getPiUseComplaintMin() < weight.getPiWeightComplaint() ||  weight.getPiWeightComplaint() < weightSetting.getPiUseComplaintMax()){
                 rangeMinMaxList.add("부합");
             }else{
                 rangeMinMaxList.add("불부합");
@@ -1198,7 +1201,7 @@ public class PerformanceFunctionService {
             }else{
                 changeYseNoList.add("Yes");
             }
-            if(weightSetting.getPiUseBusinessEffectMin() < weight.getPiWeightBusinessEffect() &&  weight.getPiWeightBusinessEffect() < weightSetting.getPiUseBusinessEffectMax()){
+            if(weightSetting.getPiUseBusinessEffectMin() < weight.getPiWeightBusinessEffect() ||  weight.getPiWeightBusinessEffect() < weightSetting.getPiUseBusinessEffectMax()){
                 rangeMinMaxList.add("부합");
             }else{
                 rangeMinMaxList.add("불부합");
@@ -1213,7 +1216,7 @@ public class PerformanceFunctionService {
             }else{
                 changeYseNoList.add("Yes");
             }
-            if(weightSetting.getPiBaseSafetyMin() < weight.getPiWeightSafe() &&  weight.getPiWeightSafe() < weightSetting.getPiBaseSafetyMax()){
+            if(weightSetting.getPiBaseSafetyMin() < weight.getPiWeightSafe() ||  weight.getPiWeightSafe() < weightSetting.getPiBaseSafetyMax()){
                 rangeMinMaxList.add("부합");
             }else{
                 rangeMinMaxList.add("불부합");
@@ -1226,7 +1229,7 @@ public class PerformanceFunctionService {
             }else{
                 changeYseNoList.add("Yes");
             }
-            if(weightSetting.getPiBaseOldMin() < weight.getPiWeightOld() &&  weight.getPiWeightOld() < weightSetting.getPiBaseOldMax()){
+            if(weightSetting.getPiBaseOldMin() < weight.getPiWeightOld() ||  weight.getPiWeightOld() < weightSetting.getPiBaseOldMax()){
                 rangeMinMaxList.add("부합");
             }else{
                 rangeMinMaxList.add("불부합");
@@ -1239,7 +1242,7 @@ public class PerformanceFunctionService {
             }else{
                 changeYseNoList.add("Yes");
             }
-            if(weightSetting.getPiBaseBusinessScaleRankMin() < weight.getPiWeightSafeUtility() &&  weight.getPiWeightSafeUtility() < weightSetting.getPiBaseBusinessScaleRankMax()){
+            if(weightSetting.getPiBaseBusinessScaleRankMin() < weight.getPiWeightSafeUtility() ||  weight.getPiWeightSafeUtility() < weightSetting.getPiBaseBusinessScaleRankMax()){
                 rangeMinMaxList.add("부합");
             }else{
                 rangeMinMaxList.add("불부합");
@@ -1252,7 +1255,7 @@ public class PerformanceFunctionService {
             }else{
                 changeYseNoList.add("Yes");
             }
-            if(weightSetting.getPiBaseBusinessEffectRankMin() < weight.getPiWeightCostUtility() &&  weight.getPiWeightCostUtility() < weightSetting.getPiBaseBusinessEffectRankMax()){
+            if(weightSetting.getPiBaseBusinessEffectRankMin() < weight.getPiWeightCostUtility() ||  weight.getPiWeightCostUtility() < weightSetting.getPiBaseBusinessEffectRankMax()){
                 rangeMinMaxList.add("부합");
             }else{
                 rangeMinMaxList.add("불부합");
@@ -1265,7 +1268,7 @@ public class PerformanceFunctionService {
             }else{
                 changeYseNoList.add("Yes");
             }
-            if(weightSetting.getPiBaseBusinessMin() < weight.getPiWeightBusiness() &&  weight.getPiWeightBusiness() < weightSetting.getPiBaseBusinessMax()){
+            if(weightSetting.getPiBaseBusinessMin() < weight.getPiWeightBusiness() ||  weight.getPiWeightBusiness() < weightSetting.getPiBaseBusinessMax()){
                 rangeMinMaxList.add("부합");
             }else{
                 rangeMinMaxList.add("불부합");
@@ -1278,7 +1281,7 @@ public class PerformanceFunctionService {
             }else{
                 changeYseNoList.add("Yes");
             }
-            if(weightSetting.getPiBaseBusinessEffectMin() < weight.getPiWeightBusinessEffect() &&  weight.getPiWeightBusinessEffect() < weightSetting.getPiBaseBusinessEffectMax()){
+            if(weightSetting.getPiBaseBusinessEffectMin() < weight.getPiWeightBusinessEffect() ||  weight.getPiWeightBusinessEffect() < weightSetting.getPiBaseBusinessEffectMax()){
                 rangeMinMaxList.add("부합");
             }else{
                 rangeMinMaxList.add("불부합");

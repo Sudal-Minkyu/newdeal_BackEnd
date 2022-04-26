@@ -8,7 +8,7 @@ import com.broadwave.backend.performance.reference.policy.ReferencePolicyMapperD
 import com.broadwave.backend.performance.reference.technicality.ReferenceTechnicality;
 import com.broadwave.backend.performance.reference.technicality.ReferenceTechnicalityMapperDto;
 import com.broadwave.backend.performance.reference.weightSetting.ReferenceWeight;
-import com.broadwave.backend.performance.reference.weightSetting.ReferenceWeightMapperDto;
+import com.broadwave.backend.performance.reference.weightSetting.weightSettingDtos.ReferenceWeightMapperDto;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;

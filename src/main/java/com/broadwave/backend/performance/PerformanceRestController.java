@@ -9,6 +9,9 @@ import com.broadwave.backend.performance.reference.policy.ReferencePolicy;
 import com.broadwave.backend.performance.reference.ReferenceService;
 import com.broadwave.backend.performance.reference.technicality.ReferenceTechnicality;
 import com.broadwave.backend.performance.reference.weightSetting.ReferenceWeight;
+import com.broadwave.backend.performance.reference.weightSetting.weightSettingDtos.ReferenceWeightBaseDto;
+import com.broadwave.backend.performance.reference.weightSetting.weightSettingDtos.ReferenceWeightOldDto;
+import com.broadwave.backend.performance.reference.weightSetting.weightSettingDtos.ReferenceWeightUseDto;
 import com.broadwave.backend.performance.weight.Weight;
 import com.broadwave.backend.performance.weight.WeightDto;
 import com.broadwave.backend.performance.weight.WeightMapperDto;
@@ -118,7 +121,7 @@ public class PerformanceRestController {
     @PostMapping("/middleDataBusiness")
     public ResponseEntity<Map<String,Object>> middleDataBusiness(@RequestParam("autoNum")String autoNum,HttpServletRequest request) {
 
-        log.info("middleData 호출성공");
+        log.info("middleDataBusiness 호출성공");
 
         AjaxResponse res = new AjaxResponse();
         HashMap<String, Object> data = new HashMap<>();
@@ -141,7 +144,7 @@ public class PerformanceRestController {
     @PostMapping("/weightBusiness")
     public ResponseEntity<Map<String,Object>> weightBusiness(@RequestParam("autoNum")String autoNum,HttpServletRequest request) {
 
-        log.info("middleData 호출성공");
+        log.info("weightBusiness 호출성공");
 
         AjaxResponse res = new AjaxResponse();
         HashMap<String, Object> data = new HashMap<>();
@@ -151,7 +154,7 @@ public class PerformanceRestController {
         log.info("JWT_AccessToken : "+JWT_AccessToken);
         log.info("insert_id : "+insert_id);
 
-        PerformancePiBusinessDto performance = performanceService.findByInsertIAndAutoNumAndCount(insert_id,autoNum,1);
+        PerformancePiBusinessDto performance = performanceService.findByInsertIAndAutoNumAndCount(insert_id,autoNum);
         log.info("성능개선 유형 : "+performance.getPiBusiness());
 
         data.put("facilityType",performance.getPiFacilityType());
@@ -188,6 +191,7 @@ public class PerformanceRestController {
     public ResponseEntity<Map<String,Object>> middleSaveUpdate(@ModelAttribute PerformanceMiddleSaveDto performanceMiddleSaveDto, @PathVariable String autoNum, HttpServletRequest request) {
 
         log.info("NEWDEAL 성능개선사업평가 Performance1 중간저장 세이브");
+
         log.info("middleSaveUpdate 호출성공");
         AjaxResponse res = new AjaxResponse();
         HashMap<String, Object> data = new HashMap<>();
@@ -240,6 +244,9 @@ public class PerformanceRestController {
                 performance.setPiInputCount(optionalPerformance.get().getPiInputCount());
                 performance.setPiInputGreat(optionalPerformance.get().getPiInputGreat());
                 performance.setPiInputMiddleSave(optionalPerformance.get().getPiInputMiddleSave());
+
+                performance.setInsert_id(optionalPerformance.get().getInsert_id());
+                performance.setInsertDateTime(optionalPerformance.get().getInsertDateTime());
                 performance.setModify_id(currentuserid);
                 performance.setModifyDateTime(LocalDateTime.now());
 
@@ -516,12 +523,41 @@ public class PerformanceRestController {
 
         // 가중치 셋팅
         log.info("weightMapperDto : " + weightMapperDto);
-        Weight weight = modelMapper.map(weightMapperDto, Weight.class);
-        weight.setPiAutoNum(autoNum);
-        weight.setInsert_id(insert_id);
-        weight.setInsertDateTime(LocalDateTime.now());
-        log.info("가중치 : "+weight);
-        weightService.save(weight);
+        Optional<Weight> optionalWeight = weightService.findByAutoNumAndInsertId(autoNum, insert_id);
+        Weight weight;
+        if(optionalWeight.isPresent()){
+
+            optionalWeight.get().setPiWeightTechnicality(weightMapperDto.getPiWeightTechnicality());
+            optionalWeight.get().setPiWeightEconomy(weightMapperDto.getPiWeightEconomy());
+            optionalWeight.get().setPiWeightPolicy(weightMapperDto.getPiWeightPolicy());
+
+            optionalWeight.get().setPiWeightSafe(weightMapperDto.getPiWeightSafe());
+            optionalWeight.get().setPiWeightUsability(weightMapperDto.getPiWeightUsability());
+            optionalWeight.get().setPiWeightOld(weightMapperDto.getPiWeightOld());
+            optionalWeight.get().setPiWeightUrgency(weightMapperDto.getPiWeightUrgency());
+            optionalWeight.get().setPiWeightGoal(weightMapperDto.getPiWeightGoal());
+
+            optionalWeight.get().setPiWeightSafeUtility(weightMapperDto.getPiWeightSafeUtility());
+            optionalWeight.get().setPiWeightCostUtility(weightMapperDto.getPiWeightCostUtility());
+
+            optionalWeight.get().setPiWeightBusiness(weightMapperDto.getPiWeightBusiness());
+            optionalWeight.get().setPiWeightComplaint(weightMapperDto.getPiWeightComplaint());
+            optionalWeight.get().setPiWeightBusinessEffect(weightMapperDto.getPiWeightBusinessEffect());
+
+            optionalWeight.get().setPiWeightCriticalScore(weightMapperDto.getPiWeightCriticalScore());
+
+            optionalWeight.get().setModify_id(insert_id);
+            optionalWeight.get().setModifyDateTime(LocalDateTime.now());
+            log.info("가중치 : "+optionalWeight.get());
+            weightService.save(optionalWeight.get());
+        }else{
+            weight = modelMapper.map(weightMapperDto, Weight.class);
+            weight.setPiAutoNum(autoNum);
+            weight.setInsert_id(insert_id);
+            weight.setInsertDateTime(LocalDateTime.now());
+            log.info("가중치 : "+weight);
+            weightService.save(weight);
+        }
 
         data.put("autoNum", autoNum);
 
@@ -1409,6 +1445,47 @@ public class PerformanceRestController {
         optionalWeight.ifPresent(weightService::delete);
 
         return ResponseEntity.ok(res.success());
+    }
+
+    // NEWDEAL 성능개선사업평가 가중치 가져오기
+    @PostMapping("/weightGet")
+    public ResponseEntity<Map<String,Object>> weightGet(@RequestParam("autoNum")String autoNum, @RequestParam("businessNum")String businessNum, HttpServletRequest request) {
+
+        log.info("weightGet 호출성공");
+
+        AjaxResponse res = new AjaxResponse();
+        HashMap<String, Object> data = new HashMap<>();
+
+        String JWT_AccessToken = request.getHeader("JWT_AccessToken");
+        String insert_id = request.getHeader("insert_id");
+        log.info("JWT_AccessToken : "+JWT_AccessToken);
+        log.info("insert_id : "+insert_id);
+
+        log.info("autoNum : "+autoNum);
+        log.info("businessNum : "+businessNum);
+
+        WeightDto weightDto = weightService.findByAutoNum(autoNum);
+        if(weightDto != null){
+            data.put("weightDto", weightDto);
+        }else{
+            data.put("weightDto", null);
+        }
+
+        if (businessNum.equals("노후화대응")) {
+            log.info("노후화대응 가중치");
+            ReferenceWeightOldDto referenceWeightOldDto = referenceService.findByReferenceWeightOld();
+            data.put("weightSettingDto", referenceWeightOldDto);
+        }else if (businessNum.equals("기준변화")){
+            log.info("기준변화 가중치");
+            ReferenceWeightBaseDto referenceWeightBaseDto = referenceService.findByReferenceWeightBase();
+            data.put("weightSettingDto", referenceWeightBaseDto);
+        }else{
+            log.info("사용성변화 가중치");
+            ReferenceWeightUseDto referenceWeightUseDto = referenceService.findByReferenceWeightUse();
+            data.put("weightSettingDto", referenceWeightUseDto);
+        }
+
+        return ResponseEntity.ok(res.dataSendSuccess(data));
     }
 
 }

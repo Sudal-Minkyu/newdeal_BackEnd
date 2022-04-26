@@ -74,8 +74,8 @@ public class PerformanceService {
         return performanceRepository.findById(id);
     }
 
-    public PerformancePiBusinessDto findByInsertIAndAutoNumAndCount(String insert_id, String autoNum, int count) {
-        return performanceRepositoryCustom.findByInsertIAndAutoNumAndCount(insert_id,autoNum,count);
+    public PerformancePiBusinessDto findByInsertIAndAutoNumAndCount(String insert_id, String autoNum) {
+        return performanceRepositoryCustom.findByInsertIAndAutoNumAndCount(insert_id,autoNum);
     }
 
     public Page<PerformanceListDto> findByPerformanceList(String piFacilityType, String piKind, String piFacilityName, String insert_id, Pageable pageable) {

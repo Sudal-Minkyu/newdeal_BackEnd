@@ -1,4 +1,4 @@
-package com.broadwave.backend.performance.reference.weightSetting;
+package com.broadwave.backend.performance.reference.weightSetting.weightSettingDtos;
 
 import lombok.*;
 

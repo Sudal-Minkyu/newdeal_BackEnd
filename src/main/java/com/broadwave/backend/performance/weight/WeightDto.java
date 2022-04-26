@@ -24,10 +24,13 @@ public class WeightDto {
 
     private Double piWeightSafeUtility; // 안전효용 개선 가중치(NOTNULL) , 사업규모 가중치
     private Double piWeightCostUtility; // 자산가치 개선 가중치(NULL), 사업효율 가중치
+
     private Double piWeightBusiness; // 사업추진 타당성 가중치(NOTNULL)
     private Double piWeightComplaint; // 민원 및 사고 대응성 가중치(NOTNULL)
     private Double piWeightBusinessEffect; // 사업효과 범용성 가중치(NOTNULL)
+
     private Double piWeightCriticalScore; // 사업추진 임계점수(NOTNULL)
+
     private Double piWeightTechnicality; // 유형_기술성(NOTNULL)
     private Double piWeightEconomy; // 유형_경제성(NOTNULL)
     private Double piWeightPolicy; // 유형_정책성(NOTNULL)

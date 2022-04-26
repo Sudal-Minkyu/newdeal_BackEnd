@@ -21,6 +21,6 @@ public class PerformanceListDto {
     private String piType; // 형식구분(NULL)
     private String piBusiness; // 사업구분(NOTNULL)
     private String piSafetyLevel; // 안전등급(NOTNULL)
-    private String piBusinessType; // 사업유형(NOTNULL)
+    private String piKind; // 종별구분(NOTNULL)
     private Long piBusinessExpenses; // 사업비용(NOTNULL)
 }

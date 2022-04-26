@@ -63,7 +63,7 @@ public class PerformanceRepositoryCustomImpl extends QuerydslRepositorySupport i
                 ));
 
         // 검색조건필터
-        if (autoNum != null && !autoNum.isEmpty()){
+        if (autoNum != null || !autoNum.isEmpty()){
             query.where(performance.piAutoNum.eq(autoNum));
         }
 
@@ -120,9 +120,6 @@ public class PerformanceRepositoryCustomImpl extends QuerydslRepositorySupport i
                         performance.piRaterPhone
                 ));
 
-        // 검색조건필터
-//        query.where(performance.piInputMiddleSave.eq(0));
-//        query.where(performance.piInputCount.eq(1));
         return query.fetchOne();
     }
 
@@ -132,7 +129,7 @@ public class PerformanceRepositoryCustomImpl extends QuerydslRepositorySupport i
         QPerformance performance = QPerformance.performance;
 
         JPQLQuery<PerformanceMiddleBusinessDataDto> query = from(performance)
-                .where(performance.insert_id.eq(insert_id).and(performance.piAutoNum.eq(autoNum)))
+                .where(performance.insert_id.eq(insert_id).and(performance.piAutoNum.eq(autoNum))).orderBy(performance.id.asc())
                 .select(Projections.constructor(PerformanceMiddleBusinessDataDto.class,
                         performance.id,
                         performance.piBusinessType,
@@ -146,11 +143,6 @@ public class PerformanceRepositoryCustomImpl extends QuerydslRepositorySupport i
                         performance.piBusinessPlanned,
                         performance.piWhether
                 ));
-
-        // 검색조건필터
-        query.where(performance.insert_id.eq(insert_id));
-//        query.where(performance.piInputMiddleSave.eq(0));
-        query.where(performance.piAutoNum.eq(autoNum));
 
         return query.fetch();
 
@@ -274,19 +266,16 @@ public class PerformanceRepositoryCustomImpl extends QuerydslRepositorySupport i
                         performance.modify_id
                 ));
 
-        // 검색조건필터
-//        query.where(performance.piInputMiddleSave.eq(0));
-//        query.where(performance.piInputCount.eq(1));
-
         return query.fetchOne();
     }
 
     @Override
-    public PerformancePiBusinessDto findByInsertIAndAutoNumAndCount(String insert_id, String autoNum, int count){
+    public PerformancePiBusinessDto findByInsertIAndAutoNumAndCount(String insert_id, String autoNum){
 
         QPerformance performance = QPerformance.performance;
 
         JPQLQuery<PerformancePiBusinessDto> query = from(performance)
+                .where(performance.insert_id.eq(insert_id).and(performance.piAutoNum.eq(autoNum))).groupBy(performance.piAutoNum).orderBy(performance.id.asc()).limit(1)
                 .select(Projections.constructor(PerformancePiBusinessDto.class,
                         performance.piFacilityType,
                         performance.piBusiness
@@ -294,9 +283,7 @@ public class PerformanceRepositoryCustomImpl extends QuerydslRepositorySupport i
 
         // 검색조건필터
         query.where(performance.insert_id.eq(insert_id));
-//        query.where(performance.piInputMiddleSave.eq(0));
         query.where(performance.piAutoNum.eq(autoNum));
-        query.where(performance.piInputCount.eq(count));
 
         return query.fetchOne();
 
@@ -316,7 +303,7 @@ public class PerformanceRepositoryCustomImpl extends QuerydslRepositorySupport i
                         performance.piType,
                         performance.piBusiness,
                         performance.piSafetyLevel,
-                        performance.piBusinessType,
+                        performance.piKind,
                         performance.piBusinessExpenses
                 ));
 

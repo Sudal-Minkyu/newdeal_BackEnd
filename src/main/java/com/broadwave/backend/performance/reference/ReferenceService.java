@@ -8,6 +8,9 @@ import com.broadwave.backend.performance.reference.technicality.ReferenceTechnic
 import com.broadwave.backend.performance.reference.technicality.ReferenceTechnicalityRepository;
 import com.broadwave.backend.performance.reference.weightSetting.ReferenceWeight;
 import com.broadwave.backend.performance.reference.weightSetting.ReferenceWeightRepository;
+import com.broadwave.backend.performance.reference.weightSetting.weightSettingDtos.ReferenceWeightBaseDto;
+import com.broadwave.backend.performance.reference.weightSetting.weightSettingDtos.ReferenceWeightOldDto;
+import com.broadwave.backend.performance.reference.weightSetting.weightSettingDtos.ReferenceWeightUseDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -72,5 +75,19 @@ public class ReferenceService {
         return referenceWeightRepository.findByWeightSettingData(id);
     }
 
+    // 가중치 노후도대응의 데이터 가져오기
+    public ReferenceWeightOldDto findByReferenceWeightOld() {
+        return referenceWeightRepository.findByReferenceWeightOld();
+    }
+
+    // 가중치 기준변화의 데이터 가져오기
+    public ReferenceWeightUseDto findByReferenceWeightUse() {
+        return referenceWeightRepository.findByReferenceWeightUse();
+    }
+
+    // 가중치 사용성변화의 데이터 가져오기
+    public ReferenceWeightBaseDto findByReferenceWeightBase() {
+        return referenceWeightRepository.findByReferenceWeightBase();
+    }
 
 }

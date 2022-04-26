@@ -24,7 +24,7 @@ public interface PerformanceRepositoryCustom {
 
     Performance findByBusiness(String autoNum, String insert_id);
 
-    PerformancePiBusinessDto findByInsertIAndAutoNumAndCount(String insert_id, String autoNum, int count);
+    PerformancePiBusinessDto findByInsertIAndAutoNumAndCount(String insert_id, String autoNum);
 
     Page<PerformanceListDto> findByPerformanceList(String piFacilityType, String piKind, String piFacilityName, String insert_id, Pageable pageable);
 
