@@ -53,6 +53,9 @@ public class LifeAllTime {
     @Column(name="lt_all_completion_date")
     private String ltAllCompletionDate; // 준공일자(NOTNULL)
 
+    @Column(name="lt_all_input_date")
+    private String ltAllInputDate; // 평가기준 일자(NOTNULL)
+
     @Column(name="lt_all_volume")
     private Double ltAllVolume; // 전체물량(NOTNULL)
 

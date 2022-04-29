@@ -34,6 +34,8 @@ public class LifeAllTimeRepositoryCustomImpl extends QuerydslRepositorySupport i
                         lifeAllTime.ltAllLength,
                         lifeAllTime.ltAllArea,
                         lifeAllTime.ltAllCompletionDate,
+                        lifeAllTime.ltAllInputDate,
+
                         lifeAllTime.ltAllVolume,
 
                         lifeAllTime.ltDamageBRank,

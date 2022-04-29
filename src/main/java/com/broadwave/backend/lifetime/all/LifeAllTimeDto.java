@@ -27,6 +27,8 @@ public class LifeAllTimeDto {
     private Double ltAllLength; // 연장(NOTNULL)
     private Double ltAllArea; // 폭(NOTNULL)
     private String ltAllCompletionDate; // 준공일자(NOTNULL)
+    private String ltAllInputDate; // 평가기준 일자(NOTNULL)
+
     private Double ltAllVolume; // 전체물량(NOTNULL)
 
     private Double ltDamageBRank; // B등급 손상지수(NOTNULL)

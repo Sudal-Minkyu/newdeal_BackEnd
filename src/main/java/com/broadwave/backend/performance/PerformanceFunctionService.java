@@ -86,25 +86,41 @@ public class PerformanceFunctionService {
     }
 
     // 노후화 대응, 기준변화, 사용성변화 - 노후도 환산점수 21/11/04 완료
-    public Map<String, String> publicYear(Double piPublicYear,ReferenceTechnicality technicality) {
+    public Map<String, String> publicYear(Double piPublicYear,ReferenceTechnicality technicality, String publicYearValue) {
         log.info("노후도 환산점수 함수호출");
         funRankScore.clear();
         log.info("piPublicYear : " + piPublicYear);
-        if (technicality.getPiTechOldAMin() <= piPublicYear) {
-            funRankScore.put("score", String.valueOf(technicality.getPiTechOldAScore()));
-            funRankScore.put("rank", "A");
-        } else if (technicality.getPiTechOldBMin() <= piPublicYear) {
-            funRankScore.put("score", String.valueOf(technicality.getPiTechOldBScore()));
-            funRankScore.put("rank", "B");
-        } else if (technicality.getPiTechOldCMin() <= piPublicYear) {
-            funRankScore.put("score", String.valueOf(technicality.getPiTechOldCScore()));
-            funRankScore.put("rank", "C");
-        } else if (technicality.getPiTechOldDMin() <= piPublicYear) {
-            funRankScore.put("score", String.valueOf(technicality.getPiTechOldDScore()));
-            funRankScore.put("rank", "D");
-        } else {
-            funRankScore.put("score", String.valueOf(technicality.getPiTechOldEScore()));
-            funRankScore.put("rank", "E");
+        if(publicYearValue == null) {
+            if (technicality.getPiTechOldAMin() <= piPublicYear) {
+                funRankScore.put("score", String.valueOf(technicality.getPiTechOldAScore()));
+                funRankScore.put("rank", "A");
+            } else if (technicality.getPiTechOldBMin() <= piPublicYear) {
+                funRankScore.put("score", String.valueOf(technicality.getPiTechOldBScore()));
+                funRankScore.put("rank", "B");
+            } else if (technicality.getPiTechOldCMin() <= piPublicYear) {
+                funRankScore.put("score", String.valueOf(technicality.getPiTechOldCScore()));
+                funRankScore.put("rank", "C");
+            } else if (technicality.getPiTechOldDMin() <= piPublicYear) {
+                funRankScore.put("score", String.valueOf(technicality.getPiTechOldDScore()));
+                funRankScore.put("rank", "D");
+            } else {
+                funRankScore.put("score", String.valueOf(technicality.getPiTechOldEScore()));
+                funRankScore.put("rank", "E");
+            }
+        }else {
+            double score = 100 - Double.parseDouble(publicYearValue);
+            funRankScore.put("score", String.valueOf(score));
+            if (technicality.getPiTechOldAMin() <= score) {
+                funRankScore.put("rank", "A");
+            } else if (technicality.getPiTechOldBMin() <= score) {
+                funRankScore.put("rank", "B");
+            } else if (technicality.getPiTechOldCMin() <= score) {
+                funRankScore.put("rank", "C");
+            } else if (technicality.getPiTechOldDMin() <= score) {
+                funRankScore.put("rank", "D");
+            } else {
+                funRankScore.put("rank", "E");
+            }
         }
 
         return funRankScore;

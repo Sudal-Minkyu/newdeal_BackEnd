@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**
@@ -56,11 +57,14 @@ public class LifeAllTimeRestController {
 
         LifeAllTime lifeAllTime = modelMapper.map(lifeAllTimeMapperDto, LifeAllTime.class);
 
+        String nowDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy년도 MM월"));
+        log.info("평가기준 일자 : "+nowDate);
 //        log.info("일련번호 생성");
         Date now = new Date();
         SimpleDateFormat yyMM = new SimpleDateFormat("yyMM");
         String newAutoNum = keyGenerateService.keyGenerate("nd_lt_all_input", yyMM.format(now), insert_id);
         lifeAllTime.setLtBridgeCode(newAutoNum);
+        lifeAllTime.setLtAllInputDate(nowDate);
         lifeAllTime.setInsertDateTime(LocalDateTime.now());
         lifeAllTime.setInsert_id(insert_id);
 //        log.info("lifeAllTime : "+lifeAllTime);
@@ -189,11 +193,13 @@ public class LifeAllTimeRestController {
             double discountRate = 0; // 할인율 적용 보수보강비용
             double repairYear; // 보수보강수행시기
             double costYearVal; // 원년
+            double completionYear = Double.parseDouble(lifeAllTimeDto.getLtAllCompletionDate().substring(0,4)); // 준공년도
 
             List<Double> damageRankYearList = new ArrayList<>(); // 선제적 유지관리 보수보강수행시기 리스트
             List<Double> ltDeteriorationList = new ArrayList<>(); // 선제적 유지관리  적용된 기울기 리스트
             List<Double> pointViewEarlyList = new ArrayList<>(); // 선제적 유지관리 시점 초기값(b) 리스트
             List<Double> pointViewList = new ArrayList<>(); // 선제적 유지관리 시점 리스트
+            List<Double> performCompletion = new ArrayList<>(); // 실제 보수보강 수행시기(년) 리스트(준공년도 + 보수보강수행시기년도)
 
             double ltDeterioration2; // 단계별 평균열화율
             double changeRankNum2 = 0; // 전 단계 수행전등급
@@ -213,6 +219,7 @@ public class LifeAllTimeRestController {
             double pointView2 = 0; // 현행 유지관리 시점
             double pointViewEarly2 = 0; // 현행 유지관리 시점 초기값(b)
 
+
             //차트의 JSON정보를 담을 Array 선언
             List<HashMap<String,Object>> chartDataList = new ArrayList<>();
             HashMap<String,Object> chartData;
@@ -228,6 +235,8 @@ public class LifeAllTimeRestController {
                 List<Double> costYear = new ArrayList<>(); // 선행유지관리 원/년 리스트
                 List<Double> performYear2 = new ArrayList<>(); // 선행유지관리 현행유지관리 보수보강수행시기(년) 리스트
                 List<Double> costYear2 = new ArrayList<>(); // 선행유지관리 원/년 리스트
+
+
 
                 if(stage==1){
                     ltDeterioration = absenceDto.getLtDeterioration();
@@ -255,7 +264,6 @@ public class LifeAllTimeRestController {
                         // 보수보강 수행시기(년)
                         repairYear = Math.pow((rankList.get(step - 1) / ltDeterioration), 0.5); // 보수보강 수행시기(년)
                         performYear.add(repairYear); // 보수보강 수행시기(년) 리스트로 저장
-
                         discountRateList.add(costRankList.get(step-1)*1/Math.pow((1+lifeAllTimeDto.getLtDiscountRate()),repairYear)); // 누적 보수보강비용(원) 리스트로 저장
                     }else{
                         // 보수보강 수행시기(년)
@@ -427,6 +435,7 @@ public class LifeAllTimeRestController {
                 ltDeteriorationList.add(ltDeterioration);
                 pointViewEarlyList.add(pointViewEarly);
                 pointViewList.add(pointView);
+                performCompletion.add(completionYear+damageRankYear);  // 실제 보수보강 수행시기(년) 리스트로 저장
 
                 damageRankYearList2.add(damageRankYear2);
                 ltDeteriorationList2.add(ltDeterioration2);
@@ -616,6 +625,7 @@ public class LifeAllTimeRestController {
             data.put("ltAbsenceName",absenceDto.getLtAbsenceName());
 
             data.put("damageRankYearList",damageRankYearList);
+            data.put("performCompletion",performCompletion);
             data.put("discountAccumulateList",discountAccumulateList);
 
 //            log.info("차트 테스트 : "+chartDataList);

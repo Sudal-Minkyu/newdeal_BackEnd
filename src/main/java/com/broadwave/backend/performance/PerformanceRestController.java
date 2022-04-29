@@ -1141,6 +1141,7 @@ public class PerformanceRestController {
 
         String piBusinessType;
         String safeValue = null;
+        String publicYearValue = null;
 
         for(int i=0; i<performance.size(); i++){
 //        for(int i=0; i<1; i++){
@@ -1175,9 +1176,20 @@ public class PerformanceRestController {
 
             // 노후화 대응, 기준변화, 사용성변화 - 기술성 - 노후도 환산점수 11/04 완료
             Map<String,String> publicYear;
-            publicYear  = performanceFunctionService.publicYear(performance.get(i).getPiPublicYear(),technicality);
-            technicality_scroeList.add(publicYear.get("score"));
-            technicality_rankList.add(publicYear.get("rank"));
+            if(piBusinessType.startsWith("유지")) {
+                publicYear  = performanceFunctionService.publicYear(performance.get(i).getPiPublicYear(),technicality,publicYearValue);
+                technicality_scroeList.add(publicYear.get("score"));
+                technicality_rankList.add(publicYear.get("rank"));
+            }else{
+                publicYear  = performanceFunctionService.publicYear(performance.get(i).getPiPublicYear(),technicality,null);
+                publicYearValue = publicYear.get("score");
+                technicality_scroeList.add(publicYear.get("score"));
+                technicality_rankList.add(publicYear.get("rank"));
+            }
+
+//            publicYear  = performanceFunctionService.publicYear(performance.get(i).getPiPublicYear(),technicality);
+//            technicality_scroeList.add(publicYear.get("score"));
+//            technicality_rankList.add(publicYear.get("rank"));
 
             if(piBusiness.equals("노후화대응")){
 
