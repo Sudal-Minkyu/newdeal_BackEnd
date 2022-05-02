@@ -12,12 +12,10 @@ import javax.persistence.Column;
  * Time :
  * Remark : 뉴딜 생애주기 의사결정 지원서비스 전체부분 MapperDto
  */
+@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
-@Setter
-@Slf4j
 public class LifeAllTimeMapperDto {
 
     private String ltBridgeName; // 교량명(NULL)
@@ -29,6 +27,8 @@ public class LifeAllTimeMapperDto {
     private Double ltAllLength; // 연장(NOTNULL)
     private Double ltAllArea; // 폭(NOTNULL)
     private String ltAllCompletionDate; // 준공일자(NOTNULL)
+    private String ltAllInputDate; // 평가기준 일자(NOTNULL)
+
     private Double ltAllVolume; // 전체물량(NOTNULL)
 
     private Double ltDamageBRank; // B등급 손상지수(NOTNULL)
@@ -46,57 +46,6 @@ public class LifeAllTimeMapperDto {
     private Double ltSafetyFrequency; // 정밀안전점검 빈도수(NOTNULL)
     private Double ltSafetyCost; // 정밀안전점검 비용(NOTNULL)
 
-    public String getLtBridgeName() {
-        return ltBridgeName;
-    }
-
-    public String getLtSpanNum() {
-        return ltSpanNum;
-    }
-
-    public String getLtAbsenceCode() {
-        return ltAbsenceCode;
-    }
-
-    public Double getLtAllTeaRoad() {
-        return ltAllTeaRoad;
-    }
-
-    public String getLtAllKind() {
-        return ltAllKind;
-    }
-
-    public Double getLtAllLength() {
-        return ltAllLength;
-    }
-
-    public Double getLtAllArea() {
-        return ltAllArea;
-    }
-
-    public String getLtAllCompletionDate() {
-        return ltAllCompletionDate;
-    }
-
-    public Double getLtAllVolume() {
-        return ltAllVolume;
-    }
-
-    public Double getLtDamageBRank() {
-        return ltDamageBRank;
-    }
-
-    public Double getLtDamageCRank() {
-        return ltDamageCRank;
-    }
-
-    public Double getLtDamageDRank() {
-        return ltDamageDRank;
-    }
-
-    public Double getLtDamageERank() {
-        return ltDamageERank;
-    }
 
     public Double getLtDiscountRate() {
         return ltDiscountRate/100;
@@ -106,27 +55,4 @@ public class LifeAllTimeMapperDto {
         return ltIncrease/100;
     }
 
-    public Double getLtPeriodicFrequency() {
-        return ltPeriodicFrequency;
-    }
-
-    public Double getLtPeriodicCost() {
-        return ltPeriodicCost;
-    }
-
-    public Double getLtCloseFrequency() {
-        return ltCloseFrequency;
-    }
-
-    public Double getLtCloseCost() {
-        return ltCloseCost;
-    }
-
-    public Double getLtSafetyFrequency() {
-        return ltSafetyFrequency;
-    }
-
-    public Double getLtSafetyCost() {
-        return ltSafetyCost;
-    }
 }

@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**
@@ -57,14 +56,11 @@ public class LifeAllTimeRestController {
 
         LifeAllTime lifeAllTime = modelMapper.map(lifeAllTimeMapperDto, LifeAllTime.class);
 
-        String nowDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy년도 MM월"));
-        log.info("평가기준 일자 : "+nowDate);
 //        log.info("일련번호 생성");
         Date now = new Date();
         SimpleDateFormat yyMM = new SimpleDateFormat("yyMM");
         String newAutoNum = keyGenerateService.keyGenerate("nd_lt_all_input", yyMM.format(now), insert_id);
         lifeAllTime.setLtBridgeCode(newAutoNum);
-        lifeAllTime.setLtAllInputDate(nowDate);
         lifeAllTime.setInsertDateTime(LocalDateTime.now());
         lifeAllTime.setInsert_id(insert_id);
 //        log.info("lifeAllTime : "+lifeAllTime);
@@ -184,7 +180,10 @@ public class LifeAllTimeRestController {
             List<Double> closeCountList = new ArrayList<>(); // 정밀점검 횟수 리스트
             List<Double> safetyCountList = new ArrayList<>(); // 정밀안전진단 횟수 리스트
             List<Double> checkCostList = new ArrayList<>(); // 총 점검비용 리스트
-            List<Double> managementCostList = new ArrayList<>(); // 총 유지관리비용 리스트
+            List<Double> managementCostList = new ArrayList<>(); // 선제적 총 유지관리비용 리스트
+            List<Double> managementCostList2 = new ArrayList<>(); // 현행 총 유지관리비용 리스트
+
+            List<Double> costDownEffect = new ArrayList<>(); // 비용 절감효과 리스트
 
             double ltDeterioration; // 단계별 평균열화율
             double changeRankNum = 0; // 전 단계 수행전등급
@@ -192,14 +191,17 @@ public class LifeAllTimeRestController {
             double damageRankYear = 0; // 보수보강 수행시기(년)
             double discountRate = 0; // 할인율 적용 보수보강비용
             double repairYear; // 보수보강수행시기
-            double costYearVal; // 원년
-            double completionYear = Double.parseDouble(lifeAllTimeDto.getLtAllCompletionDate().substring(0,4)); // 준공년도
+            double costYearVal; // 선제적 원년
+            double costYearVal2; // 현행 원년
+
+            double completionYear = Double.parseDouble(lifeAllTimeDto.getLtAllCompletionDate().substring(0,4)); // 준공 년도
+            String completionMonth = lifeAllTimeDto.getLtAllCompletionDate().substring(4,7); // 준공 월
 
             List<Double> damageRankYearList = new ArrayList<>(); // 선제적 유지관리 보수보강수행시기 리스트
             List<Double> ltDeteriorationList = new ArrayList<>(); // 선제적 유지관리  적용된 기울기 리스트
             List<Double> pointViewEarlyList = new ArrayList<>(); // 선제적 유지관리 시점 초기값(b) 리스트
             List<Double> pointViewList = new ArrayList<>(); // 선제적 유지관리 시점 리스트
-            List<Double> performCompletion = new ArrayList<>(); // 실제 보수보강 수행시기(년) 리스트(준공년도 + 보수보강수행시기년도)
+            List<String> performCompletion = new ArrayList<>(); // 실제 보수보강 수행시기(년) 리스트(준공년도 + 보수보강수행시기년도)
 
             double ltDeterioration2; // 단계별 평균열화율
             double changeRankNum2 = 0; // 전 단계 수행전등급
@@ -229,12 +231,12 @@ public class LifeAllTimeRestController {
             for(int stage=1; stage<26; stage++){ // 25바퀴 고정
 
                 List<Double> discountRateList = new ArrayList<>(); // 선행유지관리 할인율적용 누적 보수보강비용 리스트
-                List<Double> discountRateList2 = new ArrayList<>(); // 선행유지관리 할인율적용 누적 보수보강비용 리스트
-
                 List<Double> performYear = new ArrayList<>(); // 선행유지관리 보수보강수행시기(년) 리스트
                 List<Double> costYear = new ArrayList<>(); // 선행유지관리 원/년 리스트
-                List<Double> performYear2 = new ArrayList<>(); // 선행유지관리 현행유지관리 보수보강수행시기(년) 리스트
-                List<Double> costYear2 = new ArrayList<>(); // 선행유지관리 원/년 리스트
+
+                List<Double> discountRateList2 = new ArrayList<>(); // 현행유지관리 할인율적용 누적 보수보강비용 리스트
+                List<Double> performYear2 = new ArrayList<>(); // 현행유지관리 현행유지관리 보수보강수행시기(년) 리스트
+                List<Double> costYear2 = new ArrayList<>(); // 현행유지관리 원/년 리스트
 
 
 
@@ -399,43 +401,69 @@ public class LifeAllTimeRestController {
                 }
 
                 // 1~25단계까지 변하는 값
-                damageRankYear = performYear.get(thNum); // 보수보강 수행시기(년)
-                discountRate = discountRateList.get(thNum); // [할인율 적용] 누적 보수보강비용
+                damageRankYear = performYear.get(thNum); // 선제적 보수보강 수행시기(년)
+                discountRate = discountRateList.get(thNum); // 선제적 [할인율 적용] 누적 보수보강비용
                 discountAccumulateList.add(discountRate);// [할인율 적용] 누적 보수보강비용 리스트
 
-                costYearVal = costYear.get(thNum); // 원년
+                costYearVal = costYear.get(thNum); // 선제적 원/년
 
                 // 1~25단계까지 변하는 값
-                damageRankYear2 = performYear2.get(thNum2); // 보수보강 수행시기(년)
-                discountRate2 = discountRateList2.get(thNum2); // [할인율 적용] 누적 보수보강비용
+                damageRankYear2 = performYear2.get(thNum2); // 현행 보수보강 수행시기(년)
+                discountRate2 = discountRateList2.get(thNum2); // 현행 [할인율 적용] 누적 보수보강비용
 
-                double periodicCount = Math.floor(damageRankYear/lifeAllTimeDto.getLtPeriodicFrequency()); // 정기점검 횟수
-                double closeCount = Math.floor(damageRankYear/lifeAllTimeDto.getLtCloseFrequency()); // 정밀점검 횟수
-                double safetyCount; // 정밀안전진단 횟수
+                costYearVal2 = costYear2.get(thNum2);;  // 현행 원/년
+
+                double periodicCount = Math.floor(damageRankYear/lifeAllTimeDto.getLtPeriodicFrequency()); // 선제적 정기점검 횟수
+                double closeCount = Math.floor(damageRankYear/lifeAllTimeDto.getLtCloseFrequency()); // 선제적 정밀점검 횟수
+                double safetyCount; // 선제적 정밀안전진단 횟수
                 if(costYearVal<15){
                     safetyCount = 1.0;
                 }else{
                     safetyCount = 1+Math.floor((damageRankYear-10)/lifeAllTimeDto.getLtSafetyFrequency());
                 }
 
-                double checkCostStep1 = lifeAllTimeDto.getLtPeriodicCost()*ltPeriodicRn*(1-Math.pow(ltPeriodicRn,periodicCount))/(1-ltPeriodicRn);
-                double checkCostStep2 = lifeAllTimeDto.getLtCloseCost()*ltCloseRn*(1-Math.pow(ltCloseRn,closeCount))/(1-ltCloseRn);
-                double checkCostStep3 = lifeAllTimeDto.getLtSafetyCost()*ltSafetyRn*(1-Math.pow(ltSafetyRn,safetyCount))/(1-ltSafetyRn);
-                double checkCostStep4 = lifeAllTimeDto.getLtSafetyCost()*ltSafetyRn;
-                double checkCost = checkCostStep1+checkCostStep2+checkCostStep3-checkCostStep4;
-                double managementCost = discountRate+checkCost;
+                double periodicCount2 = Math.floor(damageRankYear/lifeAllTimeDto.getLtPeriodicFrequency()); // 현행 정기점검 횟수
+                double closeCount2 = Math.floor(damageRankYear/lifeAllTimeDto.getLtCloseFrequency()); // 현행 정밀점검 횟수
+                double safetyCount2; // 현행 정밀안전진단 횟수
+                if(costYearVal2<15){
+                    safetyCount2 = 1.0;
+                }else{
+                    safetyCount2 = 1+Math.floor((damageRankYear-10)/lifeAllTimeDto.getLtSafetyFrequency());
+                }
+
+                double checkCostStep1_1 = lifeAllTimeDto.getLtPeriodicCost()*ltPeriodicRn*(1-Math.pow(ltPeriodicRn,periodicCount))/(1-ltPeriodicRn); // 선제적 정기점검횟 수
+                double checkCostStep2_1 = lifeAllTimeDto.getLtCloseCost()*ltCloseRn*(1-Math.pow(ltCloseRn,closeCount))/(1-ltCloseRn); // 선제적 정밀점검 횟수
+                double checkCostStep3_1 = lifeAllTimeDto.getLtSafetyCost()*ltSafetyRn*(1-Math.pow(ltSafetyRn,safetyCount))/(1-ltSafetyRn); // 선제적 정밀안전진단 횟수
+                double checkCostStep4_1 = lifeAllTimeDto.getLtSafetyCost()*ltSafetyRn;
+                double checkCost = checkCostStep1_1+checkCostStep2_1+checkCostStep3_1-checkCostStep4_1; // 선제적 총 점검비용
+                double managementCost = discountRate+checkCost; // 선제적 총 유지관리비용(원)
+
+                double checkCostStep1_2 = lifeAllTimeDto.getLtPeriodicCost()*ltPeriodicRn*(1-Math.pow(ltPeriodicRn,periodicCount2))/(1-ltPeriodicRn); // 현행 정기점검횟 수
+                double checkCostStep2_2 = lifeAllTimeDto.getLtCloseCost()*ltCloseRn*(1-Math.pow(ltCloseRn,closeCount2))/(1-ltCloseRn); // 현행 정밀점검 횟수
+                double checkCostStep3_2 = lifeAllTimeDto.getLtSafetyCost()*ltSafetyRn*(1-Math.pow(ltSafetyRn,safetyCount2))/(1-ltSafetyRn); // 현행 정밀안전진단 횟수
+                double checkCostStep4_2 = lifeAllTimeDto.getLtSafetyCost()*ltSafetyRn;
+                double checkCost2 = checkCostStep1_2+checkCostStep2_2+checkCostStep3_2-checkCostStep4_2; // 현행 총 점검비용
+
+                double managementCost2 = discountRate2+checkCost2; // 현행 총 유지관리비용(원)
 
                 periodicCountList.add(periodicCount);
                 closeCountList.add(closeCount);
                 safetyCountList.add(safetyCount);
                 checkCostList.add(checkCost);
                 managementCostList.add(managementCost);
+                managementCostList2.add(managementCost2);
 
                 damageRankYearList.add(damageRankYear);
                 ltDeteriorationList.add(ltDeterioration);
                 pointViewEarlyList.add(pointViewEarly);
                 pointViewList.add(pointView);
-                performCompletion.add(completionYear+damageRankYear);  // 실제 보수보강 수행시기(년) 리스트로 저장
+
+                double costDownEffectPercent = ((managementCost2-managementCost)/managementCost2)*100; // 비용절감효과
+                costDownEffect.add(costDownEffectPercent); // 비용절감효과 리스트
+
+                int completionYearPlusDamageRankYear = (int)Math.round(completionYear+damageRankYear);
+                String change = String.valueOf(completionYearPlusDamageRankYear);
+                performCompletion.add(change+completionMonth);  // 실제 보수보강 수행시기(년) 리스트로 저장
 
                 damageRankYearList2.add(damageRankYear2);
                 ltDeteriorationList2.add(ltDeterioration2);
@@ -443,7 +471,7 @@ public class LifeAllTimeRestController {
                 pointViewList2.add(pointView2);
 
             }
-
+            log.info("선제 총 유지관리비용 : "+managementCostList);
 
 
             // 1단계 D.I 구하는 식 -> 적용된기울기 *(공용연수^2)
@@ -622,6 +650,9 @@ public class LifeAllTimeRestController {
             data.put("safetyCountList",safetyCountList);
             data.put("checkCostList",checkCostList);
             data.put("managementCostList",managementCostList);
+            data.put("managementCostList2",managementCostList2);
+            data.put("costDownEffect",costDownEffect);
+
             data.put("ltAbsenceName",absenceDto.getLtAbsenceName());
 
             data.put("damageRankYearList",damageRankYearList);
