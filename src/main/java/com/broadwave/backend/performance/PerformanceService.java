@@ -58,8 +58,8 @@ public class PerformanceService {
         return performanceRepositoryCustom.findByPiAutoNumAndInsert_idDel(autoNum,insert_id,piInputMiddleSave);
     }
 
-    public Optional<Performance> findByPiAutoNumAndInsert_idAndPiInputCount(String autoNum, String insert_id, Integer piInputCount) {
-        return performanceRepository.findByPiAutoNumAndInsert_idAndPiInputCount(autoNum,insert_id,piInputCount);
+    public Optional<Performance> findByPiAutoNumAndInsert_idAndPiInputCount(String autoNum, Integer piInputCount) {
+        return performanceRepository.findByPiAutoNumAndInsert_idAndPiInputCount(autoNum,piInputCount);
     }
 
     public void delete(Performance performance) {

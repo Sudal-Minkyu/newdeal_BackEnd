@@ -89,14 +89,17 @@ public class Performance {
     @Column(name="pi_after_safety_rating")
     private String piAfterSafetyRating; // 사업후 부재 안전등급(NOTNULL)
 
-    @Column(name="pi_business_obligatory")
-    private Double piBusinessObligatory; // 법에 따른 의무사업(NOTNULL)
+    @Column(name="pi_business_validity")
+    private String piBusinessValidity; // 사업추진 타당성( 0 : 해당사유 외, 1 : 법에 따른 의무사업, 2 : 법정계획/설계기준에 따른 의무사업, 3 : 자체계획/의결에 따른 사업
 
-    @Column(name="pi_business_mandatory")
-    private Double piBusinessMandatory; // 법정계획에 따른 의무사업(NOTNULL)
-
-    @Column(name="pi_business_planned")
-    private Double piBusinessPlanned; // 자체계획/의결에 따른 사업(NOTNULL)
+//    @Column(name="pi_business_obligatory")
+//    private Double piBusinessObligatory; // 법에 따른 의무사업(NOTNULL)
+//
+//    @Column(name="pi_business_mandatory")
+//    private Double piBusinessMandatory; // 법정계획에 따른 의무사업(NOTNULL)
+//
+//    @Column(name="pi_business_planned")
+//    private Double piBusinessPlanned; // 자체계획/의결에 따른 사업(NOTNULL)
 
     @Column(name="pi_whether")
     private Double piWhether; // 최근 1년간 민원 및 사고발생 건수(NOTNULL)
@@ -121,6 +124,9 @@ public class Performance {
 
     @Column(name="pi_input_middle_save")
     private Integer piInputMiddleSave; //작성완료된 글인지 0 or 1(NULL)
+
+    @Column(name="pi_input_skip")
+    private String piInputSkip; // 스킵여부 0:적합, 1:부적합, 2: 스킵
 
     @Column(name="insert_date")
     private LocalDateTime insertDateTime;

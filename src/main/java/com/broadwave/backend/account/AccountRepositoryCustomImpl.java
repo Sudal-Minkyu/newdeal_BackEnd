@@ -1,5 +1,7 @@
 package com.broadwave.backend.account;
 
+import com.broadwave.backend.account.AccountDtos.AccountDtoWithTeam;
+import com.broadwave.backend.account.AccountDtos.AccountBaseDto;
 import com.broadwave.backend.teams.QTeam;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPQLQuery;
@@ -59,13 +61,16 @@ public class AccountRepositoryCustomImpl extends QuerydslRepositorySupport imple
     }
 
     @Override
-    public AccountRoleNameDto findByRoleAndName(String userid) {
+    public AccountBaseDto findByAcountBase(String userid) {
         QAccount account  = QAccount.account;
+        QTeam team = QTeam.team;
 
-        JPQLQuery<AccountRoleNameDto> query = from(account)
-                .select(Projections.constructor(AccountRoleNameDto.class,
+        JPQLQuery<AccountBaseDto> query = from(account)
+                .innerJoin(team).on(team.eq(account.team))
+                .select(Projections.constructor(AccountBaseDto.class,
                         account.username,
-                        account.role
+                        account.role,
+                        team.teamname
                 ));
 
         query.where(account.userid.eq(userid));

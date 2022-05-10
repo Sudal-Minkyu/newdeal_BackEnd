@@ -38,4 +38,6 @@ public class PerformanceMiddleSaveDto {
     private String piRaterBelong; // 평자가 소속(NULL)
     private String piRaterPhone; // 평가자 연락처(NULL)
 
+    private String piInputSkip; // 스킵여부
+
 }

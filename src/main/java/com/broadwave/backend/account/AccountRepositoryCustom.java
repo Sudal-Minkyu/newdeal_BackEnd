@@ -1,5 +1,7 @@
 package com.broadwave.backend.account;
 
+import com.broadwave.backend.account.AccountDtos.AccountDtoWithTeam;
+import com.broadwave.backend.account.AccountDtos.AccountBaseDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -10,9 +12,9 @@ import org.springframework.data.domain.Pageable;
  * Remark :
  */
 public interface AccountRepositoryCustom {
-    Page<AccountDtoWithTeam> findAllBySearchStrings(String userid, String username,String teamname, Pageable pageable);
+    Page<AccountDtoWithTeam> findAllBySearchStrings(String userid, String username, String teamname, Pageable pageable);
 
-    AccountRoleNameDto findByRoleAndName(String userid);
+    AccountBaseDto findByAcountBase(String userid);
 
     Long findByAccountCount();
 }

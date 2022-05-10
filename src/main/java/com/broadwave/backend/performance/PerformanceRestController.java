@@ -1,12 +1,14 @@
 package com.broadwave.backend.performance;
 
+import com.broadwave.backend.account.AccountDtos.AccountBaseDto;
+import com.broadwave.backend.account.AccountService;
 import com.broadwave.backend.common.AjaxResponse;
 import com.broadwave.backend.common.ResponseErrorCode;
 import com.broadwave.backend.keygenerate.KeyGenerateService;
 import com.broadwave.backend.performance.performanceDtos.*;
+import com.broadwave.backend.performance.reference.ReferenceService;
 import com.broadwave.backend.performance.reference.economy.ReferenceEconomy;
 import com.broadwave.backend.performance.reference.policy.ReferencePolicy;
-import com.broadwave.backend.performance.reference.ReferenceService;
 import com.broadwave.backend.performance.reference.technicality.ReferenceTechnicality;
 import com.broadwave.backend.performance.reference.weightSetting.ReferenceWeight;
 import com.broadwave.backend.performance.reference.weightSetting.weightSettingDtos.ReferenceWeightBaseDto;
@@ -49,15 +51,18 @@ public class PerformanceRestController {
 
     private final ModelMapper modelMapper;
     private final PerformanceService performanceService;
+    private final AccountService accountService;
     private final WeightService weightService;
     private final PerformanceFunctionService performanceFunctionService;
     private final KeyGenerateService keyGenerateService;
     private final ReferenceService referenceService;
 
     @Autowired
-    public PerformanceRestController(ModelMapper modelMapper, PerformanceService performanceService, WeightService weightService, PerformanceFunctionService performanceFunctionService, KeyGenerateService keyGenerateService, ReferenceService referenceService) {
+    public PerformanceRestController(ModelMapper modelMapper, PerformanceService performanceService, AccountService accountService,
+                                     WeightService weightService, PerformanceFunctionService performanceFunctionService, KeyGenerateService keyGenerateService, ReferenceService referenceService) {
         this.modelMapper = modelMapper;
         this.performanceService = performanceService;
+        this.accountService = accountService;
         this.weightService = weightService;
         this.performanceFunctionService = performanceFunctionService;
         this.keyGenerateService = keyGenerateService;
@@ -81,12 +86,19 @@ public class PerformanceRestController {
         PerformanceCheckDto performance = performanceService.findByInsertId(insert_id);
         log.info("middleCheck performance : "+performance);
 
+        String nowDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy년 MM월 dd일"));
+
+        AccountBaseDto accountBaseDto = accountService.findByAcountBase(insert_id);
+        data.put("accountData",accountBaseDto);
+        data.put("nowDate",nowDate);
+
         if(performance==null){
             data.put("middleSave",0);
         }else{
             data.put("middleSave",1);
             data.put("piAutoNum",performance.getPiAutoNum());
             data.put("piBusiness",performance.getPiBusiness());
+            data.put("piInputSkip",performance.getPiInputSkip());
         }
         return ResponseEntity.ok(res.dataSendSuccess(data));
     }
@@ -106,7 +118,7 @@ public class PerformanceRestController {
         log.info("insert_id : "+insert_id);
 
         PerformanceMiddleDataDto performance = performanceService.findByInsertIAndAutoNum(insert_id,autoNum);
-        log.info("middleData performance : "+performance);
+//        log.info("middleData performance : "+performance);
 
         if(performance!=null){
             data.put("performanceData",performance);
@@ -236,9 +248,10 @@ public class PerformanceRestController {
                 performance.setPiBusinessExpenses(optionalPerformance.get().getPiBusinessExpenses());
                 performance.setPiBeforeSafetyRating(optionalPerformance.get().getPiBeforeSafetyRating());
                 performance.setPiAfterSafetyRating(optionalPerformance.get().getPiAfterSafetyRating());
-                performance.setPiBusinessObligatory(optionalPerformance.get().getPiBusinessObligatory());
-                performance.setPiBusinessMandatory(optionalPerformance.get().getPiBusinessMandatory());
-                performance.setPiBusinessPlanned(optionalPerformance.get().getPiBusinessPlanned());
+                performance.setPiBusinessValidity(optionalPerformance.get().getPiBusinessValidity());
+//                performance.setPiBusinessObligatory(optionalPerformance.get().getPiBusinessObligatory());
+//                performance.setPiBusinessMandatory(optionalPerformance.get().getPiBusinessMandatory());
+//                performance.setPiBusinessPlanned(optionalPerformance.get().getPiBusinessPlanned());
                 performance.setPiWhether(optionalPerformance.get().getPiWhether());
 
                 performance.setPiInputCount(optionalPerformance.get().getPiInputCount());
@@ -319,9 +332,10 @@ public class PerformanceRestController {
                     if (i == 0 ) {
                         performance.setId(listPerformance.get(i).getId());
                         performance.setPiBusinessType(performanceMiddleSaveBusinessDto.getPiBusinessType1());
-                        performance.setPiBusinessObligatory(performanceMiddleSaveBusinessDto.getPiBusinessObligatory1());
-                        performance.setPiBusinessMandatory(performanceMiddleSaveBusinessDto.getPiBusinessMandatory1());
-                        performance.setPiBusinessPlanned(performanceMiddleSaveBusinessDto.getPiBusinessPlanned1());
+                        performance.setPiBusinessValidity(performanceMiddleSaveBusinessDto.getPiBusinessValidity1());
+//                        performance.setPiBusinessObligatory(performanceMiddleSaveBusinessDto.getPiBusinessObligatory1());
+//                        performance.setPiBusinessMandatory(performanceMiddleSaveBusinessDto.getPiBusinessMandatory1());
+//                        performance.setPiBusinessPlanned(performanceMiddleSaveBusinessDto.getPiBusinessPlanned1());
 
                         // 더미데이터삭제
                         if(3<=listPerformance.size()){
@@ -341,9 +355,7 @@ public class PerformanceRestController {
                             performance.setId(null);
                         }
                         performance.setPiBusinessType(performanceMiddleSaveBusinessDto.getPiBusinessType2());
-                        performance.setPiBusinessObligatory(performanceMiddleSaveBusinessDto.getPiBusinessObligatory2());
-                        performance.setPiBusinessMandatory(performanceMiddleSaveBusinessDto.getPiBusinessMandatory2());
-                        performance.setPiBusinessPlanned(performanceMiddleSaveBusinessDto.getPiBusinessPlanned2());
+                        performance.setPiBusinessValidity(performanceMiddleSaveBusinessDto.getPiBusinessValidity2());
                     }
 
                     log.info("신규 등록 "+(i+1)+"번째 대안 : " + performance);
@@ -375,9 +387,7 @@ public class PerformanceRestController {
                         if (i == 0) {
                             performance.setId(listPerformance.get(i).getId());
                             performance.setPiBusinessType(performanceMiddleSaveBusinessDto.getPiBusinessType1());
-                            performance.setPiBusinessObligatory(performanceMiddleSaveBusinessDto.getPiBusinessObligatory1());
-                            performance.setPiBusinessMandatory(performanceMiddleSaveBusinessDto.getPiBusinessMandatory1());
-                            performance.setPiBusinessPlanned(performanceMiddleSaveBusinessDto.getPiBusinessPlanned1());
+                            performance.setPiBusinessValidity(performanceMiddleSaveBusinessDto.getPiBusinessValidity1());
 
                             // 더미데이터삭제
                             if(4<=listPerformance.size()){
@@ -391,9 +401,8 @@ public class PerformanceRestController {
                                 performance.setId(null);
                             }
                             performance.setPiBusinessType(performanceMiddleSaveBusinessDto.getPiBusinessType2());
-                            performance.setPiBusinessObligatory(performanceMiddleSaveBusinessDto.getPiBusinessObligatory2());
-                            performance.setPiBusinessMandatory(performanceMiddleSaveBusinessDto.getPiBusinessMandatory2());
-                            performance.setPiBusinessPlanned(performanceMiddleSaveBusinessDto.getPiBusinessPlanned2());
+                            performance.setPiBusinessValidity(performanceMiddleSaveBusinessDto.getPiBusinessValidity2());
+
                         } else if(i == 2){
                             if(3<=listPerformance.size()){
                                 performance.setId(listPerformance.get(i).getId());
@@ -401,9 +410,7 @@ public class PerformanceRestController {
                                 performance.setId(null);
                             }
                             performance.setPiBusinessType(performanceMiddleSaveBusinessDto.getPiBusinessType3());
-                            performance.setPiBusinessObligatory(performanceMiddleSaveBusinessDto.getPiBusinessObligatory3());
-                            performance.setPiBusinessMandatory(performanceMiddleSaveBusinessDto.getPiBusinessMandatory3());
-                            performance.setPiBusinessPlanned(performanceMiddleSaveBusinessDto.getPiBusinessPlanned3());
+                            performance.setPiBusinessValidity(performanceMiddleSaveBusinessDto.getPiBusinessValidity3());
                         }
 
                         log.info("신규 등록 "+(i+1)+"번째 대안 : " + performance);
@@ -440,9 +447,10 @@ public class PerformanceRestController {
                         if (i == 0) {
                             performance.setId(listPerformance.get(i).getId());
                             performance.setPiBusinessType(performanceMiddleSaveBusinessDto.getPiBusinessType1());
-                            performance.setPiBusinessObligatory(performanceMiddleSaveBusinessDto.getPiBusinessObligatory1());
-                            performance.setPiBusinessMandatory(performanceMiddleSaveBusinessDto.getPiBusinessMandatory1());
-                            performance.setPiBusinessPlanned(performanceMiddleSaveBusinessDto.getPiBusinessPlanned1());
+                            performance.setPiBusinessValidity(performanceMiddleSaveBusinessDto.getPiBusinessValidity1());
+//                            performance.setPiBusinessObligatory(performanceMiddleSaveBusinessDto.getPiBusinessObligatory1());
+//                            performance.setPiBusinessMandatory(performanceMiddleSaveBusinessDto.getPiBusinessMandatory1());
+//                            performance.setPiBusinessPlanned(performanceMiddleSaveBusinessDto.getPiBusinessPlanned1());
                         } else if(i == 1){
                             if(2<=listPerformance.size()){
                                 performance.setId(listPerformance.get(i).getId());
@@ -450,9 +458,7 @@ public class PerformanceRestController {
                                 performance.setId(null);
                             }
                             performance.setPiBusinessType(performanceMiddleSaveBusinessDto.getPiBusinessType2());
-                            performance.setPiBusinessObligatory(performanceMiddleSaveBusinessDto.getPiBusinessObligatory2());
-                            performance.setPiBusinessMandatory(performanceMiddleSaveBusinessDto.getPiBusinessMandatory2());
-                            performance.setPiBusinessPlanned(performanceMiddleSaveBusinessDto.getPiBusinessPlanned2());
+                            performance.setPiBusinessValidity(performanceMiddleSaveBusinessDto.getPiBusinessValidity2());
                         } else if(i == 2){
                             if(3<=listPerformance.size()){
                                 performance.setId(listPerformance.get(i).getId());
@@ -460,9 +466,7 @@ public class PerformanceRestController {
                                 performance.setId(null);
                             }
                             performance.setPiBusinessType(performanceMiddleSaveBusinessDto.getPiBusinessType3());
-                            performance.setPiBusinessObligatory(performanceMiddleSaveBusinessDto.getPiBusinessObligatory3());
-                            performance.setPiBusinessMandatory(performanceMiddleSaveBusinessDto.getPiBusinessMandatory3());
-                            performance.setPiBusinessPlanned(performanceMiddleSaveBusinessDto.getPiBusinessPlanned3());
+                            performance.setPiBusinessValidity(performanceMiddleSaveBusinessDto.getPiBusinessValidity3());
                         } else if(i == 3){
                             if(4<=listPerformance.size()){
                                 performance.setId(listPerformance.get(i).getId());
@@ -470,9 +474,7 @@ public class PerformanceRestController {
                                 performance.setId(null);
                             }
                             performance.setPiBusinessType(performanceMiddleSaveBusinessDto.getPiBusinessType4());
-                            performance.setPiBusinessObligatory(performanceMiddleSaveBusinessDto.getPiBusinessObligatory4());
-                            performance.setPiBusinessMandatory(performanceMiddleSaveBusinessDto.getPiBusinessMandatory4());
-                            performance.setPiBusinessPlanned(performanceMiddleSaveBusinessDto.getPiBusinessPlanned4());
+                            performance.setPiBusinessValidity(performanceMiddleSaveBusinessDto.getPiBusinessValidity4());
                         }
 
                         log.info("신규 등록 "+(i+1)+"번째 대안 : " + performance);
@@ -742,9 +744,10 @@ public class PerformanceRestController {
                     performance.setPiBeforeSafetyRating(excelList.get(18).toString()); // 사업전 부재 안전등급(NOTNULL)
                     performance.setPiAfterSafetyRating(excelList.get(19).toString()); // 사업후 부재 안전등급(NOTNULL)
 
-                    performance.setPiBusinessObligatory(Double.parseDouble(excelList.get(20).toString()));// 법에 따른 의무사업(NOTNULL)
-                    performance.setPiBusinessMandatory(Double.parseDouble(excelList.get(21).toString())); // 법정계획에 따른 의무사업(NOTNULL)
-                    performance.setPiBusinessPlanned(Double.parseDouble(excelList.get(22).toString())); // 자체계획/의결에 따른 사업(NOTNULL)
+                    // 수정해야됨.
+//                    performance.setPiBusinessObligatory(Double.parseDouble(excelList.get(20).toString()));// 법에 따른 의무사업(NOTNULL)
+//                    performance.setPiBusinessMandatory(Double.parseDouble(excelList.get(21).toString())); // 법정계획에 따른 의무사업(NOTNULL)
+//                    performance.setPiBusinessPlanned(Double.parseDouble(excelList.get(22).toString())); // 자체계획/의결에 따른 사업(NOTNULL)
                     performance.setPiWhether(Double.parseDouble(excelList.get(23).toString())); // 최근 1년간 민원 및 사고발생 건수(NOTNULL)
 
                     performance.setPiRaterBaseYear(Double.parseDouble(excelList.get(24).toString())); // 평가 기준년도(NOTNULL)
@@ -885,9 +888,10 @@ public class PerformanceRestController {
                     }
                     performance.setPiBusinessExpenses(Long.parseLong(excelList.get(14).toString())); // 사업비용(NOTNULL)
 
-                    performance.setPiBusinessObligatory(Double.parseDouble(excelList.get(15).toString()));// 법에 따른 의무사업(NOTNULL)
-                    performance.setPiBusinessMandatory(Double.parseDouble(excelList.get(16).toString())); // 법정계획에 따른 의무사업(NOTNULL)
-                    performance.setPiBusinessPlanned(Double.parseDouble(excelList.get(17).toString())); // 자체계획/의결에 따른 사업(NOTNULL)
+                    // 수정해야됨
+//                    performance.setPiBusinessObligatory(Double.parseDouble(excelList.get(15).toString()));// 법에 따른 의무사업(NOTNULL)
+//                    performance.setPiBusinessMandatory(Double.parseDouble(excelList.get(16).toString())); // 법정계획에 따른 의무사업(NOTNULL)
+//                    performance.setPiBusinessPlanned(Double.parseDouble(excelList.get(17).toString())); // 자체계획/의결에 따른 사업(NOTNULL)
 
                     performance.setPiRaterBaseYear(Double.parseDouble(excelList.get(18).toString())); // 평가 기준년도(NOTNULL)
                     if(excelList.get(19)==null){
@@ -1021,9 +1025,11 @@ public class PerformanceRestController {
                         performance.setPiBusinessClassification(excelList.get(14).toString()); // 사업분류(NOTNULL)
                     }
                     performance.setPiBusinessExpenses(Long.parseLong(excelList.get(15).toString())); // 사업비용(NOTNULL)
-                    performance.setPiBusinessObligatory(Double.parseDouble(excelList.get(16).toString()));// 법에 따른 의무사업(NOTNULL)
-                    performance.setPiBusinessMandatory(Double.parseDouble(excelList.get(17).toString())); // 법정계획에 따른 의무사업(NOTNULL)
-                    performance.setPiBusinessPlanned(Double.parseDouble(excelList.get(18).toString())); // 자체계획/의결에 따른 사업(NOTNULL)
+
+                    // 수정해야됨
+//                    performance.setPiBusinessObligatory(Double.parseDouble(excelList.get(16).toString()));// 법에 따른 의무사업(NOTNULL)
+//                    performance.setPiBusinessMandatory(Double.parseDouble(excelList.get(17).toString())); // 법정계획에 따른 의무사업(NOTNULL)
+//                    performance.setPiBusinessPlanned(Double.parseDouble(excelList.get(18).toString())); // 자체계획/의결에 따른 사업(NOTNULL)
                     performance.setPiWhether(Double.parseDouble(excelList.get(19).toString())); // 최근 1년간 민원 및 사고발생 건수(NOTNULL)
                     performance.setPiRaterBaseYear(Double.parseDouble(excelList.get(20).toString())); // 평가 기준년도(NOTNULL)
                     if(excelList.get(21)==null){
@@ -1135,7 +1141,6 @@ public class PerformanceRestController {
         String piBusiness = performance.get(0).getPiBusiness();
         String type = performance.get(0).getPiFacilityType();
 
-        data.put("nowYear",LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy")));
         List<List<String>> weightResultList = performanceFunctionService.weightResultList(type, piBusiness, weight, weightSetting); // 가중치 변경여부, 최소-최대 범위내 지정 리스트 호출
         data.put("weightResultList",weightResultList);
 
@@ -1263,7 +1268,7 @@ public class PerformanceRestController {
 
 
             // 정책성 - 사업추진 타당성
-            Map<String, String> businessFeasibility = performanceFunctionService.BusinessFeasibility(policy, performance.get(i).getPiBusinessObligatory(), performance.get(i).getPiBusinessMandatory(), performance.get(i).getPiBusinessPlanned());
+            Map<String, String> businessFeasibility = performanceFunctionService.BusinessFeasibility(policy, performance.get(i).getPiBusinessValidity());
             policy_scroeList.add(businessFeasibility.get("score"));
             policy_rankList.add(businessFeasibility.get("rank"));
             // 정책성 - 사업효과 범용성
@@ -1347,6 +1352,8 @@ public class PerformanceRestController {
         Map<Integer,List<Double>> all_scroeMap = new HashMap<>();
         Map<Integer,List<String>> all_rankMap = new HashMap<>();
         Map<Integer,List<String>> all_businessMap = new HashMap<>();
+        List<Long> piBusinessExpensesList = new ArrayList<>();
+        List<Integer> maxCostVal = new ArrayList<>();;
         int size;
         for(int i=0; i<performance.size(); i++) {
 //        for(int i=0; i<1; i++){
@@ -1354,6 +1361,9 @@ public class PerformanceRestController {
             all_scroeList = new ArrayList<>();
             all_rankList = new ArrayList<>();
             all_businessList = new ArrayList<>();
+
+            // 사업비용 리스트
+            piBusinessExpensesList.add(performance.get(i).getPiBusinessExpenses());
 
             size = technicality_scroeMap.get(i).size();
             scoreList.add(technicality_scroeMap.get(i).get(size-1));
@@ -1377,24 +1387,62 @@ public class PerformanceRestController {
             log.info("great_scroeList : "+great_scroeList);
             if(i+1==performance.size()){
                 Double maxVal = Collections.max(great_scroeList);
+                Long minCost = Collections.min(piBusinessExpensesList);
+
+                int x= 0;
                 for (int j=0; j<great_scroeList.size(); j++) {
                     if (great_scroeList.get(j).equals(maxVal)) {
-                        Optional<Performance> optionalPerformance = performanceService.findByPiAutoNumAndInsert_idAndPiInputCount(autoNum,insert_id,j+1);
-                        if(optionalPerformance.isEmpty()){
-                            return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE024.getCode(), ResponseErrorCode.NDE024.getDesc(), null, null));
-                        }else{
-                            log.info("우수대안 업데이트하기 카운트 : "+j);
-                            optionalPerformance.get().setPiInputGreat(1);
+                        maxCostVal.add(j+1);
+                        x++;
+                    } else {
+                        maxCostVal.add(0);
+                    }
+                }
+
+                for(int z=0; z<maxCostVal.size(); z++){
+                    if(!maxCostVal.get(z).equals(0)){
+                        Optional<Performance> optionalPerformance = performanceService.findByPiAutoNumAndInsert_idAndPiInputCount(autoNum,maxCostVal.get(z));
+                        if(optionalPerformance.isPresent()) {
+                            if (2 <= x) {
+                                if (piBusinessExpensesList.get(z).equals(minCost)) {
+                                    log.info("우수대안 업데이트하기 카운트 : "+maxCostVal.get(z));
+                                    optionalPerformance.get().setPiInputGreat(1);
+                                    optionalPerformance.get().setModify_id(insert_id);
+                                    optionalPerformance.get().setModifyDateTime(LocalDateTime.now());
+                                    performanceService.save(optionalPerformance.get());
+
+                                    all_greate.add("우수 대안");
+                                }else{
+                                    optionalPerformance.get().setPiInputGreat(0);
+                                    optionalPerformance.get().setModify_id(insert_id);
+                                    optionalPerformance.get().setModifyDateTime(LocalDateTime.now());
+                                    performanceService.save(optionalPerformance.get());
+
+                                    all_greate.add("-");
+                                }
+                            }else{
+                                log.info("우수대안 업데이트하기 카운트 : "+maxCostVal.get(z));
+                                optionalPerformance.get().setPiInputGreat(1);
+                                optionalPerformance.get().setModify_id(insert_id);
+                                optionalPerformance.get().setModifyDateTime(LocalDateTime.now());
+                                performanceService.save(optionalPerformance.get());
+
+                                all_greate.add("우수 대안");
+                            }
+                        }
+                    }else{
+                        Optional<Performance> optionalPerformance = performanceService.findByPiAutoNumAndInsert_idAndPiInputCount(autoNum,z+1);
+                        if(optionalPerformance.isPresent()){
+                            optionalPerformance.get().setPiInputGreat(0);
                             optionalPerformance.get().setModify_id(insert_id);
                             optionalPerformance.get().setModifyDateTime(LocalDateTime.now());
                             performanceService.save(optionalPerformance.get());
+
+                            all_greate.add("-");
                         }
-                        all_greate.add("우수 대안");
-                        break;
-                    } else {
-                        all_greate.add("-");
                     }
                 }
+
             }
         }
 

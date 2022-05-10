@@ -1,5 +1,6 @@
 package com.broadwave.backend.account;
 
+import com.broadwave.backend.account.AccountDtos.AccountRole;
 import com.broadwave.backend.teams.Team;
 import lombok.*;
 

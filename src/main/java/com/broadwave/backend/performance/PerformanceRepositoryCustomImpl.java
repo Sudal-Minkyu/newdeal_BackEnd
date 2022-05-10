@@ -51,15 +51,14 @@ public class PerformanceRepositoryCustomImpl extends QuerydslRepositorySupport i
                         performance.piBusinessExpenses,
                         performance.piBeforeSafetyRating,
                         performance.piAfterSafetyRating,
-                        performance.piBusinessObligatory,
-                        performance.piBusinessMandatory,
-                        performance.piBusinessPlanned,
+                        performance.piBusinessValidity,
                         performance.piWhether,
                         performance.piRaterBaseYear,
                         performance.piRater,
                         performance.piRaterBelong,
                         performance.piRaterPhone,
-                        performance.piInputCount
+                        performance.piInputCount,
+                        performance.piInputSkip
                 ));
 
         // 검색조건필터
@@ -81,7 +80,8 @@ public class PerformanceRepositoryCustomImpl extends QuerydslRepositorySupport i
                 .select(Projections.constructor(PerformanceCheckDto.class,
                         performance.piAutoNum,
                         performance.piBusiness,
-                        performance.piInputMiddleSave
+                        performance.piInputMiddleSave,
+                        performance.piInputSkip
                 ));
 
         // 검색조건필터
@@ -138,9 +138,7 @@ public class PerformanceRepositoryCustomImpl extends QuerydslRepositorySupport i
                         performance.piBusinessExpenses,
                         performance.piBeforeSafetyRating,
                         performance.piAfterSafetyRating,
-                        performance.piBusinessObligatory,
-                        performance.piBusinessMandatory,
-                        performance.piBusinessPlanned,
+                        performance.piBusinessValidity,
                         performance.piWhether
                 ));
 
@@ -183,9 +181,7 @@ public class PerformanceRepositoryCustomImpl extends QuerydslRepositorySupport i
                         performance.piBeforeSafetyRating,
                         performance.piAfterSafetyRating,
 
-                        performance.piBusinessObligatory,
-                        performance.piBusinessMandatory,
-                        performance.piBusinessPlanned,
+                        performance.piBusinessValidity,
                         performance.piWhether,
 
                         performance.piRaterBaseYear,
@@ -196,7 +192,7 @@ public class PerformanceRepositoryCustomImpl extends QuerydslRepositorySupport i
                         performance.piInputCount,
                         performance.piInputGreat,
                         performance.piInputMiddleSave,
-
+                        performance.piInputSkip,
                         performance.insertDateTime,
                         performance.insert_id,
                         performance.modifyDateTime,
@@ -246,9 +242,7 @@ public class PerformanceRepositoryCustomImpl extends QuerydslRepositorySupport i
                         performance.piBeforeSafetyRating,
                         performance.piAfterSafetyRating,
 
-                        performance.piBusinessObligatory,
-                        performance.piBusinessMandatory,
-                        performance.piBusinessPlanned,
+                        performance.piBusinessValidity,
                         performance.piWhether,
 
                         performance.piRaterBaseYear,
@@ -259,7 +253,7 @@ public class PerformanceRepositoryCustomImpl extends QuerydslRepositorySupport i
                         performance.piInputCount,
                         performance.piInputGreat,
                         performance.piInputMiddleSave,
-
+                        performance.piInputSkip,
                         performance.insertDateTime,
                         performance.insert_id,
                         performance.modifyDateTime,

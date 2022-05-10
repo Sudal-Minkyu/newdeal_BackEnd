@@ -117,7 +117,7 @@ public class ReferenceWeightRepositoryCustomImpl extends QuerydslRepositorySuppo
                         referenceWeight.piBaseBusinessStan,
                         referenceWeight.piBaseBusinessMin,
                         referenceWeight.piBaseBusinessMax,
-                        referenceWeight.piBaseBusinessEffectMin,
+                        referenceWeight.piBaseBusinessEffectStan,
                         referenceWeight.piBaseBusinessEffectMin,
                         referenceWeight.piBaseBusinessEffectMax
                     ));

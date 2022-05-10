@@ -2,14 +2,11 @@ package com.broadwave.backend.performance.performanceDtos;
 
 import lombok.*;
 
-import javax.persistence.*;
-import java.time.LocalDateTime;
-
 /**
  * @author Minkyu
  * Date : 2021-07-07
  * Time :
- * Remark : 뉴딜 성능개선사업평가 관련 Dto
+ * Remark : 뉴딜 성능개선사업평가 시설정보 등 한줄로 나오는 데이터 관련 Dto
  */
 @Builder
 @NoArgsConstructor
@@ -37,13 +34,12 @@ public class PerformanceDto {
     private Long piBusinessExpenses; // 사업비용(NOTNULL)
     private String piBeforeSafetyRating; // 사업전 부재 안전등급(NOTNULL)
     private String piAfterSafetyRating; // 사업후 부재 안전등급(NOTNULL)
-    private Double piBusinessObligatory; // 법에 따른 의무사업(NOTNULL)
-    private Double piBusinessMandatory; // 법정계획에 따른 의무사업(NOTNULL)
-    private Double piBusinessPlanned; // 자체계획/의결에 따른 사업(NOTNULL)
+    private String piBusinessValidity; // 사업추진 타당성( 0 : 해당사유 외, 1 : 법에 따른 의무사업, 2 : 법정계획/설계기준에 따른 의무사업, 3 : 자체계획/의결에 따른 사업
     private Double piWhether; // 최근 1년간 민원 및 사고발생 건수(NOTNULL)
     private Double piRaterBaseYear; // 평가 기준년도(NOTNULL)
     private String piRater; // 평가자이름(NULL)
     private String piRaterBelong; // 평자가 소속(NULL)
     private String piRaterPhone; // 평가자 연락처(NULL)
     private Integer piInputCount; //대안카운트(NULL)
+    private String piInputSkip; // 스킵여부 0:적합, 1:부적합, 2: 스킵
 }

@@ -1,5 +1,6 @@
 package com.broadwave.backend.account;
 
+import com.broadwave.backend.account.AccountDtos.*;
 import com.broadwave.backend.common.AjaxResponse;
 import com.broadwave.backend.common.ResponseErrorCode;
 import com.broadwave.backend.teams.Team;
@@ -285,7 +286,7 @@ public class AccountRestController {
         AjaxResponse res = new AjaxResponse();
         HashMap<String, Object> data = new HashMap<>();
 
-        AccountRoleNameDto account = accountService.findByRoleAndName(userid);
+        AccountBaseDto account = accountService.findByAcountBase(userid);
         data.put("accountData",account);
 
         return ResponseEntity.ok(res.dataSendSuccess(data));

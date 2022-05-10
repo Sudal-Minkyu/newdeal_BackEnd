@@ -1,4 +1,4 @@
-package com.broadwave.backend.account;
+package com.broadwave.backend.account.AccountDtos;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -1,5 +1,7 @@
 package com.broadwave.backend.account;
 
+import com.broadwave.backend.account.AccountDtos.AccountDtoWithTeam;
+import com.broadwave.backend.account.AccountDtos.AccountBaseDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -44,7 +46,7 @@ public class AccountService {
         return this.accountRepository.findByUserid(userid);
     }
 
-    public Page<AccountDtoWithTeam> findAllBySearchStrings(String userid,String username,String teamname,Pageable pageable){
+    public Page<AccountDtoWithTeam> findAllBySearchStrings(String userid, String username, String teamname, Pageable pageable){
         return accountRepositoryCustom.findAllBySearchStrings(userid,username,teamname,pageable);
     }
 
@@ -52,8 +54,8 @@ public class AccountService {
         accountRepository.delete(account);
     }
 
-    public AccountRoleNameDto findByRoleAndName(String userid) {
-        return accountRepositoryCustom.findByRoleAndName(userid);
+    public AccountBaseDto findByAcountBase(String userid) {
+        return accountRepositoryCustom.findByAcountBase(userid);
     }
 
     public Account registerAccount(Account account){

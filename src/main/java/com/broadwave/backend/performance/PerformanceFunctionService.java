@@ -788,25 +788,24 @@ public class PerformanceFunctionService {
 //================ 노후화_정책성 함수 ===================
 
     // 사업추진 타당성 환산점수
-    public Map<String, String> BusinessFeasibility(ReferencePolicy policy, Double piBusinessObligatory, Double piBusinessMandatory, Double piBusinessPlanned) {
+    public Map<String, String> BusinessFeasibility(ReferencePolicy policy, String piBusinessValidity) {
         log.info("사업추진 타당성 환산점수 함수호출");
         funRankScore.clear();
-        log.info("piBusinessObligatory : " + piBusinessObligatory);
-        log.info("piBusinessMandatory : " + piBusinessMandatory);
-        log.info("piBusinessPlanned : " + piBusinessPlanned);
 
-        if(piBusinessObligatory==1){
+        log.info("piBusinessValidity : " + piBusinessValidity);
+
+        if(piBusinessValidity.equals("1")){
             funRankScore.put("score",String.valueOf(policy.getPiPolicyValidityA()));
             funRankScore.put("rank", "A");
-        }else if(piBusinessMandatory==1){
+        }else if(piBusinessValidity.equals("2")){
             funRankScore.put("score",String.valueOf(policy.getPiPolicyValidityB()));
             funRankScore.put("rank", "B");
-        }else if(piBusinessPlanned==1){
+        }else if(piBusinessValidity.equals("3")){
             funRankScore.put("score",String.valueOf(policy.getPiPolicyValidityC()));
             funRankScore.put("rank", "C");
         }else{
-            funRankScore.put("score",String.valueOf(policy.getPiPolicyValidityD()));
-            funRankScore.put("rank", "D");
+            funRankScore.put("score",String.valueOf(policy.getPiPolicyValidityC()));
+            funRankScore.put("rank", "C");
         }
         return funRankScore;
     }
@@ -939,8 +938,9 @@ public class PerformanceFunctionService {
             Double b = Double.parseDouble(all_scroeList.get(1))*economy;
             Double c = Double.parseDouble(all_scroeList.get(2))*policy;
             allScore = a+b+c;
-            allScore = Math.round(allScore*1000)/1000.0;
+            allScore = Math.round(allScore*10)/10.0;
 
+//            log.info("쓰코어 : "+allScore);
             if (referenceTechnicality.getPiTechGoalAPlusMin() < allScore ) {
                 allRank = "A+";
             } else if (referenceTechnicality.getPiTechGoalAMinusMin() < allScore ) {
@@ -957,10 +957,10 @@ public class PerformanceFunctionService {
                 allRank = "D+";
             } else if (referenceTechnicality.getPiTechGoalDMinusMin() < allScore) {
                 allRank = "D0";
-            } else  if (referenceTechnicality.getPiTechGoalEMax() >= allScore){
+            } else  if (referenceTechnicality.getPiTechGoalEMax() < allScore){
                 allRank = "E";
             } else{
-                allRank = "에러";
+                allRank = "E";
             }
 
             allRankScore.put("score",allScore);
