@@ -72,6 +72,7 @@ public class AccountRepositoryCustomImpl extends QuerydslRepositorySupport imple
                 .select(Projections.constructor(AccountBaseDto.class,
                         account.username,
                         account.role,
+                        team.teamcode,
                         team.teamname
                 ));
 

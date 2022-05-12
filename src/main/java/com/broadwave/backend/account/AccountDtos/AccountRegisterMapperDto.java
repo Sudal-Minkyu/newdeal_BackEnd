@@ -21,5 +21,5 @@ public class AccountRegisterMapperDto {
     private String check_password;
     private String username;
     private String email;
-    private String teamcode;
+    private String team;
 }

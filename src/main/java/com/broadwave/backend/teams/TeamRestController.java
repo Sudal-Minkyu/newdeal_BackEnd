@@ -2,16 +2,8 @@ package com.broadwave.backend.teams;
 
 import com.broadwave.backend.common.AjaxResponse;
 import com.broadwave.backend.common.CommonUtils;
-import com.broadwave.backend.common.ResponseErrorCode;
-import com.broadwave.backend.excel.ExcelData;
 import com.broadwave.backend.teams.teamfile.TeamFileService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -20,12 +12,8 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -113,6 +101,20 @@ public class TeamRestController {
         Page<TeamDto> teams = teamService.findAllBySearchStrings(teamcode,teamname, pageable);
 
         return ResponseEntity.ok(res.ResponseEntityPage(teams));
+    }
+
+    // 회원가입용 소속 리스트 호출 API
+    @GetMapping("registerTeamList")
+    public ResponseEntity<Map<String,Object>> registerTeamList(){
+
+        AjaxResponse res = new AjaxResponse();
+        HashMap<String, Object> data = new HashMap<>();
+
+        List<TeamListDto> teams = teamService.findByRegisterTeamList();
+
+        data.put("teams",teams);
+
+        return ResponseEntity.ok(res.dataSendSuccess(data));
     }
 
     @GetMapping ("team")

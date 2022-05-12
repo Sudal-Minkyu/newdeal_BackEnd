@@ -299,7 +299,7 @@ public class AccountRestController {
         AjaxResponse res = new AjaxResponse();
 
         Account account = modelMapper.map(accountRegisterMapperDto, Account.class);
-        Optional<Team> optionalTeam = teamService.findByTeamcode("T00003");
+        Optional<Team> optionalTeam = teamService.findByTeamcode(accountRegisterMapperDto.getTeam());
 
 //        log.info("account ; "+account);
 

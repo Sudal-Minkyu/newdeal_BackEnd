@@ -1,12 +1,17 @@
 package com.broadwave.backend.env.salt;
+import com.broadwave.backend.account.AccountDtos.AccountBaseDto;
+import com.broadwave.backend.account.AccountRepository;
+import com.broadwave.backend.account.AccountService;
 import com.broadwave.backend.common.AjaxResponse;
+import com.broadwave.backend.performance.performanceDtos.PerformanceCheckDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 /**
@@ -21,10 +26,37 @@ import java.util.Map;
 public class SaltRestController {
 
     private final SaltFunctionService saltFunctionService;
+    private final AccountService accountService;
 
     @Autowired
-    public SaltRestController(SaltFunctionService saltFunctionService) {
+    public SaltRestController(SaltFunctionService saltFunctionService, AccountService accountService) {
         this.saltFunctionService = saltFunctionService;
+        this.accountService = accountService;
+    }
+
+    // 열화환경 관리자인지 확인하는 함수
+    @GetMapping("seaAdminCheck")
+    public ResponseEntity<Map<String,Object>> seaAdminCheck(HttpServletRequest request) {
+
+        log.info("seaAdminCheck 호출성공");
+
+        AjaxResponse res = new AjaxResponse();
+        HashMap<String, Object> data = new HashMap<>();
+
+        String JWT_AccessToken = request.getHeader("JWT_AccessToken");
+        String insert_id = request.getHeader("insert_id");
+        log.info("JWT_AccessToken : "+JWT_AccessToken);
+        log.info("insert_id : "+insert_id);
+
+        AccountBaseDto accountBaseDto = accountService.findByAcountBase(insert_id);
+        log.info("accountBaseDto : "+accountBaseDto);
+        if(accountBaseDto.getTeamcode().equals("T00004") || accountBaseDto.getTeamcode().equals("T00001")){
+            data.put("result","1");
+        }else{
+            data.put("result","0");
+        }
+
+        return ResponseEntity.ok(res.dataSendSuccess(data));
     }
 
     // 해안가 대기중 비래염분 계산하기 함수

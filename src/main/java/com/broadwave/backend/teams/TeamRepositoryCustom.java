@@ -8,4 +8,5 @@ import java.util.List;
 public interface TeamRepositoryCustom {
     Page<TeamDto> findAllBySearchStrings(String teamcode, String teamname, Pageable pageable);
     List<TeamDto> findAllBySearchStringsExcel(String teamcode, String teamname);
+    List<TeamListDto> findByRegisterTeamList();
 }

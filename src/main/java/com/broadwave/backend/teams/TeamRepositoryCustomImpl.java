@@ -51,4 +51,18 @@ public class TeamRepositoryCustomImpl extends QuerydslRepositorySupport implemen
 
     }
 
+    @Override
+    public List<TeamListDto> findByRegisterTeamList() {
+        QTeam team = QTeam.team;
+
+        JPQLQuery<TeamListDto> query = from(team)
+                .select(Projections.constructor(TeamListDto.class,
+                        team.teamcode,
+                        team.teamname
+                ));
+
+        return query.fetch();
+
+    }
+
 }

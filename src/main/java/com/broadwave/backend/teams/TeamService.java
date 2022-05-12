@@ -36,4 +36,9 @@ public class TeamService {
         return teamRepositoryCustom.findAllBySearchStringsExcel(teamcode,teamname);
     }
 
+    // 회원가입용 소속 리스트 호출 API
+    public List<TeamListDto> findByRegisterTeamList() {
+        return teamRepositoryCustom.findByRegisterTeamList();
+    }
+
 }
