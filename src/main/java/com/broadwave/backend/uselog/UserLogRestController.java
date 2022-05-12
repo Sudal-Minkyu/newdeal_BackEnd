@@ -23,12 +23,9 @@ public class UserLogRestController {
 
     private final UserLogService userLogService;
 
-    private final UserLogRepositoryCustom userLogRepositoryCustom;
-
     @Autowired
-    public UserLogRestController(UserLogService userLogService, UserLogRepositoryCustom userLogRepositoryCustom) {
+    public UserLogRestController(UserLogService userLogService) {
         this.userLogService = userLogService;
-        this.userLogRepositoryCustom = userLogRepositoryCustom;
     }
 
     // NEWDEAL 메류 로그/서치 기록
@@ -59,14 +56,14 @@ public class UserLogRestController {
         return ResponseEntity.ok(res.success());
     }
 
-    // NEWDEAL 유저수가져오기
+    // NEWDEAL 조회수가져오기
     @GetMapping("count")
     public ResponseEntity<Map<String,Object>> dataSearchCount(){
 
         AjaxResponse res = new AjaxResponse();
         HashMap<String, Object> data = new HashMap<>();
 
-        Long dataSearchCount = userLogRepositoryCustom.findBySearchCount();
+        Long dataSearchCount = userLogService.findBySearchCount();
 
         data.put("dataSearchCount",dataSearchCount);
 

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import java.util.List;
 import java.util.Objects;
 
@@ -35,8 +36,7 @@ public class UserLogRepositoryCustomImpl extends QuerydslRepositorySupport imple
     public Long findBySearchCount() {
         QUserLog userLog  = QUserLog.userLog;
         JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
-        return queryFactory .selectFrom(userLog).where(userLog.useType.eq("search")).fetchCount();
+        return queryFactory.selectFrom(userLog).where(userLog.useType.eq("search")).fetchCount();
     }
-
 
 }

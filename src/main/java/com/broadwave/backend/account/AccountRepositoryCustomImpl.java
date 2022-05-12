@@ -2,7 +2,9 @@ package com.broadwave.backend.account;
 
 import com.broadwave.backend.account.AccountDtos.AccountDtoWithTeam;
 import com.broadwave.backend.account.AccountDtos.AccountBaseDto;
+import com.broadwave.backend.account.AccountDtos.AccountRole;
 import com.broadwave.backend.teams.QTeam;
+import com.broadwave.backend.teams.Team;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -82,8 +84,9 @@ public class AccountRepositoryCustomImpl extends QuerydslRepositorySupport imple
     @Override
     public Long findByAccountCount() {
         QAccount account  = QAccount.account;
+
         JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
-        return queryFactory .selectFrom(account) .fetchCount();
+        return queryFactory.selectFrom(account).where(account.team.teamcode.eq("T00003")).fetchCount();
     }
 
 

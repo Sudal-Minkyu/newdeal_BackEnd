@@ -24,4 +24,9 @@ public class UserLogService {
         return userLogRepository.save(userLog);
     }
 
+    public Long findBySearchCount(){
+        return userLogRepository.findBySearchCount();
+    }
+
+
 }
