@@ -37,6 +37,10 @@ public class AccountService {
 //    @Autowired
 //    TeamService teamService;
 
+    public Account updateAccount(Account account){
+        return accountRepository.save(account);
+    }
+
     public Account saveAccount(Account account){
         account.setPassword(passwordEncoder.encode(account.getPassword()));
         return accountRepository.save(account);

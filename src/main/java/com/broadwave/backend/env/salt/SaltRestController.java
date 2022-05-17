@@ -1,17 +1,14 @@
 package com.broadwave.backend.env.salt;
+
 import com.broadwave.backend.account.AccountDtos.AccountBaseDto;
-import com.broadwave.backend.account.AccountRepository;
 import com.broadwave.backend.account.AccountService;
 import com.broadwave.backend.common.AjaxResponse;
-import com.broadwave.backend.performance.performanceDtos.PerformanceCheckDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 /**
@@ -163,7 +160,7 @@ public class SaltRestController {
         }
 
         log.info("dataResult : "+dataResult);
-        dataResult = Math.round(dataResult*100)/100.0;
+        dataResult = Math.round(dataResult*10)/10.0;
 
         log.info("소수점처리 : "+dataResult);
         log.info("해안거리(m) : "+seaDistance);
@@ -230,7 +227,7 @@ public class SaltRestController {
             }
         }
 
-        dataResult = Math.round(dataResult*100)/100.0;
+        dataResult = Math.round(dataResult*10)/10.0;
         log.info("결과값 : "+dataResult);
         data.put("dataResult",dataResult);
 
@@ -284,7 +281,7 @@ public class SaltRestController {
             }
         }
 
-        dataResult = Math.round(dataResult*100)/100.0;
+        dataResult = Math.round(dataResult*10)/10.0;
         log.info("결과값 : "+dataResult);
         data.put("dataResult",dataResult);
 

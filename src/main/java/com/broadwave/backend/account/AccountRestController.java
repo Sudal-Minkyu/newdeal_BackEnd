@@ -4,6 +4,7 @@ import com.broadwave.backend.account.AccountDtos.*;
 import com.broadwave.backend.common.AjaxResponse;
 import com.broadwave.backend.common.ResponseErrorCode;
 import com.broadwave.backend.teams.Team;
+import com.broadwave.backend.teams.TeamListDto;
 import com.broadwave.backend.teams.TeamService;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -135,13 +137,16 @@ public class AccountRestController {
 
     // AccountInfo API
     @PostMapping("account")
-    public ResponseEntity<Map<String,Object>> account(@RequestParam (value="userid", defaultValue="") String userid,HttpServletRequest request){
+    public ResponseEntity<Map<String,Object>> account(HttpServletRequest request){
 
         AjaxResponse res = new AjaxResponse();
         HashMap<String, Object> data = new HashMap<>();
 
         String JWT_AccessToken = request.getHeader("JWT_AccessToken");
         log.info("JWT_AccessToken : "+JWT_AccessToken);
+
+        String userid = request.getHeader("insert_id");
+        log.info("userid : "+userid);
 
         log.info("단일사용자조회  / userid: '" + userid + "'");
         Optional<Account> optionalAccount = accountService.findByUserid(userid);
@@ -152,7 +157,10 @@ public class AccountRestController {
         }
         Account account = optionalAccount.get();
 
+        List<TeamListDto> teams = teamService.findByRegisterTeamList();
+        data.put("teams",teams);
         data.put("accountData",account);
+
         log.info("단일사용자 조회 성공 : id '" + account.getUserid() + "'");
 
         return ResponseEntity.ok(res.dataSendSuccess(data));
@@ -187,16 +195,50 @@ public class AccountRestController {
         return ResponseEntity.ok(res.success());
     }
 
+    //  accountInfoChange API(회원정보 변경)
+    @PostMapping("accountInfoChange")
+    public  ResponseEntity<Map<String,Object>> accountInfoChange(@RequestParam (value="email", defaultValue="") String email,
+                                                                 @RequestParam (value="team", defaultValue="") String team,
+                                                          HttpServletRequest request){
+        AjaxResponse res = new AjaxResponse();
+
+        String JWT_AccessToken = request.getHeader("JWT_AccessToken");
+        log.info("JWT_AccessToken : "+JWT_AccessToken);
+
+        String insert_id = request.getHeader("insert_id");
+        log.info("insert_id : "+insert_id);
+
+        Optional<Account> optionalAccount = accountService.findByUserid(insert_id);
+
+        //정보가있는지 체크
+        if (optionalAccount.isEmpty()){
+            return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE006.getCode(),"사용자 "+ResponseErrorCode.NDE006.getDesc(),null,null));
+        }else{
+            Optional<Team> optionalTeam = teamService.findByTeamcode(team);
+            if (optionalTeam.isEmpty()){
+                return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE006.getCode(),"부서 "+ResponseErrorCode.NDE006.getDesc(),"문자","새로고침이후 다시 시도해주세요."));
+            }else{
+                optionalAccount.get().setEmail(email);
+                optionalAccount.get().setTeam(optionalTeam.get());
+                accountService.updateAccount(optionalAccount.get());
+            }
+        }
+        return ResponseEntity.ok(res.success());
+    }
+
     //  AccountModifyPassword API(비밀번호 변경)
     @PostMapping("modifypassword")
-    public ResponseEntity<Map<String,Object>> accountSavepassword(@RequestParam(value="userid", defaultValue="") String userid,
-                                              @RequestParam(value="oldPassword", defaultValue="") String oldPassword,
-                                              @RequestParam(value="changePassword", defaultValue="") String changePassword,
-                                              @RequestParam(value="confirmPassword", defaultValue="") String confirmPassword){
+    public ResponseEntity<Map<String,Object>> accountSavepassword(@RequestParam(value="oldPassword", defaultValue="") String oldPassword,
+                                              @RequestParam(value="changePassword", defaultValue="") String changePassword, @RequestParam(value="confirmPassword", defaultValue="") String confirmPassword,
+                                                                  HttpServletRequest request){
+
 
         Account account = new Account();
 
         AjaxResponse res = new AjaxResponse();
+
+        String userid = request.getHeader("insert_id");
+        log.info("userid : "+userid);
 
         //아이디를 입력하세요.
         if (userid == null || userid.equals("")){

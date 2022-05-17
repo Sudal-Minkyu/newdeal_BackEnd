@@ -774,7 +774,7 @@ public class PerformanceFunctionService {
                 allRank = "E";
             }
 
-            funRankScore.put("score",String.valueOf(allScore));
+            funRankScore.put("score",String.valueOf(Math.round(allScore*10)/10.0));
             funRankScore.put("rank", allRank);
             return funRankScore;
         }catch (Exception e){
