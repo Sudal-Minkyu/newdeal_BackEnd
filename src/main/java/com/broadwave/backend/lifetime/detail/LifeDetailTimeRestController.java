@@ -239,7 +239,7 @@ public class LifeDetailTimeRestController {
                         break;
                 }
             }
-//            log.info("referenceTable_List : " +referenceTable_List);
+            log.info("referenceTable_List : " +referenceTable_List);
 
             List<Double> b_One_List = new ArrayList<>();
             List<Double> b_Two_List = new ArrayList<>();

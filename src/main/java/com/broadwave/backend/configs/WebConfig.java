@@ -21,6 +21,8 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/**")
+                // 허용 URL김지겸 ip http://192.168.0.140:8010, URL최인석 ip http://192.168.0.16:8010, URL성낙원 ip http://192.168.0.132:8010,  URL신동하 ip http://192.168.0.:8010,
+//                .allowedOrigins(front_protocol+"://localhost:8010", front_protocol+"://"+front_url, front_protocol+"://192.168.0.140:8010", front_protocol+"://192.168.0.132:8010", front_protocol+"://192.168.0.16:8010")
                 .allowedOrigins(front_protocol+"://"+front_url, front_protocol)
                 .allowedHeaders("JWT_AccessToken","insert_id");
     }
