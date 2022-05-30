@@ -71,7 +71,9 @@ public class SafetyRepositoryCustomImpl extends QuerydslRepositorySupport implem
                         safety.sfWidth,
                         safety.sfNum,
                         safety.sfCompletionYear,
-                        safety.sfFactor
+                        safety.sfFactor,
+                        safety.sfFilePath,
+                        safety.sfFileName
 
                 ));
 

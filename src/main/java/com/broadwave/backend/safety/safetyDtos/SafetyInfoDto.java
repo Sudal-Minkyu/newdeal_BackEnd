@@ -2,6 +2,8 @@ package com.broadwave.backend.safety.safetyDtos;
 
 import lombok.*;
 
+import javax.persistence.Column;
+
 /**
  * @author Minkyu
  * Date : 2022-04-05
@@ -24,5 +26,8 @@ public class SafetyInfoDto {
     private Integer sfNum; // 경간수
     private Integer sfCompletionYear; // 준공년도
     private Double sfFactor; // 안전율
+    private String sfFilePath; // S3 파일경로
+    private String sfFileName; // S3 파일명
+
 
 }

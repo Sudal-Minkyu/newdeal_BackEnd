@@ -1,6 +1,7 @@
 package com.broadwave.backend.safety.safetyDtos;
 
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author Minkyu
@@ -24,5 +25,6 @@ public class SafetyMapperDto {
     private Integer sfNum; // 경간수
     private Integer sfCompletionYear; // 준공년도
     private Double sfFactor; // 안전율
+    private MultipartFile sfImage; // 사진업로드 파일
 
 }

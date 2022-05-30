@@ -1,24 +1,28 @@
 package com.broadwave.backend.safety.service;
 
+import com.broadwave.backend.Aws.AWSS3Service;
 import com.broadwave.backend.common.AjaxResponse;
 import com.broadwave.backend.safety.Safety;
 import com.broadwave.backend.safety.SafetyRepository;
-import com.broadwave.backend.safety.calculation.*;
+import com.broadwave.backend.safety.calculation.CalculationCapDto;
+import com.broadwave.backend.safety.calculation.CalculationListDto;
+import com.broadwave.backend.safety.calculation.CalculationRepository;
+import com.broadwave.backend.safety.calculation.CalculationTempDto;
 import com.broadwave.backend.safety.safetyDtos.SafetyInfoDto;
 import com.broadwave.backend.safety.safetyDtos.SafetyListDto;
 import com.broadwave.backend.safety.safetyDtos.SafetyMapperDto;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * @author Minkyu
@@ -30,18 +34,25 @@ import java.util.Optional;
 @Service
 public class SafetyService {
 
+    @Value("${newdeal.aws.s3.bucket.url}")
+    private String AWSBUCKETURL;
+
     private final ModelMapper modelMapper;
     private final SafetyRepository safetyRepository;
     private final CalculationRepository calculationRepository;
+    private final AWSS3Service awss3Service;
+
     @Autowired
-    public SafetyService(ModelMapper modelMapper, SafetyRepository safetyRepository, CalculationRepository calculationRepository){
+    public SafetyService(ModelMapper modelMapper, SafetyRepository safetyRepository, CalculationRepository calculationRepository,
+                         AWSS3Service awss3Service){
         this.modelMapper = modelMapper;
         this.safetyRepository = safetyRepository;
         this.calculationRepository = calculationRepository;
+        this.awss3Service = awss3Service;
     }
 
     // NEWDEAL 계측 기반 안전성 추정 데이터 제공 저장
-    public ResponseEntity<Map<String, Object>> safetySave(SafetyMapperDto safetyMapperDto, HttpServletRequest request) {
+    public ResponseEntity<Map<String, Object>> safetySave(SafetyMapperDto safetyMapperDto, HttpServletRequest request) throws IOException {
         log.info("safetySave 호출성공");
 
         AjaxResponse res = new AjaxResponse();
@@ -53,6 +64,7 @@ public class SafetyService {
         log.info("insert_id : "+insert_id);
 
         Safety safety;
+        String fileName = UUID.randomUUID().toString().replace("-", "")+".png";
 
         if(safetyMapperDto.getId() == null){
             safetyMapperDto.setId(0L);
@@ -69,11 +81,38 @@ public class SafetyService {
             safety.setSfNum(safetyMapperDto.getSfNum());
             safety.setSfCompletionYear(safetyMapperDto.getSfCompletionYear());
             safety.setSfFactor(safetyMapperDto.getSfFactor());
+
+            // AWS 첨부파일 수정
+            if(safetyMapperDto.getSfImage() != null){
+                if(safety.getSfFilePath() != null && safety.getSfFileName() != null){
+                    awss3Service.deleteObject(safety.getSfFilePath(),safety.getSfFileName());
+                }
+
+                safety.setSfFileName(fileName);
+                SimpleDateFormat date = new SimpleDateFormat("yyyyMMdd");
+                String filePath = "/newdeal-safety-images/" + date.format(new Date());
+                log.info("filePath : "+AWSBUCKETURL+filePath+"/");
+                safety.setSfFilePath(AWSBUCKETURL+filePath+"/");
+                awss3Service.imageFileUpload(safetyMapperDto.getSfImage(), fileName, filePath);
+            }
+
             safety.setModify_id(insert_id);
             safety.setModifyDateTime(LocalDateTime.now());
         }else{
             log.info("신규입니다.");
             safety = modelMapper.map(safetyMapperDto, Safety.class);
+
+            // AWS 첨부파일 업로드
+            if(safetyMapperDto.getSfImage() != null){
+                safety.setSfFileName(fileName);
+
+                SimpleDateFormat date = new SimpleDateFormat("yyyyMMdd");
+                String filePath = "/newdeal-safety-images/" + date.format(new Date());
+                log.info("filePath : "+AWSBUCKETURL+filePath+"/");
+                safety.setSfFilePath(AWSBUCKETURL+filePath+"/");
+                awss3Service.imageFileUpload(safetyMapperDto.getSfImage(), fileName, filePath);
+            }
+
             safety.setInsert_id(insert_id);
             safety.setInsertDateTime(LocalDateTime.now());
         }
@@ -82,6 +121,7 @@ public class SafetyService {
 
         return ResponseEntity.ok(res.success());
     }
+
 
     // NEWDEAL 계측 기반 안전성 추정 데이터 - 교량 리스트 검색
     public ResponseEntity<Map<String, Object>> bridgeDataList(String sfForm, String sfRank, String sfName, HttpServletRequest request) {

@@ -55,6 +55,7 @@ public enum ResponseErrorCode {
     NDE028("NDE028", "하지 않습니다. 확인후 다시 업로드 해주세요."),
     NDE029("NDE029", "필수항목을 입력하지 않았습니다."),
     NDE030("NDE030", "파일을 확인해주세요."),
+    NDE031("NDE031", "새로고침이후 다시 시도해주세요."),
     ;
 
     private String code;

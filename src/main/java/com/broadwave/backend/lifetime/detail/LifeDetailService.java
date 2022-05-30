@@ -6,10 +6,17 @@ import com.broadwave.backend.lifetime.detail.carbonation.CabonationInfoDto;
 import com.broadwave.backend.lifetime.detail.carbonation.CabonationRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.*;
 
 /**
@@ -21,6 +28,9 @@ import java.util.*;
 @Slf4j
 @Service
 public class LifeDetailService {
+
+    @Value("${newdeal.aws.python.api.url}")
+    private String awsPythonApiUrl;
 
     private final LiftDetailRepository liftDetailRepository;
 
@@ -81,6 +91,51 @@ public class LifeDetailService {
             if(optionalLifeDetail.get().getLtDetailType().equals("1")){
                 // 반발경도
 
+                // 파이썬 테스트
+                log.info("AWS URL : "+awsPythonApiUrl);
+                try {
+//                    https://vqdeoa9z35.execute-api.ap-northeast-2.amazonaws.com/echo/1?filter=test
+                    URL url = new URL(awsPythonApiUrl+"echo/1?filter=Test");
+                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+                    connection.setRequestMethod("GET");
+                    connection.setRequestProperty("Content-Type", "application/json");
+                    connection.setDoOutput(true);
+
+                    List<Object> objectList = new ArrayList<>();
+                    objectList.add("test");
+                    objectList.add(123);
+                    objectList.add(1.5);
+
+                    connection.setRequestProperty("name","minkyu");
+                    connection.setRequestProperty("birthday","0716");
+                    connection.setRequestProperty("list", String.valueOf(objectList));
+
+                    String pythonSetData = "pythonTest";
+                    DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
+                    outputStream.writeBytes(pythonSetData);
+                    outputStream.flush();
+                    outputStream.close();
+
+                    int responseCode = connection.getResponseCode();
+                    log.info("responseCode : "+responseCode);
+
+                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+
+                    StringBuilder stringBuffer = new StringBuilder();
+                    String inputLine;
+
+                    while ((inputLine = bufferedReader.readLine()) != null)  {
+                        stringBuffer.append(inputLine);
+                    }
+
+                    bufferedReader.close();
+                    String response = stringBuffer.toString();
+                    log.info("response : "+response);
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
             }else if(optionalLifeDetail.get().getLtDetailType().equals("2")){
                 // 탄산화깊이
@@ -122,7 +177,7 @@ public class LifeDetailService {
                 for(int area=publicYear; area<publicYear+21; area++){
                     int pf_Count = 0; // PF<0 카운트
                     double result;
-                    for(int i=1; i<simulation+1; i++) {
+                    for(int i=1; i<simulation; i++) {
                         rand = Math.random();
                         double tdNum = NormMath.inv(rand, tdAverage, tdStandard); // td 난수
 
@@ -332,6 +387,7 @@ public class LifeDetailService {
 
                 data.put("chartName","carbonation"); // 타입
 
+                data.put("publicYear",publicYear); // 공용연수
                 data.put("ltRecoveryList",ltRecoveryList); // 회복율
                 data.put("ltCostList",ltCostList); // 비용
 
@@ -374,151 +430,6 @@ public class LifeDetailService {
         }else{
             return ResponseEntity.ok(res.fail("문자", "존재하지 않은 고유코드 입니다. ", "문자", "고유코드 : "+autoNum));
         }
-
-//
-//            double b_max = Collections.max(b_List);
-//
-//            List<Double> referenceTable_List = new ArrayList<>();
-//            for(int i=0; i<21; i++){
-//                switch (i%21){
-//                    case 0: case 5: case 10: case 15: case 20:
-//                        referenceTable_List.add(b_List.get(0)*lifeDetailTimeDto.getLtRecoveryPercent());
-//                        break;
-//                    case 1: case 6: case 11: case 16:
-//                        referenceTable_List.add(b_List.get(1)*lifeDetailTimeDto.getLtRecoveryPercent());
-//                        break;
-//                    case 2: case 7: case 12: case 17:
-//                        referenceTable_List.add(b_List.get(2)*lifeDetailTimeDto.getLtRecoveryPercent());
-//                        break;
-//                    case 3: case 8: case 13: case 18:
-//                        referenceTable_List.add(b_List.get(3)*lifeDetailTimeDto.getLtRecoveryPercent());
-//                        break;
-//                    case 4: case 9: case 14: case 19:
-//                        referenceTable_List.add(b_List.get(4)*lifeDetailTimeDto.getLtRecoveryPercent());
-//                        break;
-//                }
-//            }
-////            log.info("referenceTable_List : " +referenceTable_List);
-//
-//            List<Double> b_One_List = new ArrayList<>();
-//            List<Double> b_Two_List = new ArrayList<>();
-//            int maintenanceYear = 0;
-//            for(int i=1; i<22; i++){
-//                if(b_List.get(i-1)>=lifeDetailTimeDto.getLtTargetValue()){
-//                    b_One_List.add(b_List.get(i-1));
-//                }else{
-//                    b_One_List.add(0.0);
-//                }
-//            }
-//
-//            for(int i=0; i<21; i++){
-//                if(b_One_List.get(i)==0.0){
-//                    maintenanceYear = i;
-//                    break;
-//                }
-//            }
-//
-//            int count = 0;
-//            double ltRepairLength = lifeDetailTimeDto.getLtRepairLength(); // 보수보강 총 길이
-//            int repairNumber = 0; // 보수보강 개입 횟수
-//            int repairCost = 0; // 보수보강 총 비용
-//            for(int i=0; i<21; i++){
-//                if(i<maintenanceYear){
-//                    b_Two_List.add(b_List.get(i));
-//                }else{
-//                    b_Two_List.add(referenceTable_List.get(count));
-//                    count++;
-//                    if (count%5 == 0) {
-//                        repairNumber++;
-//                    }
-//                }
-//            }
-//
-//
-//            for(int i=0; i<ltRecoveryList.size(); i++){
-//                if(lifeDetailTimeDto.getLtRecoveryPercent().equals(ltRecoveryList.get(i))){
-//                    repairCost = Integer.parseInt(String.valueOf(Math.round(ltRepairLength * repairNumber * ltCostList.get(i))));
-//                    break;
-//                }
-//            }
-//
-//
-////            System.out.println();
-////            log.info("보수보강 총 길이 : " +ltRepairLength);
-////            log.info("보수보강 개입 횟수: " + repairNumber);
-////            log.info("보수보강 총 비용 : "+ repairCost);
-////
-////            System.out.println();
-////            log.info("신뢰성 지수 최대값 : " +b_max);
-////            log.info("신뢰성 지수 최소값 : " + lifeDetailTimeDto.getLtTargetValue());
-////            log.info("보수보강 회복율 : " + lifeDetailTimeDto.getLtRecoveryPercent()*100);
-////            log.info("유지보수 무조치 가능년수 : "+ maintenanceYear);
-//
-////            log.info("b_One_List : "+ b_One_List);
-////            log.info("b_Two_List : "+ b_Two_List);
-////            log.info("b_One_List 사이즈 : "+ b_One_List.size());
-////            log.info("b_Two_List 사이즈 : "+ b_Two_List.size());
-//
-//            data.put("lifeDetailTimeDto",lifeDetailTimeDto); // lifeDetailTimeDto 모든 값 던지기
-//
-//            data.put("pfmax",Math.floor(pf_max*1000)/1000.0); // 무조치 시 손상확률 최대값(PF 최댓값)
-//            data.put("pfmin",Math.floor(pf_min*1000)/1000.0); // 무조치 시 신뢰성 지수 최소값
-//            data.put("pfList",pf_List); // 무조치 시 PF
-//            data.put("bList",b_List); // 무조치 시 B
-//
-//            data.put("bmax",Math.floor(b_max*1000)/1000.0); // 유지보수 개입 시 신뢰성지수최대값
-//            data.put("bmin",lifeDetailTimeDto.getLtTargetValue()); // 유지보수 개입 시 신뢰성지수최소값
-//            data.put("ltRecoveryPercent",lifeDetailTimeDto.getLtRecoveryPercent()*100); // 유지보수 개입 시 보수보강 회복율
-//            data.put("maintenanceYear",maintenanceYear); // 유지보수 개입 시 유지보수 무조치 가능년수
-//
-//            data.put("bOneList",b_One_List); // 유지보수 개입 시 B1
-//            data.put("bTwoList",b_Two_List); // 유지보수 개입 시 B2
-//
-//            data.put("ltRepairLength",ltRepairLength);; // 보수보강 총 길이
-//            data.put("repairNumber",repairNumber); // 보수보강 개입 횟수
-//            data.put("repairCost",repairCost); // 보수보강 총 비용
-//
-//
-//            // 차트의 JSON정보를 담을 Array 선언
-//            List<HashMap<String,Object>> noactionChartDataList = new ArrayList<>(); // 무조치 시 차트데이터
-//            List<HashMap<String,Object>> actionChartDataList = new ArrayList<>(); // 유지보수 개입시 차트데이터
-//            HashMap<String,Object> noactionchartData;
-//            HashMap<String,Object> actionchartData;
-//
-//            // 차트데이터 값 for문 알고리즘 20번돌아야됨.
-//            for(int publicYear=0; publicYear< b_Two_List.size(); publicYear++){
-//
-//                // 그래프로 보낼 데이터 뽑기 여기서 시작
-//                noactionchartData  = new HashMap<>();
-//                actionchartData  = new HashMap<>();
-//
-//                noactionchartData.put("publicYear", publicYear);
-//                noactionchartData.put("redline", lifeDetailTimeDto.getLtTargetValue());
-//                noactionchartData.put("noaction", Math.floor(b_List.get(publicYear)*1000)/1000.0);
-//                noactionChartDataList.add(noactionchartData);
-//
-//                actionchartData.put("publicYear", publicYear);
-//                actionchartData.put("redline", lifeDetailTimeDto.getLtTargetValue());
-//                actionchartData.put("action", Math.floor(b_Two_List.get(publicYear)*1000)/1000.0);
-//                actionChartDataList.add(actionchartData);
-//
-//            }
-//
-////            System.out.println();
-////            log.info("무조치 차트 테스트 : "+noactionChartDataList);
-////            log.info("무조치 차트 데이터 길이 : "+noactionChartDataList.size());
-////            log.info("유지보수 차트 테스트 : "+actionChartDataList);
-////            log.info("유지보수 차트 데이터 길이 : "+actionChartDataList.size());
-//
-//            data.put("ltTargetValue", lifeDetailTimeDto.getLtTargetValue());
-//            data.put("noactionChartDataList",noactionChartDataList);
-//            data.put("actionChartDataList",actionChartDataList);
-//
-//        }else{
-//            return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE006.getCode(),ResponseErrorCode.NDE006.getDesc(),null,null));
-//        }
-
-//        data.put("lifeDetailTimeDto",lifeDetailTimeDto);
 
         return ResponseEntity.ok(res.dataSendSuccess(data));
     }

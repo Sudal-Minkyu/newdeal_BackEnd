@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -33,7 +34,7 @@ public class SafetyRestController {
 
     // NEWDEAL 계측 기반 안전성 추정 데이터 제공 저장
     @PostMapping("save")
-    public ResponseEntity<Map<String,Object>> save(@ModelAttribute SafetyMapperDto lifeDetailTimeMapperDto, HttpServletRequest request) {
+    public ResponseEntity<Map<String,Object>> save(@ModelAttribute SafetyMapperDto lifeDetailTimeMapperDto, HttpServletRequest request) throws IOException {
         return safetyService.safetySave(lifeDetailTimeMapperDto, request);
     }
 
@@ -41,6 +42,12 @@ public class SafetyRestController {
     @GetMapping("bridgeDataList")
     public ResponseEntity<Map<String,Object>> bridgeDataList(@RequestParam("s_sfForm")String sfForm, @RequestParam("s_sfRank")String sfRank ,@RequestParam("s_sfName")String sfName, HttpServletRequest request) {
         return safetyService.bridgeDataList(sfForm, sfRank, sfName, request);
+    }
+
+    // NEWDEAL 계측 기반 교량 & 안전성 추정 데이터 삭제
+    @PostMapping("bridgeDataDelete")
+    public ResponseEntity<Map<String,Object>> bridgeDataDelete(@RequestParam("id")Long id, HttpServletRequest request) {
+        return calculationService.bridgeDataDelete(id, request);
     }
 
     // NEWDEAL 계측 기반 안전성 추정 데이터 가져오기

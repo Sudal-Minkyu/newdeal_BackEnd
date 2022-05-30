@@ -1,5 +1,6 @@
 package com.broadwave.backend.safety.service;
 
+import com.broadwave.backend.Aws.AWSS3Service;
 import com.broadwave.backend.common.AjaxResponse;
 import com.broadwave.backend.common.ResponseErrorCode;
 import com.broadwave.backend.safety.Safety;
@@ -30,12 +31,15 @@ public class CalculationService {
     private final ModelMapper modelMapper;
     private final CalculationRepository calculationRepository;
     private final SafetyRepository safetyRepository;
+    private final AWSS3Service awss3Service;
 
     @Autowired
-    public CalculationService(ModelMapper modelMapper, CalculationRepository calculationRepository, SafetyRepository safetyRepository){
+    public CalculationService(ModelMapper modelMapper, CalculationRepository calculationRepository, SafetyRepository safetyRepository,
+                              AWSS3Service awss3Service){
         this.modelMapper = modelMapper;
         this.calculationRepository = calculationRepository;
         this.safetyRepository = safetyRepository;
+        this.awss3Service = awss3Service;
     }
 
     public ResponseEntity<Map<String, Object>> calculationDate(Long id, HttpServletRequest request) {
@@ -150,8 +154,31 @@ public class CalculationService {
         return ResponseEntity.ok(res.dataSendSuccess(data));
     }
 
+    // NEWDEAL 계측 기반 교량 & 안전성 추정 데이터 삭제
+    public ResponseEntity<Map<String, Object>> bridgeDataDelete(Long id, HttpServletRequest request) {
+        log.info("bridgeDataDelete 호출성공");
 
+        AjaxResponse res = new AjaxResponse();
 
+        String JWT_AccessToken = request.getHeader("JWT_AccessToken");
+        String insert_id = request.getHeader("insert_id");
 
+        log.info("JWT_AccessToken : "+JWT_AccessToken);
+        log.info("insert_id : "+insert_id);
+
+        Optional<Safety> optionalSafety = safetyRepository.findById(id);
+        List<Calculation> calculationList = calculationRepository.findBySfId(id);
+        if(optionalSafety.isPresent()){
+            if(optionalSafety.get().getSfFilePath() != null && optionalSafety.get().getSfFileName() != null){
+                awss3Service.deleteObject(optionalSafety.get().getSfFilePath(), optionalSafety.get().getSfFileName());
+            }
+            safetyRepository.delete(optionalSafety.get());
+            calculationRepository.deleteAll(calculationList);
+        }else{
+            return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE006.getCode(), "교량 "+ResponseErrorCode.NDE006.getDesc(), ResponseErrorCode.NDE031.getCode(), ResponseErrorCode.NDE031.getDesc()));
+        }
+
+        return ResponseEntity.ok(res.success());
+    }
 
 }
