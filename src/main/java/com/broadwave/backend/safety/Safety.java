@@ -50,6 +50,9 @@ public class Safety {
     @Column(name="sf_factor")
     private Double sfFactor; // 안전율
 
+    @Column(name="sf_file_yyyymmdd")
+    private String sfFileYyyymmdd; // S3 파일업로드 날짜
+
     @Column(name="sf_file_path")
     private String sfFilePath; // S3 파일경로
 

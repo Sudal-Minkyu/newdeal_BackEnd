@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**
@@ -85,11 +86,13 @@ public class SafetyService {
             // AWS 첨부파일 수정
             if(safetyMapperDto.getSfImage() != null){
                 if(safety.getSfFilePath() != null && safety.getSfFileName() != null){
-                    awss3Service.deleteObject(safety.getSfFilePath(),safety.getSfFileName());
+                    String path = "/newdeal-img/"+safety.getSfFileYyyymmdd();
+                    awss3Service.deleteObject(path,safety.getSfFileName());
                 }
 
                 safety.setSfFileName(fileName);
                 SimpleDateFormat date = new SimpleDateFormat("yyyyMMdd");
+                safety.setSfFileYyyymmdd(date.format(new Date()));
                 String filePath = "/newdeal-safety-images/" + date.format(new Date());
                 log.info("filePath : "+AWSBUCKETURL+filePath+"/");
                 safety.setSfFilePath(AWSBUCKETURL+filePath+"/");
@@ -105,8 +108,8 @@ public class SafetyService {
             // AWS 첨부파일 업로드
             if(safetyMapperDto.getSfImage() != null){
                 safety.setSfFileName(fileName);
-
                 SimpleDateFormat date = new SimpleDateFormat("yyyyMMdd");
+                safety.setSfFileYyyymmdd(date.format(new Date()));
                 String filePath = "/newdeal-safety-images/" + date.format(new Date());
                 log.info("filePath : "+AWSBUCKETURL+filePath+"/");
                 safety.setSfFilePath(AWSBUCKETURL+filePath+"/");

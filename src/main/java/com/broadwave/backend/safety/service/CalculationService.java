@@ -170,7 +170,8 @@ public class CalculationService {
         List<Calculation> calculationList = calculationRepository.findBySfId(id);
         if(optionalSafety.isPresent()){
             if(optionalSafety.get().getSfFilePath() != null && optionalSafety.get().getSfFileName() != null){
-                awss3Service.deleteObject(optionalSafety.get().getSfFilePath(), optionalSafety.get().getSfFileName());
+                String path = "/newdeal-img/"+optionalSafety.get().getSfFileYyyymmdd();
+                awss3Service.deleteObject(path, optionalSafety.get().getSfFileName());
             }
             safetyRepository.delete(optionalSafety.get());
             calculationRepository.deleteAll(calculationList);
