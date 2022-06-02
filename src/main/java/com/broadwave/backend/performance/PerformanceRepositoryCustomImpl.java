@@ -62,7 +62,7 @@ public class PerformanceRepositoryCustomImpl extends QuerydslRepositorySupport i
                 ));
 
         // 검색조건필터
-        if (autoNum != null || !autoNum.isEmpty()){
+        if (autoNum != null){
             query.where(performance.piAutoNum.eq(autoNum));
         }
 
@@ -316,7 +316,7 @@ public class PerformanceRepositoryCustomImpl extends QuerydslRepositorySupport i
         query.where(performance.piInputGreat.eq(1)); // 2. 우수 대안만 리스트로 출력한다.
         query.where(performance.piInputMiddleSave.eq(1)); // 3. 중간저장된 글이 아닌 완전히 작성된 대안만 출력한다.
 
-        query.groupBy(performance.piAutoNum).orderBy(performance.id.asc()).distinct();
+        query.groupBy(performance.piAutoNum).orderBy(performance.id.desc());
 
         final List<PerformanceListDto> performanceListDtos = Objects.requireNonNull(getQuerydsl()).applyPagination(pageable, query).fetch();
         return new PageImpl<>(performanceListDtos, pageable, query.fetchCount());

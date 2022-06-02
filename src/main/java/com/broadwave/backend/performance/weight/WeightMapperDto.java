@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 public class WeightMapperDto {
 
     private String weightCategory;
+    private String piInputSkip;
 
     private Double piWeightTechnicality; // 유형_기술성(NOTNULL)
     private Double piWeightEconomy; // 유형_경제성(NOTNULL)

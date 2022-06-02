@@ -596,31 +596,27 @@ public class PerformanceRestController {
             workbook = new HSSFWorkbook(excelfile.getInputStream());  // -> .xls
         }
 
-        Sheet worksheet = workbook.getSheetAt(0); // 첫번째 시트
+//        Sheet worksheet = workbook.getSheetAt(0); // 첫번째 시트
+        Sheet worksheet = workbook.getSheetAt(1); // 두번째 시트
+
         // 제공한 양식 엑셀파일이 맞는지 확인 (첫번째시트)
         String businessData = weightMapperDto.getWeightCategory();
         String piBusiness;
-        int rowNum;
-        log.info("유형 : "+weightMapperDto.getWeightCategory());
+        log.info("유형 : "+businessData);
         try {
             Row rowCheck = worksheet.getRow(2);
             Object cellDataCheck = rowCheck.getCell(2);
             log.info("cellDataCheck : " + cellDataCheck.toString());
-            if(businessData.equals("노후화대응")){
-                rowNum = 16;
-            }else if(businessData.equals("기준변화")){
-                rowNum = 13;
-            }else{
-                rowNum = 14;
-            }
-            Row rowBusiness = worksheet.getRow(rowNum);
-            Object rowBusinessCheck = rowBusiness.getCell(3);
+            Row rowBusiness = worksheet.getRow(1);
+            Object rowBusinessCheck = rowBusiness.getCell(1);
             piBusiness = rowBusinessCheck.toString().substring(0,2);
             log.info("");
             if (!cellDataCheck.toString().equals("입력정보")) {
+                log.info("2열,2행 값이 양식에 맞지않음.");
                 return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE012.getCode(), ResponseErrorCode.NDE012.getDesc(), null, null));
             }
         } catch (NullPointerException e) {
+            log.info("1열,1행 값이 양식에 맞지않음.");
             return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE012.getCode(), ResponseErrorCode.NDE012.getDesc(), null, null));
         }
 
@@ -643,85 +639,103 @@ public class PerformanceRestController {
             List<Performance> ListPerformance = new ArrayList<>();
             log.info("getPhysicalNumberOfRows : " + worksheet.getPhysicalNumberOfRows());
             log.info("");
-            for (int i=3; i<7; i++){
+
+            for (int i = 3; i < 7; i++) {
                 Performance performance = new Performance();
-                for (int j = 3; j < worksheet.getPhysicalNumberOfRows()+1; j++) {
+                for (int j = 3; j < worksheet.getPhysicalNumberOfRows() + 1; j++) {
                     Row row = worksheet.getRow(j);
                     Cell cellData = row.getCell(i);
                     CellType ct = cellData.getCellType();
 //                    log.info( j +" 셀타입 : "+ct);
                     if (ct == CellType.BLANK) {
-                        if(j==4 || j==6 || j==7 || j==9 || j==10 || j==11 || j==12 || j==13 || j==16 || j==17 || j==18 || j==21 || j==22 || j==23 || j==24 || j==25 || j==26 || j==27 || j==28){
-                            return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE029.getCode(), ResponseErrorCode.NDE029.getDesc(), ResponseErrorCode.NDE030.getCode(), ResponseErrorCode.NDE030.getDesc()));
+                        if (j == 4 || j == 6 || j == 7 || j == 9 || j == 10 || j == 11 || j == 12 || j == 15 || j == 16 || j == 19 || j == 20 || j == 21 || j == 22 || j == 23 || j == 24) {
+                            return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE029.getCode(), ResponseErrorCode.NDE029.getDesc(), ResponseErrorCode.NDE030.getCode(), i+"열의 "+j+"번째 행"+ResponseErrorCode.NDE030.getDesc()));
                         }else{
-                            if(j!=3){
+                            if(j == 3){
+                                log.info("대안 종료");
                                 excelList.add(null);
-                            }else{
-                                log.info("이곳은 널 입니다.");
                                 break;
+                            }else{
+//                                log.info("이곳은 널 입니다.");
+                                excelList.add(null);
                             }
                         }
-                    } else if(ct == CellType.NUMERIC || ct == CellType.STRING) {
-                        if (j == 20 || j == 9) {
+                    } else if (ct == CellType.NUMERIC || ct == CellType.STRING) {
+                        if (j == 6 || j == 7 || j == 9 || j == 15 || j == 19 || j == 24) {
                             try {
                                 String cost = cellData.toString();
                                 if (cost.contains("E")) {
-                                    log.info("문자가 E가 포함되어 있습니다.");
-                                    log.info("cost : " + cost);
+//                                    log.info("문자가 E가 포함되어 있습니다.");
+//                                    log.info("cost : " + cost);
                                     BigDecimal costCheck = new BigDecimal(Double.parseDouble(cost));
-                                    log.info("숫자로 변환 : " + costCheck);
+//                                    log.info("숫자로 변환 : " + costCheck);
                                     excelList.add(costCheck);
                                 } else {
-                                    log.info("문자 E가 포함되어 있지 않습니다.");
-                                    log.info("cost : " + cost);
+//                                    log.info("문자 E가 포함되어 있지 않습니다.");
+//                                    log.info("cost : " + cost);
                                     excelList.add(cellData);
                                 }
                             } catch (Exception e) {
-                                log.info("e : " + e);
-                                log.info("숫자가 아닌 문자열 입니다.");
+//                                log.info("e : " + e);
+//                                log.info("숫자가 아닌 문자열 입니다.");
                                 return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE017.getCode(), ResponseErrorCode.NDE017.getDesc(), ResponseErrorCode.NDE018.getCode(), ResponseErrorCode.NDE018.getDesc()));
                             }
-                        }else{
+                        } else {
                             excelList.add(cellData);
                         }
-                    }else{
+                    } else {
                         return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE012.getCode(), ResponseErrorCode.NDE012.getDesc(), null, null));
                     }
                 }
 
                 log.info("==============결과==============");
-//                log.info(i-2+"번째 루트 리스트 : "+excelList);
-//                log.info(i-2+"번째 루트 리스트길이 : "+excelList.size());
+                log.info(i-2+"번째 루트 리스트 : "+excelList);
+                log.info(i-2+"번째 루트 리스트길이 : "+excelList.size());
                 log.info("");
-                if(excelList.size()==28) {
-                    log.info("엑셀의 성능개선사업 내용을 저장합니다.");
+                if (excelList.size() == 25) {
+                    log.info("노후화 대응 : 엑셀업로드 성능개선사업 내용을 저장합니다.");
+                    performance.setPiInputSkip(weightMapperDto.getPiInputSkip());  // 스킵여부 0:적합, 1:부적합, 2: 스킵
 
                     performance.setPiFacilityType(excelList.get(0).toString());  // 시설유형(NOTNULL)
                     performance.setPiFacilityName(excelList.get(1).toString());  // 시설유형
-                    if(excelList.get(2)==null){
+                    if (excelList.get(2) == null) {
                         performance.setPiKind(null);
-                    }else{
-                        performance.setPiKind(excelList.get(2).toString()); // 종별구분(NOTNULL)
+                    } else {
+                        performance.setPiKind(excelList.get(2).toString()); // 종별구분(NULL)
                     }
+
                     performance.setPiCompletionYear(Double.parseDouble(excelList.get(3).toString())); // 준공연도(NOTNULL)
                     performance.setPiPublicYear(Double.parseDouble(excelList.get(4).toString())); // 공용연수(NOTNULL)
-                    if(excelList.get(5)==null){
+                    if (excelList.get(5) == null) {
                         performance.setPiType(null);
-                    }else{
+                    } else {
                         performance.setPiType(excelList.get(5).toString()); // 형식구분(NULL)
                     }
+
                     performance.setPiErectionCost(Long.parseLong(excelList.get(6).toString())); // 취득원가(NOTNULL)
                     performance.setPiSafetyLevel(excelList.get(7).toString()); // 안전등급(NOTNULL)
                     performance.setPiUsabilityAndGoalLevel(excelList.get(8).toString()); // 목표 안전등급(NOTNULL)
-                    performance.setPiMaintenanceDelay(Double.parseDouble(excelList.get(9).toString())); // 유지보수기간(NOTNULL)
-                    if(excelList.get(10)==null){
-                        performance.setPiManagement(null);
+
+                    if (excelList.get(9).equals("1년 미만")) {
+                        performance.setPiMaintenanceDelay(0.0); // 유지보수기간(NOTNULL)
+                    }else if(excelList.get(9).equals("1년")){
+                        performance.setPiMaintenanceDelay(1.0); // 유지보수기간(NOTNULL)
+                    }else if(excelList.get(9).equals("2년")){
+                        performance.setPiMaintenanceDelay(2.0); // 유지보수기간(NOTNULL)
+                    }else if(excelList.get(9).equals("3년")){
+                        performance.setPiMaintenanceDelay(3.0); // 유지보수기간(NOTNULL)
                     }else{
+                        performance.setPiMaintenanceDelay(4.0); // 유지보수기간(NOTNULL)
+                    }
+
+                    if (excelList.get(10) == null) {
+                        performance.setPiManagement(null);
+                    } else {
                         performance.setPiManagement(excelList.get(10).toString()); // 관리주체(NULL)
                     }
-                    if(excelList.get(11)==null){
+                    if (excelList.get(11) == null) {
                         performance.setPiAgency(null);
-                    }else{
+                    } else {
                         performance.setPiAgency(excelList.get(11).toString()); // 관리감독기관(NULL)
                     }
 
@@ -729,42 +743,51 @@ public class PerformanceRestController {
 
                     performance.setPiBusiness(weightMapperDto.getWeightCategory()); // 사업구분(NOTNULL)
 
-                    performance.setPiBusinessType(excelList.get(14).toString()); // 사업유형(NOTNULL)
-                    if(excelList.get(15)==null){
+                    performance.setPiBusinessType(excelList.get(13).toString()); // 사업유형(NOTNULL)
+
+                    if (excelList.get(14) == null) {
                         performance.setPiTargetAbsence(null);
-                    }else{
-                        performance.setPiTargetAbsence(excelList.get(15).toString()); // 대상부재(NULL)
+                    } else {
+                        performance.setPiTargetAbsence(excelList.get(14).toString()); // 대상부재(NULL)
                     }
-                    if(excelList.get(16)==null){
+                    if (excelList.get(15) == null) {
                         performance.setPiBusinessClassification(null);
-                    }else{
-                        performance.setPiBusinessClassification(excelList.get(16).toString()); // 사업분류(NOTNULL)
+                    } else {
+                        performance.setPiBusinessClassification(excelList.get(15).toString()); // 사업분류(NOTNULL)
                     }
-                    performance.setPiBusinessExpenses(Long.parseLong(excelList.get(17).toString())); // 사업비용(NOTNULL)
-                    performance.setPiBeforeSafetyRating(excelList.get(18).toString()); // 사업전 부재 안전등급(NOTNULL)
-                    performance.setPiAfterSafetyRating(excelList.get(19).toString()); // 사업후 부재 안전등급(NOTNULL)
 
-                    // 수정해야됨.
-//                    performance.setPiBusinessObligatory(Double.parseDouble(excelList.get(20).toString()));// 법에 따른 의무사업(NOTNULL)
-//                    performance.setPiBusinessMandatory(Double.parseDouble(excelList.get(21).toString())); // 법정계획에 따른 의무사업(NOTNULL)
-//                    performance.setPiBusinessPlanned(Double.parseDouble(excelList.get(22).toString())); // 자체계획/의결에 따른 사업(NOTNULL)
-                    performance.setPiWhether(Double.parseDouble(excelList.get(23).toString())); // 최근 1년간 민원 및 사고발생 건수(NOTNULL)
+                    performance.setPiBusinessExpenses(Long.parseLong(excelList.get(16).toString())); // 사업비용(NOTNULL)
+                    performance.setPiBeforeSafetyRating(excelList.get(17).toString()); // 사업전 부재 안전등급(NOTNULL)
+                    performance.setPiAfterSafetyRating(excelList.get(18).toString()); // 사업후 부재 안전등급(NOTNULL)
 
-                    performance.setPiRaterBaseYear(Double.parseDouble(excelList.get(24).toString())); // 평가 기준년도(NOTNULL)
-                    if(excelList.get(25)==null){
+                    if (excelList.get(19).toString().startsWith("해당")) {
+                        performance.setPiBusinessValidity("0"); // 사업추진 타당성(NOTNULL) - 해당사유 외
+                    }else if(excelList.get(19).toString().startsWith("법에")){
+                        performance.setPiBusinessValidity("1"); // 사업추진 타당성(NOTNULL) - 법에 따른 의무사업
+                    }else if(excelList.get(19).toString().startsWith("법정")){
+                        performance.setPiBusinessValidity("2"); // 사업추진 타당성(NOTNULL) - 법정계획/설계기준에 따른 의무사업
+                    }else{
+                        performance.setPiBusinessValidity("3"); // 사업추진 타당성(NOTNULL) - 자체계획/의결에 따른 사업
+                    }
+
+                    performance.setPiWhether(Double.parseDouble(excelList.get(20).toString().substring(0,1))); // 최근 1년간 민원 및 사고발생 건수(NOTNULL)
+
+
+                    performance.setPiRaterBaseYear(Double.parseDouble(excelList.get(21).toString())); // 평가 기준년도(NOTNULL)
+                    if (excelList.get(22) == null) {
                         performance.setPiRater(null);
-                    }else{
-                        performance.setPiRater(excelList.get(25).toString()); // 평가자이름(NULL)
+                    } else {
+                        performance.setPiRater(excelList.get(22).toString()); // 평가자이름(NULL)
                     }
-                    if(excelList.get(26)==null){
+                    if (excelList.get(23) == null) {
                         performance.setPiRaterBelong(null);
-                    }else{
-                        performance.setPiRaterBelong(excelList.get(26).toString()); // 평자가 소속(NULL)
+                    } else {
+                        performance.setPiRaterBelong(excelList.get(23).toString()); // 평자가 소속(NULL)
                     }
-                    if(excelList.get(27)==null){
+                    if (excelList.get(24) == null) {
                         performance.setPiRaterPhone(null);
-                    }else{
-                        performance.setPiRaterPhone(excelList.get(27).toString()); // 평가자 연락처(NULL)
+                    } else {
+                        performance.setPiRaterPhone(excelList.get(24).toString()); // 평가자 연락처(NULL)
                     }
 
                     performance.setPiAutoNum(autoNum); // 대안 일려번호(NOTNULL)
@@ -775,18 +798,19 @@ public class PerformanceRestController {
                     performance.setInsertDateTime(LocalDateTime.now()); // 작성날짜
                     performance.setInsert_id(currentuserid); // 작성자
 
-                    excelList.clear();
                     ListPerformance.add(performance);
                 }
+
+                excelList.clear();
+
             }
-    //        log.info("ListPerformance : " + ListPerformance);
+            log.info("노후화 ListPerformance : " + ListPerformance);
 
             for (Performance performance : ListPerformance) {
                 performanceService.save(performance);
             }
-
-
-        }else if(piBusiness.equals("기준") && piBusiness.equals(businessData.substring(0,2))){
+        }
+        else if(piBusiness.equals("기준") && piBusiness.equals(businessData.substring(0,2))){
             log.info("기준변화 유형 엑셀파일입니다.");
 
             ArrayList<Object> excelList = new ArrayList<>();
@@ -799,36 +823,30 @@ public class PerformanceRestController {
                     Row row = worksheet.getRow(j);
                     Cell cellData = row.getCell(i);
                     CellType ct = cellData.getCellType();
-//                    log.info( j +" 셀타입 : "+ct);
                     if (ct == CellType.BLANK) {
-                        if(j==4 || j==6 || j==7 || j==9 || j==12 || j==13 || j==14 || j==17 || j==18 || j==19 || j==20 || j==21){
-                            return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE029.getCode(), ResponseErrorCode.NDE029.getDesc(), ResponseErrorCode.NDE030.getCode(), ResponseErrorCode.NDE030.getDesc()));
+                        if(j==4 || j==5 || j==7 || j==8 || j==10 || j==13 || j==14 || j==17 || j==18 || j==19){
+                            return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE029.getCode(), ResponseErrorCode.NDE029.getDesc(), ResponseErrorCode.NDE030.getCode(), i+"열의 "+j+"번째 행"+ResponseErrorCode.NDE030.getDesc()));
                         }else{
-                            if(j!=3){
+                            if(j == 3){
+                                log.info("대안 종료");
                                 excelList.add(null);
-                            }else{
-                                log.info("이곳은 널 입니다.");
                                 break;
+                            }else{
+//                                log.info("이곳은 널 입니다.");
+                                excelList.add(null);
                             }
                         }
                     } else if(ct == CellType.NUMERIC || ct == CellType.STRING) {
-                        if (j == 17) {
+                        if (j == 6 || j == 7 || j == 12 || j == 16 || j == 18) {
                             try {
                                 String cost = cellData.toString();
                                 if (cost.contains("E")) {
-                                    log.info("문자가 E가 포함되어 있습니다.");
-                                    log.info("cost : " + cost);
                                     BigDecimal costCheck = new BigDecimal(Double.parseDouble(cost));
-                                    log.info("숫자로 변환 : " + costCheck);
                                     excelList.add(costCheck);
                                 } else {
-                                    log.info("문자 E가 포함되어 있지 않습니다.");
-                                    log.info("cost : " + cost);
                                     excelList.add(cellData);
                                 }
                             } catch (Exception e) {
-                                log.info("e : " + e);
-                                log.info("숫자가 아닌 문자열 입니다.");
                                 return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE017.getCode(), ResponseErrorCode.NDE017.getDesc(), ResponseErrorCode.NDE018.getCode(), ResponseErrorCode.NDE018.getDesc()));
                             }
                         }else{
@@ -840,11 +858,12 @@ public class PerformanceRestController {
                 }
 
                 log.info("==============결과==============");
-//                log.info(i-2+"번째 루트 리스트 : "+excelList);
-//                log.info(i-2+"번째 루트 리스트길이 : "+excelList.size());
+                log.info(i-2+"번째 루트 리스트 : "+excelList);
+                log.info(i-2+"번째 루트 리스트길이 : "+excelList.size());
                 log.info("");
-                if(excelList.size()==22) {
-                    log.info("노후화대응의 대한 엑셀파일 성능개선사업 내용을 저장합니다.");
+                if(excelList.size()==19) {
+                    log.info("기준변화의 대한 엑셀파일 성능개선사업 내용을 저장합니다.");
+                    performance.setPiInputSkip(weightMapperDto.getPiInputSkip());  // 스킵여부 0:적합, 1:부적합, 2: 스킵
 
                     performance.setPiFacilityType(excelList.get(0).toString());  // 시설유형(NOTNULL)
                     performance.setPiFacilityName(excelList.get(1).toString());  // 시설유형(NULL)
@@ -860,54 +879,70 @@ public class PerformanceRestController {
                     }else{
                         performance.setPiType(excelList.get(5).toString());  // 형식구분(NULL)
                     }
+                    performance.setPiErectionCost(Long.parseLong("0")); // 취득원가(NOTNULL)
                     performance.setPiSafetyLevel(excelList.get(6).toString()); // 안전등급(NOTNULL)
+                    performance.setPiUsabilityAndGoalLevel("해당안됨"); // 사용성등급(NOTNULL) , 목표안전등급
+                    performance.setPiMaintenanceDelay(Double.parseDouble("9")); // 유지보수기간(NOTNULL)
+
                     if(excelList.get(7)==null){
                         performance.setPiManagement(null);
                     }else{
                         performance.setPiManagement(excelList.get(7).toString()); // 관리주체(NULL)
                     }
+
                     if(excelList.get(8)==null){
                         performance.setPiAgency(null);
                     }else{
                         performance.setPiAgency(excelList.get(8).toString()); // 관리감독기관(NULL)
                     }
+
                     performance.setPiAADT(Double.parseDouble(excelList.get(9).toString())); // 연평균일교통량(NOTNULL)
 
                     performance.setPiBusiness(weightMapperDto.getWeightCategory()); // 사업구분(NOTNULL)
 
-                    performance.setPiBusinessType(excelList.get(11).toString()); // 사업유형(NOTNULL)
-                    if(excelList.get(12)==null){
+                    performance.setPiBusinessType(excelList.get(10).toString()); // 사업유형(NOTNULL)
+                    if(excelList.get(11)==null){
                         performance.setPiTargetAbsence(null);
                     }else{
-                        performance.setPiTargetAbsence(excelList.get(12).toString()); // 대상부재(NULL)
+                        performance.setPiTargetAbsence(excelList.get(11).toString()); // 대상부재(NULL)
                     }
-                    if(excelList.get(13)==null){
+                    if(excelList.get(12)==null){
                         performance.setPiBusinessClassification(null);
                     }else{
-                        performance.setPiBusinessClassification(excelList.get(13).toString()); // 사업분류(NOTNULL)
+                        performance.setPiBusinessClassification(excelList.get(12).toString()); // 사업분류(NOTNULL)
                     }
-                    performance.setPiBusinessExpenses(Long.parseLong(excelList.get(14).toString())); // 사업비용(NOTNULL)
+                    performance.setPiBusinessExpenses(Long.parseLong(excelList.get(13).toString())); // 사업비용(NOTNULL)
 
-                    // 수정해야됨
-//                    performance.setPiBusinessObligatory(Double.parseDouble(excelList.get(15).toString()));// 법에 따른 의무사업(NOTNULL)
-//                    performance.setPiBusinessMandatory(Double.parseDouble(excelList.get(16).toString())); // 법정계획에 따른 의무사업(NOTNULL)
-//                    performance.setPiBusinessPlanned(Double.parseDouble(excelList.get(17).toString())); // 자체계획/의결에 따른 사업(NOTNULL)
+                    performance.setPiBeforeSafetyRating("A"); // 사업전 부재 안전등급(NOTNULL)
+                    performance.setPiAfterSafetyRating("A"); // 사업후 부재 안전등급(NOTNULL)
 
-                    performance.setPiRaterBaseYear(Double.parseDouble(excelList.get(18).toString())); // 평가 기준년도(NOTNULL)
-                    if(excelList.get(19)==null){
+                    if (excelList.get(14).toString().startsWith("해당")) {
+                        performance.setPiBusinessValidity("0"); // 사업추진 타당성(NOTNULL) - 해당사유 외
+                    }else if(excelList.get(14).toString().startsWith("법에")){
+                        performance.setPiBusinessValidity("1"); // 사업추진 타당성(NOTNULL) - 법에 따른 의무사업
+                    }else if(excelList.get(14).toString().startsWith("법정")){
+                        performance.setPiBusinessValidity("2"); // 사업추진 타당성(NOTNULL) - 법정계획/설계기준에 따른 의무사업
+                    }else{
+                        performance.setPiBusinessValidity("3"); // 사업추진 타당성(NOTNULL) - 자체계획/의결에 따른 사업
+                    }
+
+                    performance.setPiWhether(Double.parseDouble("99999")); // 최근 1년간 민원 및 사고발생 건수(NOTNULL)
+
+                    performance.setPiRaterBaseYear(Double.parseDouble(excelList.get(15).toString())); // 평가 기준년도(NOTNULL)
+                    if(excelList.get(16)==null){
                         performance.setPiRater(null);
                     }else{
-                        performance.setPiRater(excelList.get(19).toString()); // 평가자이름(NULL)
+                        performance.setPiRater(excelList.get(16).toString()); // 평가자이름(NULL)
                     }
-                    if(excelList.get(20)==null){
+                    if(excelList.get(17)==null){
                         performance.setPiRaterBelong(null);
                     }else{
-                        performance.setPiRaterBelong(excelList.get(20).toString()); // 평자가 소속(NULL)
+                        performance.setPiRaterBelong(excelList.get(17).toString()); // 평자가 소속(NULL)
                     }
-                    if(excelList.get(21)==null){
+                    if(excelList.get(18)==null){
                         performance.setPiRaterPhone(null);
                     }else{
-                        performance.setPiRaterPhone(excelList.get(21).toString()); // 평가자 연락처(NULL)
+                        performance.setPiRaterPhone(excelList.get(18).toString()); // 평가자 연락처(NULL)
                     }
 
                     performance.setPiAutoNum(autoNum); // 대안 일려번호(NOTNULL)
@@ -918,17 +953,20 @@ public class PerformanceRestController {
                     performance.setInsertDateTime(LocalDateTime.now()); // 작성날짜
                     performance.setInsert_id(currentuserid); // 작성자
 
-                    excelList.clear();
                     ListPerformance.add(performance);
                 }
+
+                excelList.clear();
             }
-//            log.info("ListPerformance : " + ListPerformance);
+            log.info("ListPerformance : " + ListPerformance);
 
             for (Performance performance : ListPerformance) {
                 performanceService.save(performance);
             }
 
-        }else if(piBusiness.equals("사용") && piBusiness.equals(businessData.substring(0,2))){
+        }
+        else if(piBusiness.equals("사용") && piBusiness.equals(businessData.substring(0,2))){
+
             log.info("사용성변화 유형 엑셀파일입니다.");
             ArrayList<Object> excelList = new ArrayList<>();
             List<Performance> ListPerformance = new ArrayList<>();
@@ -942,34 +980,29 @@ public class PerformanceRestController {
                     CellType ct = cellData.getCellType();
 //                    log.info( j +" 셀타입 : "+ct);
                     if (ct == CellType.BLANK) {
-                        if(j==4 || j==6 || j==7 || j==9 || j==10 || j==13 || j==14 || j==15 || j==18 || j==19 || j==20 || j==21 || j==22 || j==23){
-                            return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE029.getCode(), ResponseErrorCode.NDE029.getDesc(), ResponseErrorCode.NDE030.getCode(), ResponseErrorCode.NDE030.getDesc()));
+                        if(j==4 || j==6 || j==7 || j==9 || j==10 || j==13 || j==14 ||  j==17 || j==18 || j==19 || j==20){
+                            return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE029.getCode(), ResponseErrorCode.NDE029.getDesc(), ResponseErrorCode.NDE030.getCode(), i+"열의 "+j+"번째 행"+ResponseErrorCode.NDE030.getDesc()));
                         }else{
-                            if(j!=3){
+                            if(j == 3){
+                                log.info("대안 종료");
                                 excelList.add(null);
-                            }else{
-                                log.info("이곳은 널 입니다.");
                                 break;
+                            }else{
+//                                log.info("이곳은 널 입니다.");
+                                excelList.add(null);
                             }
                         }
                     } else if(ct == CellType.NUMERIC || ct == CellType.STRING) {
-                        if (j == 18) {
+                        if (j == 6 || j == 7 || j == 13 || j == 17 || j == 20) {
                             try {
                                 String cost = cellData.toString();
                                 if (cost.contains("E")) {
-                                    log.info("문자가 E가 포함되어 있습니다.");
-                                    log.info("cost : " + cost);
                                     BigDecimal costCheck = new BigDecimal(Double.parseDouble(cost));
-                                    log.info("숫자로 변환 : " + costCheck);
                                     excelList.add(costCheck);
                                 } else {
-                                    log.info("문자 E가 포함되어 있지 않습니다.");
-                                    log.info("cost : " + cost);
                                     excelList.add(cellData);
                                 }
                             } catch (Exception e) {
-                                log.info("e : " + e);
-                                log.info("숫자가 아닌 문자열 입니다.");
                                 return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE017.getCode(), ResponseErrorCode.NDE017.getDesc(), ResponseErrorCode.NDE018.getCode(), ResponseErrorCode.NDE018.getDesc()));
                             }
                         }else{
@@ -980,11 +1013,13 @@ public class PerformanceRestController {
                     }
                 }
                 log.info("==============결과==============");
-//                log.info(i-2+"번째 루트 리스트 : "+excelList);
-//                log.info(i-2+"번째 루트 리스트길이 : "+excelList.size());
+                log.info(i-2+"번째 루트 리스트 : "+excelList);
+                log.info(i-2+"번째 루트 리스트길이 : "+excelList.size());
                 log.info("");
-                if(excelList.size()==24) {
-                    log.info("엑셀의 성능개선사업 내용을 저장합니다.");
+                if(excelList.size()==21) {
+                    log.info("사용성변화의 대한 엑셀파일 성능개선사업 내용을 저장합니다.");
+                    performance.setPiInputSkip(weightMapperDto.getPiInputSkip());  // 스킵여부 0:적합, 1:부적합, 2: 스킵
+
                     performance.setPiFacilityType(excelList.get(0).toString());  // 시설유형(NOTNULL)
                     performance.setPiFacilityName(excelList.get(1).toString());  // 시설유형(NULL)
                     if(excelList.get(2)==null){
@@ -999,8 +1034,11 @@ public class PerformanceRestController {
                     }else{
                         performance.setPiType(excelList.get(5).toString()); // 형식구분(NULL)
                     }
+                    performance.setPiErectionCost(Long.parseLong("0")); // 취득원가(NOTNULL)
                     performance.setPiSafetyLevel(excelList.get(6).toString()); // 안전등급(NOTNULL)
                     performance.setPiUsabilityAndGoalLevel(excelList.get(7).toString()); // 사용성등급(NOTNULL)
+                    performance.setPiMaintenanceDelay(Double.parseDouble("9")); // 유지보수기간(NOTNULL)
+
                     if(excelList.get(8)==null){
                         performance.setPiManagement(null);
                     }else{
@@ -1013,39 +1051,49 @@ public class PerformanceRestController {
                     }
                     performance.setPiAADT(Double.parseDouble(excelList.get(10).toString())); // 연평균일교통량(NOTNULL)
                     performance.setPiBusiness(weightMapperDto.getWeightCategory()); // 사업구분(NOTNULL)
-                    performance.setPiBusinessType(excelList.get(12).toString()); // 사업유형(NOTNULL)
-                    if(excelList.get(13)==null){
+                    performance.setPiBusinessType(excelList.get(11).toString()); // 사업유형(NOTNULL)
+                    if(excelList.get(12)==null){
                         performance.setPiTargetAbsence(null);
                     }else{
-                        performance.setPiTargetAbsence(excelList.get(13).toString()); // 대상부재(NULL)
+                        performance.setPiTargetAbsence(excelList.get(12).toString()); // 대상부재(NULL)
                     }
-                    if(excelList.get(14)==null){
+                    if(excelList.get(13)==null){
                         performance.setPiBusinessClassification(null);
                     }else{
-                        performance.setPiBusinessClassification(excelList.get(14).toString()); // 사업분류(NOTNULL)
+                        performance.setPiBusinessClassification(excelList.get(13).toString()); // 사업분류(NOTNULL)
                     }
-                    performance.setPiBusinessExpenses(Long.parseLong(excelList.get(15).toString())); // 사업비용(NOTNULL)
+                    performance.setPiBusinessExpenses(Long.parseLong(excelList.get(14).toString())); // 사업비용(NOTNULL)
 
-                    // 수정해야됨
-//                    performance.setPiBusinessObligatory(Double.parseDouble(excelList.get(16).toString()));// 법에 따른 의무사업(NOTNULL)
-//                    performance.setPiBusinessMandatory(Double.parseDouble(excelList.get(17).toString())); // 법정계획에 따른 의무사업(NOTNULL)
-//                    performance.setPiBusinessPlanned(Double.parseDouble(excelList.get(18).toString())); // 자체계획/의결에 따른 사업(NOTNULL)
-                    performance.setPiWhether(Double.parseDouble(excelList.get(19).toString())); // 최근 1년간 민원 및 사고발생 건수(NOTNULL)
-                    performance.setPiRaterBaseYear(Double.parseDouble(excelList.get(20).toString())); // 평가 기준년도(NOTNULL)
-                    if(excelList.get(21)==null){
+                    performance.setPiBeforeSafetyRating("A"); // 사업전 부재 안전등급(NOTNULL)
+                    performance.setPiAfterSafetyRating("A"); // 사업후 부재 안전등급(NOTNULL)
+
+                    if (excelList.get(15).toString().startsWith("해당")) {
+                        performance.setPiBusinessValidity("0"); // 사업추진 타당성(NOTNULL) - 해당사유 외
+                    }else if(excelList.get(15).toString().startsWith("법에")){
+                        performance.setPiBusinessValidity("1"); // 사업추진 타당성(NOTNULL) - 법에 따른 의무사업
+                    }else if(excelList.get(15).toString().startsWith("법정")){
+                        performance.setPiBusinessValidity("2"); // 사업추진 타당성(NOTNULL) - 법정계획/설계기준에 따른 의무사업
+                    }else{
+                        performance.setPiBusinessValidity("3"); // 사업추진 타당성(NOTNULL) - 자체계획/의결에 따른 사업
+                    }
+
+                    performance.setPiWhether(Double.parseDouble(excelList.get(16).toString().substring(0,1))); // 최근 1년간 민원 및 사고발생 건수(NOTNULL)
+
+                    performance.setPiRaterBaseYear(Double.parseDouble(excelList.get(17).toString())); // 평가 기준년도(NOTNULL)
+                    if(excelList.get(18)==null){
                         performance.setPiRater(null);
                     }else{
-                        performance.setPiRater(excelList.get(21).toString()); // 평가자이름(NULL)
+                        performance.setPiRater(excelList.get(18).toString()); // 평가자이름(NULL)
                     }
-                    if(excelList.get(22)==null){
+                    if(excelList.get(19)==null){
                         performance.setPiRaterBelong(null);
                     }else{
-                        performance.setPiRaterBelong(excelList.get(22).toString()); // 평자가 소속(NULL)
+                        performance.setPiRaterBelong(excelList.get(19).toString()); // 평자가 소속(NULL)
                     }
-                    if(excelList.get(23)==null){
+                    if(excelList.get(20)==null){
                         performance.setPiRaterPhone(null);
                     }else{
-                        performance.setPiRaterPhone(excelList.get(23).toString()); // 평가자 연락처(NULL)
+                        performance.setPiRaterPhone(excelList.get(20).toString()); // 평가자 연락처(NULL)
                     }
                     performance.setPiAutoNum(autoNum); // 대안 일려번호(NOTNULL)
                     performance.setPiInputCount(i - 2);  //대안카운트(NULL)
@@ -1053,17 +1101,20 @@ public class PerformanceRestController {
                     performance.setPiInputMiddleSave(1);  //작성완료된 글인지 0 or 1(NULL)
                     performance.setInsertDateTime(LocalDateTime.now()); // 작성날짜
                     performance.setInsert_id(currentuserid); // 작성자
-                    excelList.clear();
+
                     ListPerformance.add(performance);
                 }
+                excelList.clear();
             }
-//            log.info("ListPerformance : " + ListPerformance);
+            log.info("ListPerformance : " + ListPerformance);
+
             for (Performance performance : ListPerformance) {
                 performanceService.save(performance);
             }
 
 
-        }else{
+        }
+        else{
             return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE027.getCode(), ResponseErrorCode.NDE027.getDesc(), ResponseErrorCode.NDE028.getCode(), ResponseErrorCode.NDE028.getDesc()));
         }
 
@@ -1073,6 +1124,7 @@ public class PerformanceRestController {
         weightService.save(weight);
 
         data.put("autoNum",autoNum);
+
         return ResponseEntity.ok(res.dataSendSuccess(data));
     }
 
@@ -1507,7 +1559,7 @@ public class PerformanceRestController {
         return ResponseEntity.ok(res.success());
     }
 
-    // NEWDEAL 성능개선사업평가 가중치 가져오기
+    // NEWDEAL 성능개선사업평가 가중치 가져오기(웹방식용)
     @PostMapping("/weightGet")
     public ResponseEntity<Map<String,Object>> weightGet(@RequestParam("autoNum")String autoNum, @RequestParam("businessNum")String businessNum, HttpServletRequest request) {
 
@@ -1543,6 +1595,37 @@ public class PerformanceRestController {
             log.info("사용성변화 가중치");
             ReferenceWeightUseDto referenceWeightUseDto = referenceService.findByReferenceWeightUse();
             data.put("weightSettingDto", referenceWeightUseDto);
+        }
+
+        return ResponseEntity.ok(res.dataSendSuccess(data));
+    }
+
+    // NEWDEAL 성능개선사업평가 가중치 가져오기(업로드용)
+    @PostMapping("/weightUploadGet")
+    public ResponseEntity<Map<String,Object>> weightUploadGet(@RequestParam("businessNum")String businessNum, HttpServletRequest request) {
+
+        log.info("weightUploadGet 호출성공");
+
+        AjaxResponse res = new AjaxResponse();
+        HashMap<String, Object> data = new HashMap<>();
+
+        String JWT_AccessToken = request.getHeader("JWT_AccessToken");
+        String insert_id = request.getHeader("insert_id");
+        log.info("JWT_AccessToken : "+JWT_AccessToken);
+        log.info("insert_id : "+insert_id);
+
+        if (businessNum.equals("노후화대응")) {
+            log.info("노후화대응 가중치");
+            ReferenceWeightOldDto referenceWeightOldDto = referenceService.findByReferenceWeightOld();
+            data.put("weightSettingOldDto", referenceWeightOldDto);
+        }else if (businessNum.equals("기준변화")){
+            log.info("기준변화 가중치");
+            ReferenceWeightBaseDto referenceWeightBaseDto = referenceService.findByReferenceWeightBase();
+            data.put("weightSettingBaseDto", referenceWeightBaseDto);
+        }else{
+            log.info("사용성변화 가중치");
+            ReferenceWeightUseDto referenceWeightUseDto = referenceService.findByReferenceWeightUse();
+            data.put("weightSettingUseDto", referenceWeightUseDto);
         }
 
         return ResponseEntity.ok(res.dataSendSuccess(data));
