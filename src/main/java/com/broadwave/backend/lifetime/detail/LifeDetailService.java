@@ -91,51 +91,51 @@ public class LifeDetailService {
             if(optionalLifeDetail.get().getLtDetailType().equals("1")){
                 // 반발경도
 
-                // 파이썬 테스트
-                log.info("AWS URL : "+awsPythonApiUrl);
-                try {
-//                    https://vqdeoa9z35.execute-api.ap-northeast-2.amazonaws.com/echo/1?filter=test
-                    URL url = new URL(awsPythonApiUrl+"echo/1?filter=Test");
-                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-
-                    connection.setRequestMethod("GET");
-                    connection.setRequestProperty("Content-Type", "application/json");
-                    connection.setDoOutput(true);
-
-                    List<Object> objectList = new ArrayList<>();
-                    objectList.add("test");
-                    objectList.add(123);
-                    objectList.add(1.5);
-
-                    connection.setRequestProperty("name","minkyu");
-                    connection.setRequestProperty("birthday","0716");
-                    connection.setRequestProperty("list", String.valueOf(objectList));
-
-                    String pythonSetData = "pythonTest";
-                    DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
-                    outputStream.writeBytes(pythonSetData);
-                    outputStream.flush();
-                    outputStream.close();
-
-                    int responseCode = connection.getResponseCode();
-                    log.info("responseCode : "+responseCode);
-
-                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-
-                    StringBuilder stringBuffer = new StringBuilder();
-                    String inputLine;
-
-                    while ((inputLine = bufferedReader.readLine()) != null)  {
-                        stringBuffer.append(inputLine);
-                    }
-
-                    bufferedReader.close();
-                    String response = stringBuffer.toString();
-                    log.info("response : "+response);
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+//                // 파이썬 테스트
+//                log.info("AWS URL : "+awsPythonApiUrl);
+//                try {
+////                    https://vqdeoa9z35.execute-api.ap-northeast-2.amazonaws.com/echo/1?filter=test
+//                    URL url = new URL(awsPythonApiUrl+"echo/1?filter=Test");
+//                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+//
+//                    connection.setRequestMethod("GET");
+//                    connection.setRequestProperty("Content-Type", "application/json");
+//                    connection.setDoOutput(true);
+//
+//                    List<Object> objectList = new ArrayList<>();
+//                    objectList.add("test");
+//                    objectList.add(123);
+//                    objectList.add(1.5);
+//
+//                    connection.setRequestProperty("name","minkyu");
+//                    connection.setRequestProperty("birthday","0716");
+//                    connection.setRequestProperty("list", String.valueOf(objectList));
+//
+//                    String pythonSetData = "pythonTest";
+//                    DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
+//                    outputStream.writeBytes(pythonSetData);
+//                    outputStream.flush();
+//                    outputStream.close();
+//
+//                    int responseCode = connection.getResponseCode();
+//                    log.info("responseCode : "+responseCode);
+//
+//                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+//
+//                    StringBuilder stringBuffer = new StringBuilder();
+//                    String inputLine;
+//
+//                    while ((inputLine = bufferedReader.readLine()) != null)  {
+//                        stringBuffer.append(inputLine);
+//                    }
+//
+//                    bufferedReader.close();
+//                    String response = stringBuffer.toString();
+//                    log.info("response : "+response);
+//
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
 
             }else if(optionalLifeDetail.get().getLtDetailType().equals("2")){
                 // 탄산화깊이

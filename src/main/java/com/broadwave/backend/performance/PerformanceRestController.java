@@ -596,8 +596,8 @@ public class PerformanceRestController {
             workbook = new HSSFWorkbook(excelfile.getInputStream());  // -> .xls
         }
 
-//        Sheet worksheet = workbook.getSheetAt(0); // 첫번째 시트
-        Sheet worksheet = workbook.getSheetAt(1); // 두번째 시트
+        Sheet worksheet = workbook.getSheetAt(0); // 첫번째 시트
+//        Sheet worksheet = workbook.getSheetAt(1); // 두번째 시트
 
         // 제공한 양식 엑셀파일이 맞는지 확인 (첫번째시트)
         String businessData = weightMapperDto.getWeightCategory();
