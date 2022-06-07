@@ -53,10 +53,17 @@ phases:
       - sed -i 's@NEWDEAL_API_SECURITY_PROTOCOL_TAG@'"$URL_SECURITY_PROTOCOL"'@' k8s-deploy.yaml
       - FILEUPLOAD_URL=${NEWDEAL_FILEUPLOAD_URL}
       - sed -i 's@NEWDEAL_FILEUPLOAD_URL_TAG@'"$FILEUPLOAD_URL"'@' k8s-deploy.yaml
+      - NEWDEAL_AWS_PYTHON_API_URL=${NEWDEAL_AWS_PYTHON_API_URL}
+      - sed -i 's@NEWDEAL_AWS_PYTHON_API_URL_TAG@'"$NEWDEAL_AWS_PYTHON_API_URL"'@' k8s-deploy.yaml
+      - NEWDEAL_S3_ACCESS_ID=${NEWDEAL_S3_ACCESS_ID}
+      - sed -i 's@NEWDEAL_S3_ACCESS_ID_TAG@'"$NEWDEAL_S3_ACCESS_ID"'@' k8s-deploy.yaml
+      - NEWDEAL_S3_ACCESS_KEY=${NEWDEAL_S3_ACCESS_KEY}
+      - sed -i 's@NEWDEAL_S3_ACCESS_KEY_TAG@'"$NEWDEAL_S3_ACCESS_KEY"'@' k8s-deploy.yaml
       - NEWDEAL_AWS_REGION=${NEWDEAL_AWS_REGION}
       - sed -i 's@NEWDEAL_AWS_REGION_TAG@'"$NEWDEAL_AWS_REGION"'@' k8s-deploy.yaml
       - NEWDEAL_AWS_S3_BUCKET=${NEWDEAL_AWS_S3_BUCKET}
       - sed -i 's@NEWDEAL_AWS_S3_BUCKET_TAG@'"$NEWDEAL_AWS_S3_BUCKET"'@' k8s-deploy.yaml
       - NEWDEAL_AWS_S3_BUCKET_URL=${NEWDEAL_AWS_S3_BUCKET_URL}
       - sed -i 's@NEWDEAL_AWS_S3_BUCKET_URL_TAG@'"$NEWDEAL_AWS_S3_BUCKET_URL"'@' k8s-deploy.yaml
+
       - kubectl apply -f k8s-deploy.yaml

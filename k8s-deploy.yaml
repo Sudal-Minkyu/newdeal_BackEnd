@@ -29,7 +29,7 @@ spec:
             - name: NEWDEAL_DATASOURCE_HOST
               value: NEWDEAL_DATASOURCE_HOST_TAG
             - name: NEWDEAL_DATASOURCE_PORT
-              value: "NEWDEAL_DATASOURCE_PORT_TAG"
+              value: NEWDEAL_DATASOURCE_PORT_TAG
             - name: NEWDEAL_DATASOURCE_DBNAME
               value: NEWDEAL_DATASOURCE_DBNAME_TAG
             - name: NEWDEAL_DATASOURCE_USERNAME
@@ -50,6 +50,12 @@ spec:
               value: NEWDEAL_API_SECURITY_PROTOCOL_TAG
             - name: NEWDEAL_FILEUPLOAD_URL
               value: NEWDEAL_FILEUPLOAD_URL_TAG
+            - name: NEWDEAL_AWS_PYTHON_API_URL
+              value: NEWDEAL_AWS_PYTHON_API_URL_TAG
+            - name: NEWDEAL_S3_ACCESS_ID
+              value: NEWDEAL_S3_ACCESS_ID_TAG
+            - name: NEWDEAL_S3_ACCESS_KEY
+              value: NEWDEAL_S3_ACCESS_KEY_TAG
             - name: NEWDEAL_AWS_REGION
               value: NEWDEAL_AWS_REGION_TAG
             - name: NEWDEAL_AWS_S3_BUCKET
