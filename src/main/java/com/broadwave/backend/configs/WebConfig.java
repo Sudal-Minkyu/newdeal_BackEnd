@@ -35,7 +35,7 @@ public class WebConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/**")
 //                .allowedOrigins(front_protocol+"://"+front_url, front_protocol+"://192.168.0.24:8010", front_protocol+"://192.168.0.132:8010", front_protocol+"://192.168.0.16:8010")
-                .allowedOrigins("*")
+                .allowedOrigins(front_protocol+"://"+front_url, front_protocol)
                 .allowedHeaders("JWT_AccessToken","insert_id");
     }
 

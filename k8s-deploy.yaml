@@ -50,3 +50,9 @@ spec:
               value: NEWDEAL_API_SECURITY_PROTOCOL_TAG
             - name: NEWDEAL_FILEUPLOAD_URL
               value: NEWDEAL_FILEUPLOAD_URL_TAG
+            - name: NEWDEAL_AWS_REGION
+              value: NEWDEAL_AWS_REGION_TAG
+            - name: NEWDEAL_AWS_S3_BUCKET
+              value: NEWDEAL_AWS_S3_BUCKET_TAG
+            - name: NEWDEAL_AWS_S3_BUCKET_URL
+              value: NEWDEAL_AWS_S3_BUCKET_URL_TAG
