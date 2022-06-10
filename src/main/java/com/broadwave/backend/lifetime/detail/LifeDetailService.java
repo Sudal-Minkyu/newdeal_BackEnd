@@ -11,12 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.sql.*;
 import java.util.*;
 
 /**
@@ -28,6 +23,15 @@ import java.util.*;
 @Slf4j
 @Service
 public class LifeDetailService {
+
+    @Value("${newdeal.aws.postgresql.url}")
+    private String awsPostgresqlUrl;
+
+    @Value("${newdeal.aws.postgresql.username}")
+    private String awsPostgresqlUsername;
+
+    @Value("${newdeal.aws.postgresql.password}")
+    private String awsPostgresqlPassword;
 
     @Value("${newdeal.aws.python.api.url}")
     private String awsPythonApiUrl;
@@ -43,7 +47,7 @@ public class LifeDetailService {
         this.cabonationRepository = cabonationRepository;
     }
 
-    public ResponseEntity<Map<String, Object>> output(String autoNum, HttpServletRequest request) {
+    public ResponseEntity<Map<String, Object>> output(String autoNum, HttpServletRequest request) throws ClassNotFoundException {
 
         log.info("output 호출성공");
 
@@ -89,7 +93,38 @@ public class LifeDetailService {
             int simulation; // 시뮬레이션 횟수
 
             if(optionalLifeDetail.get().getLtDetailType().equals("1")){
+                log.info("센서리스트 테스트 and 파이썬테스트");
                 // 반발경도
+
+                // Postgresql 접근 테스트
+                Class.forName("org.postgresql.Driver");
+
+                List<HashMap<String,Object>> deviceData = new ArrayList<>();
+                HashMap<String,Object> deviceDataInfo;
+
+                try (Connection connection = DriverManager.getConnection(awsPostgresqlUrl, awsPostgresqlUsername, awsPostgresqlPassword);) {
+                    Statement stmt = connection.createStatement();
+                    ResultSet rs = stmt.executeQuery("SELECT * FROM tb_device");
+                    while (rs.next()) {
+                        String deviceId = rs.getString("device_id");
+                        String deviceName = rs.getString("device_name");
+//                        System.out.println("센서ID : "+deviceId +" 센서이름 : "+deviceName);
+
+                        deviceDataInfo = new HashMap<>();
+                        deviceDataInfo.put("deviceId", deviceId);
+                        deviceDataInfo.put("deviceName", deviceName);
+                        deviceData.add(deviceDataInfo);
+                    }
+                    data.put("chartName","test"); // 타입
+                    data.put("deviceData",deviceData);
+
+                    rs.close();
+                    stmt.close();
+                }
+                catch (SQLException e) {
+                    e.printStackTrace();
+                }
+
 
 //                // 파이썬 테스트
 //                log.info("AWS URL : "+awsPythonApiUrl);

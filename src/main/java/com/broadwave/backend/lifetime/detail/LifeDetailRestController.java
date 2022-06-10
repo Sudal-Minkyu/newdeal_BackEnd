@@ -40,7 +40,7 @@ public class LifeDetailRestController {
 // @@@@@@@@@@@@@@ 아웃풋 페이지 관련 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
     // NEWDEAL 생애주기 의사결정 지원 서비스 세부부분 - 아웃풋
     @PostMapping("/output")
-    public ResponseEntity<Map<String,Object>> output(@RequestParam(value="autoNum", defaultValue="")String autoNum, HttpServletRequest request) {
+    public ResponseEntity<Map<String,Object>> output(@RequestParam(value="autoNum", defaultValue="")String autoNum, HttpServletRequest request) throws ClassNotFoundException {
         return lifeDetailService.output(autoNum, request);
     }
 

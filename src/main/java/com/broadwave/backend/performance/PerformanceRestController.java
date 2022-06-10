@@ -642,7 +642,7 @@ public class PerformanceRestController {
 
             for (int i = 3; i < 7; i++) {
                 Performance performance = new Performance();
-                for (int j = 3; j < worksheet.getPhysicalNumberOfRows() + 1; j++) {
+                for (int j = 3; j < worksheet.getPhysicalNumberOfRows(); j++) {
                     Row row = worksheet.getRow(j);
                     Cell cellData = row.getCell(i);
                     CellType ct = cellData.getCellType();
@@ -653,11 +653,11 @@ public class PerformanceRestController {
                         }else{
                             if(j == 3){
                                 log.info("대안 종료");
-                                excelList.add(null);
+                                excelList.add("");
                                 break;
                             }else{
 //                                log.info("이곳은 널 입니다.");
-                                excelList.add(null);
+                                excelList.add("");
                             }
                         }
                     } else if (ct == CellType.NUMERIC || ct == CellType.STRING) {
@@ -819,7 +819,7 @@ public class PerformanceRestController {
             log.info("");
             for (int i=3; i<7; i++){
                 Performance performance = new Performance();
-                for (int j = 3; j < worksheet.getPhysicalNumberOfRows()+1; j++) {
+                for (int j = 3; j < worksheet.getPhysicalNumberOfRows(); j++) {
                     Row row = worksheet.getRow(j);
                     Cell cellData = row.getCell(i);
                     CellType ct = cellData.getCellType();
@@ -974,7 +974,7 @@ public class PerformanceRestController {
             log.info("");
             for (int i=3; i<7; i++){
                 Performance performance = new Performance();
-                for (int j = 3; j < worksheet.getPhysicalNumberOfRows()+1; j++) {
+                for (int j = 3; j < worksheet.getPhysicalNumberOfRows(); j++) {
                     Row row = worksheet.getRow(j);
                     Cell cellData = row.getCell(i);
                     CellType ct = cellData.getCellType();

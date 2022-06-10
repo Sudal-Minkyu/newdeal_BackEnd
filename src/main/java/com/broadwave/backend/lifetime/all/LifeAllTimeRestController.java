@@ -620,6 +620,10 @@ public class LifeAllTimeRestController {
                 chartData.put("cRank", Math.floor((1-ltDamageCRank)*10)/10.0);
                 chartData.put("dRank", Math.floor((1-ltDamageDRank)*10)/10.0);
 
+                chartData.put("test1", 1.5);
+//                chartData.put("test2", 50);
+//                chartData.put("test3", 80);
+
                 if(year==1000){
                     chartData.put("bulletDisabled",false);
                 }
@@ -630,6 +634,9 @@ public class LifeAllTimeRestController {
             data.put("bRankValue", Math.floor((1-ltDamageBRank)*10)/10.0);
             data.put("cRankValue", Math.floor((1-ltDamageCRank)*10)/10.0);
             data.put("dRankValue", Math.floor((1-ltDamageDRank)*10)/10.0);
+            data.put("test1Value", 1.5);
+//            data.put("test2Value", 50);
+//            data.put("test3Value", 80);
 
 //            log.info("periodicCountList : "+periodicCountList);
 //            log.info("closeCountList : "+closeCountList);
