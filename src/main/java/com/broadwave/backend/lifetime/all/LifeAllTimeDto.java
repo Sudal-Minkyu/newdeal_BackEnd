@@ -1,7 +1,9 @@
 package com.broadwave.backend.lifetime.all;
 
-import lombok.*;
-import lombok.extern.slf4j.Slf4j;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 /**
  * @author Minkyu
@@ -9,12 +11,10 @@ import lombok.extern.slf4j.Slf4j;
  * Time :
  * Remark : 생애주기 의사결전 지원서비스 관련 전체부분 LifeAllTimeDto
  */
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
 @Data
-@Slf4j
 public class LifeAllTimeDto {
 
     private String ltBridgeCode; // 교량코드(NULL)

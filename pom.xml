@@ -142,6 +142,13 @@
         <version>4.2</version>
     </dependency>
 
+    <!-- Postgresql -->
+    <dependency>
+        <groupId>org.postgresql</groupId>
+        <artifactId>postgresql</artifactId>
+        <version>42.4.0</version>
+    </dependency>
+
 </dependencies>
 
 <build>
