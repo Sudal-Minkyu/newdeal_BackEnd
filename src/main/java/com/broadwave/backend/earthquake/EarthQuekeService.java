@@ -83,6 +83,9 @@ public class EarthQuekeService {
 
 
 
+
+
+
         return ResponseEntity.ok(res.dataSendSuccess(data));
     }
 

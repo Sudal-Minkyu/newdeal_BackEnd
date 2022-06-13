@@ -24,12 +24,11 @@ public class EarthQuakeMapperDto {
     private String eqLocation; // 대상지역
     private String eqRank; // 내진등급
     private String eqLength; // 주 경간장
-    private Double eqConfiguration; // 경간 구성
+    private String eqConfiguration; // 경간 구성
     private String eqPillar; // 교각기둥 구성
-    private Double eqDivision; // 주형 구분
-    private Double eqGirder; // 거더형식
+    private String eqDivision; // 주형 구분
+    private String eqGirder; // 거더형식
 
     private MultipartFile excelFile; // 엑셀업로드 파일
-
 
 }
