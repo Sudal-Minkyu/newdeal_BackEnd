@@ -1,4 +1,4 @@
-package com.broadwave.backend.lifetime.detail;
+package com.broadwave.backend.lifetime.detail.main;
 
 import com.broadwave.backend.lifetime.detail.carbonation.CabonationMapperDto;
 import com.broadwave.backend.lifetime.detail.carbonation.CabonationService;

@@ -2,10 +2,8 @@ package com.broadwave.backend.earthquake;
 
 import com.broadwave.backend.earthquake.EarthQuakeDtos.EarthQuakeDto;
 import com.broadwave.backend.earthquake.EarthQuakeDtos.EarthQuakeListDto;
-import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @author Minkyu
@@ -14,7 +12,7 @@ import java.util.Optional;
  */
 public interface EarthQuakeRepositoryCustom {
 
-    List<EarthQuakeListDto> findByEarthQuake(String eqLocation, String eqBridge);
+    List<EarthQuakeListDto> findByEarthQuakeList(String eqBridge);
 
     EarthQuakeDto findByEqBridge(String eqBridge);
 

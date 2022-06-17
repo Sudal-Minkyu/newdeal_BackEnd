@@ -22,22 +22,17 @@ public class EarthQuakeRepositoryCustomImpl extends QuerydslRepositorySupport im
     }
 
     @Override
-    public List<EarthQuakeListDto> findByEarthQuake(String eqLocation, String eqBridge) {
+    public List<EarthQuakeListDto> findByEarthQuakeList(String eqBridge) {
 
         QEarthQuake earthQuake = QEarthQuake.earthQuake;
 
         JPQLQuery<EarthQuakeListDto> query = from(earthQuake)
-                .where(earthQuake.eqLocation.eq(eqLocation))
                 .select(Projections.constructor(EarthQuakeListDto.class,
                         earthQuake.eqBridge,
                         earthQuake.eqLocation,
                         earthQuake.eqRank,
                         earthQuake.eqLength
                 ));
-
-        if (!eqLocation.equals("")) {
-            query.where(earthQuake.eqLocation.eq(eqLocation));
-        }
 
         if (!eqBridge.equals("")) {
             query.where(earthQuake.eqBridge.likeIgnoreCase("%"+eqBridge+"%"));
@@ -61,7 +56,8 @@ public class EarthQuakeRepositoryCustomImpl extends QuerydslRepositorySupport im
                         earthQuake.eqConfiguration,
                         earthQuake.eqPillar,
                         earthQuake.eqDivision,
-                        earthQuake.eqGirder
+                        earthQuake.eqGirder,
+                        earthQuake.eqBridgeClassification
                 ));
 
         return query.fetchOne();

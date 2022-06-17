@@ -1,4 +1,4 @@
-package com.broadwave.backend.lifetime.detail;
+package com.broadwave.backend.lifetime.detail.main;
 
 import lombok.*;
 

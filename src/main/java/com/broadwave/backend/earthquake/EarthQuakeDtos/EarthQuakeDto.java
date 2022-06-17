@@ -29,4 +29,6 @@ public class EarthQuakeDto {
     private String eqDivision; // 주형 구분
     private String eqGirder; // 거더형식
 
+    private String eqBridgeClassification; // 교량분류
+
 }

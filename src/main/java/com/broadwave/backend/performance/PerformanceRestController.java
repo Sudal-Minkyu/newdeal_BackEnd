@@ -604,19 +604,34 @@ public class PerformanceRestController {
         String piBusiness;
         log.info("유형 : "+businessData);
         try {
-            Row rowCheck = worksheet.getRow(2);
-            Object cellDataCheck = rowCheck.getCell(2);
-            log.info("cellDataCheck : " + cellDataCheck.toString());
+            Row rowCheck;
+            Cell cellDataCheck;
+//            log.info("cellDataCheck : " + cellDataCheck.toString());
+
+            rowCheck = worksheet.getRow(3);
+            cellDataCheck = rowCheck.getCell(3);
+            CellType ct = cellDataCheck.getCellType();
+            if (ct == CellType.BLANK) {
+                return ResponseEntity.ok(res.fail("문자", "필수사항 대안1의 교량을 입력해주세요.", "문자", "혹은 양식파일을 다시 받아주세요."));
+            }
+            rowCheck = worksheet.getRow(3);
+            cellDataCheck = rowCheck.getCell(4);
+            ct = cellDataCheck.getCellType();
+            if (ct == CellType.BLANK) {
+                return ResponseEntity.ok(res.fail("문자", "필수사항 대안2의 교량을 입력해주세요.", "문자", "혹은 양식파일을 다시 받아주세요."));
+            }
+            rowCheck = worksheet.getRow(2);
+            cellDataCheck = rowCheck.getCell(2);
+            if (!cellDataCheck.toString().equals("입력정보")) {
+//                log.info("2열,2행 값이 양식에 맞지않음.");
+                return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE012.getCode(), ResponseErrorCode.NDE012.getDesc(), null, null));
+            }
+
             Row rowBusiness = worksheet.getRow(1);
             Object rowBusinessCheck = rowBusiness.getCell(1);
             piBusiness = rowBusinessCheck.toString().substring(0,2);
-            log.info("");
-            if (!cellDataCheck.toString().equals("입력정보")) {
-                log.info("2열,2행 값이 양식에 맞지않음.");
-                return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE012.getCode(), ResponseErrorCode.NDE012.getDesc(), null, null));
-            }
         } catch (NullPointerException e) {
-            log.info("1열,1행 값이 양식에 맞지않음.");
+//            log.info("1열,1행 값이 양식에 맞지않음.");
             return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE012.getCode(), ResponseErrorCode.NDE012.getDesc(), null, null));
         }
 

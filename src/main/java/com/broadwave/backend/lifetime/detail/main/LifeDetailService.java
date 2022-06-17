@@ -1,4 +1,4 @@
-package com.broadwave.backend.lifetime.detail;
+package com.broadwave.backend.lifetime.detail.main;
 
 import com.broadwave.backend.common.AjaxResponse;
 import com.broadwave.backend.common.NormMath;
@@ -104,16 +104,35 @@ public class LifeDetailService {
 
                 try (Connection connection = DriverManager.getConnection(awsPostgresqlUrl, awsPostgresqlUsername, awsPostgresqlPassword);) {
                     Statement stmt = connection.createStatement();
-                    ResultSet rs = stmt.executeQuery("SELECT * FROM tb_device");
+
+                    // 권태호 박사 쿼리 테스트
+                    String quary = "SELECT t, avg(\"value\") as val  ";
+                    quary += "FROM (SELECT time_bucket('1 days', time) as t, \"value\" FROM public.tb_static_data ";
+                    quary += "WHERE time >= '2021-10-01 00:00:00'   AND time <= '2022-05-01 00:00:00'  AND channel_number = '2'";
+                    quary += "AND device_id = 'Ssmartcs:2:DNAGW2111') AS ccc GROUP BY t ORDER BY t";
+                    ResultSet rs = stmt.executeQuery(quary);
+
+//                    ResultSet rs = stmt.executeQuery("SELECT * FROM tb_device");
                     while (rs.next()) {
-                        String deviceId = rs.getString("device_id");
-                        String deviceName = rs.getString("device_name");
+//                        String deviceId = rs.getString("device_id");
+//                        String deviceName = rs.getString("device_name");
 //                        System.out.println("센서ID : "+deviceId +" 센서이름 : "+deviceName);
+//
+//                        deviceDataInfo = new HashMap<>();
+//                        deviceDataInfo.put("deviceId", deviceId);
+//                        deviceDataInfo.put("deviceName", deviceName);
+//                        deviceData.add(deviceDataInfo);
+
+                        // 권태호 박사 쿼리 테스트
+                        String t = rs.getString("t");
+                        String val = rs.getString("val");
+                        System.out.println("시간 : "+t +" 평균 : "+val);
 
                         deviceDataInfo = new HashMap<>();
-                        deviceDataInfo.put("deviceId", deviceId);
-                        deviceDataInfo.put("deviceName", deviceName);
+                        deviceDataInfo.put("deviceId", t);
+                        deviceDataInfo.put("deviceName", val);
                         deviceData.add(deviceDataInfo);
+
                     }
                     data.put("chartName","test"); // 타입
                     data.put("deviceData",deviceData);

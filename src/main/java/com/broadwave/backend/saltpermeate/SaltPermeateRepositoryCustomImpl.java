@@ -39,7 +39,7 @@ public class SaltPermeateRepositoryCustomImpl extends QuerydslRepositorySupport 
                 ));
 
         query.where(saltPermeate.stBridge.likeIgnoreCase("%"+stBridge+"%"));
-        query.orderBy(saltPermeate.stLocation1.desc(),saltPermeate.stLocation2.desc());
+        query.orderBy(saltPermeate.stLocation1.desc(),saltPermeate.stLocation2.desc()).limit(1000);
 
         return query.fetch();
     }

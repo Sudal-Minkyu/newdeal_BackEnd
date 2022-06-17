@@ -50,6 +50,9 @@ public class EarthQuake {
     @Column(name="eq_girder")
     private String eqGirder; // 거더형식
 
+    @Column(name="eq_bridge_classification")
+    private String eqBridgeClassification; // 교량분류
+
     @Column(name="insert_date")
     private LocalDateTime insertDateTime;
 

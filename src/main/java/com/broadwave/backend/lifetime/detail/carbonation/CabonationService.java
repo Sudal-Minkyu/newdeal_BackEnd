@@ -2,8 +2,8 @@ package com.broadwave.backend.lifetime.detail.carbonation;
 
 import com.broadwave.backend.common.AjaxResponse;
 import com.broadwave.backend.keygenerate.KeyGenerateService;
-import com.broadwave.backend.lifetime.detail.LifeDetail;
-import com.broadwave.backend.lifetime.detail.LiftDetailRepository;
+import com.broadwave.backend.lifetime.detail.main.LifeDetail;
+import com.broadwave.backend.lifetime.detail.main.LiftDetailRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
