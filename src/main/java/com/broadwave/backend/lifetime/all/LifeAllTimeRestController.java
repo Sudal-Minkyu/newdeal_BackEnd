@@ -471,8 +471,7 @@ public class LifeAllTimeRestController {
                 pointViewList2.add(pointView2);
 
             }
-            log.info("선제 총 유지관리비용 : "+managementCostList);
-
+//            log.info("선제 총 유지관리비용 : "+managementCostList);
 
             // 1단계 D.I 구하는 식 -> 적용된기울기 *(공용연수^2)
             // 2단계부터 적용하기. D.I 구하는 식 -> ( 공용연수 - 해당단계의 시점값)^2 * 적용된기울기 + 시점 초기값
@@ -490,6 +489,9 @@ public class LifeAllTimeRestController {
             double preemptive;
             // 무조치의 적용된 기울기
             double noAction;
+
+            // 상태지수가 0으로 됬을때 최초 무조치시 공용연수
+            double noActionResult = 0;
 
             // 현행 유지관리 기울기
             double current;
@@ -607,6 +609,9 @@ public class LifeAllTimeRestController {
                 noAction = noMaintananceltDeterioration*Math.pow(publicYear,2);
                 noAction = 1-noAction;
                 if(noAction<0){
+                    if(noActionResult == 0){
+                        noActionResult = publicYear;
+                    }
                     noAction = 0.0;
                 }
 
@@ -620,7 +625,7 @@ public class LifeAllTimeRestController {
                 chartData.put("cRank", Math.floor((1-ltDamageCRank)*10)/10.0);
                 chartData.put("dRank", Math.floor((1-ltDamageDRank)*10)/10.0);
 
-                chartData.put("test1", 1.5);
+//                chartData.put("test1", 1.5);
 //                chartData.put("test2", 50);
 //                chartData.put("test3", 80);
 
@@ -634,7 +639,7 @@ public class LifeAllTimeRestController {
             data.put("bRankValue", Math.floor((1-ltDamageBRank)*10)/10.0);
             data.put("cRankValue", Math.floor((1-ltDamageCRank)*10)/10.0);
             data.put("dRankValue", Math.floor((1-ltDamageDRank)*10)/10.0);
-            data.put("test1Value", 1.5);
+//            data.put("test1Value", 1.5);
 //            data.put("test2Value", 50);
 //            data.put("test3Value", 80);
 
@@ -662,13 +667,39 @@ public class LifeAllTimeRestController {
 
             data.put("ltAbsenceName",absenceDto.getLtAbsenceName());
 
-            data.put("damageRankYearList",damageRankYearList);
             data.put("performCompletion",performCompletion);
             data.put("discountAccumulateList",discountAccumulateList);
 
 //            log.info("차트 테스트 : "+chartDataList);
 //            log.info("차트 데이터 길이 : "+chartDataList.size());
             data.put("chartDataList",chartDataList);
+
+//            log.info("damageRankYearList 선제적 : "+damageRankYearList);
+//            log.info("damageRankYearList2 현행 : "+damageRankYearList2);
+
+            data.put("damageRankYearList",damageRankYearList);
+            data.put("damageRankYearList2",damageRankYearList2);
+
+            int count = 0;
+            int count2 = 0;
+            for(int i=0; i<damageRankYearList.size(); i++){
+                if(damageRankYearList.get(i) < 100.0){
+                    count++;
+                }else{
+                    break;
+                }
+            }
+            for(int i=0; i<damageRankYearList2.size(); i++){
+                if(damageRankYearList2.get(i) < 100.0){
+                    count2++;
+                }else{
+                    break;
+                }
+            }
+            data.put("resultTableCnt", Math.max(count, count2));
+            data.put("result2",noActionResult);
+            data.put("result3",count2);
+            data.put("result4",managementCostList2.get(count2));
 
         }else{
             return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE006.getCode(),ResponseErrorCode.NDE006.getDesc(),null,null));

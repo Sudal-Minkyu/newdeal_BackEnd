@@ -26,6 +26,6 @@ public class SaltPermeateListDto {
     private String stCoordinateY; // 좌표 Y
     private String stFreeze; // 동결융해
     private String stSnow; // 제설제
-    private String stSalt; // 비래염분
+//    private String stSalt; // 비래염분
 
 }

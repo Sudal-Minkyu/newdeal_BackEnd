@@ -11,6 +11,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.util.*;
 
@@ -96,100 +103,93 @@ public class LifeDetailService {
                 log.info("센서리스트 테스트 and 파이썬테스트");
                 // 반발경도
 
-                // Postgresql 접근 테스트
-                Class.forName("org.postgresql.Driver");
-
-                List<HashMap<String,Object>> deviceData = new ArrayList<>();
-                HashMap<String,Object> deviceDataInfo;
-
-                try (Connection connection = DriverManager.getConnection(awsPostgresqlUrl, awsPostgresqlUsername, awsPostgresqlPassword);) {
-                    Statement stmt = connection.createStatement();
-
-                    // 권태호 박사 쿼리 테스트
-                    String quary = "SELECT t, avg(\"value\") as val  ";
-                    quary += "FROM (SELECT time_bucket('1 days', time) as t, \"value\" FROM public.tb_static_data ";
-                    quary += "WHERE time >= '2021-10-01 00:00:00'   AND time <= '2022-05-01 00:00:00'  AND channel_number = '2'";
-                    quary += "AND device_id = 'Ssmartcs:2:DNAGW2111') AS ccc GROUP BY t ORDER BY t";
-                    ResultSet rs = stmt.executeQuery(quary);
-
-//                    ResultSet rs = stmt.executeQuery("SELECT * FROM tb_device");
-                    while (rs.next()) {
-//                        String deviceId = rs.getString("device_id");
-//                        String deviceName = rs.getString("device_name");
-//                        System.out.println("센서ID : "+deviceId +" 센서이름 : "+deviceName);
+//                // Postgresql 접근 테스트
+//                Class.forName("org.postgresql.Driver");
+//
+//                List<HashMap<String,Object>> deviceData = new ArrayList<>();
+//                HashMap<String,Object> deviceDataInfo;
+//
+//                try (Connection connection = DriverManager.getConnection(awsPostgresqlUrl, awsPostgresqlUsername, awsPostgresqlPassword);) {
+//                    Statement stmt = connection.createStatement();
+//
+//                    // 권태호 박사 쿼리 테스트
+//                    String quary = "SELECT t, avg(\"value\") as val  ";
+//                    quary += "FROM (SELECT time_bucket('1 days', time) as t, \"value\" FROM public.tb_static_data ";
+//                    quary += "WHERE time >= '2021-10-01 00:00:00'   AND time <= '2022-05-01 00:00:00'  AND channel_number = '2'";
+//                    quary += "AND device_id = 'Ssmartcs:2:DNAGW2111') AS ccc GROUP BY t ORDER BY t";
+//                    ResultSet rs = stmt.executeQuery(quary);
+//
+////                    ResultSet rs = stmt.executeQuery("SELECT * FROM tb_device");
+//                    while (rs.next()) {
+////                        String deviceId = rs.getString("device_id");
+////                        String deviceName = rs.getString("device_name");
+////                        System.out.println("센서ID : "+deviceId +" 센서이름 : "+deviceName);
+////
+////                        deviceDataInfo = new HashMap<>();
+////                        deviceDataInfo.put("deviceId", deviceId);
+////                        deviceDataInfo.put("deviceName", deviceName);
+////                        deviceData.add(deviceDataInfo);
+//
+//                        // 권태호 박사 쿼리 테스트
+//                        String t = rs.getString("t");
+//                        String val = rs.getString("val");
+//                        System.out.println("시간 : "+t +" 평균 : "+val);
 //
 //                        deviceDataInfo = new HashMap<>();
-//                        deviceDataInfo.put("deviceId", deviceId);
-//                        deviceDataInfo.put("deviceName", deviceName);
+//                        deviceDataInfo.put("deviceId", t);
+//                        deviceDataInfo.put("deviceName", val);
 //                        deviceData.add(deviceDataInfo);
-
-                        // 권태호 박사 쿼리 테스트
-                        String t = rs.getString("t");
-                        String val = rs.getString("val");
-                        System.out.println("시간 : "+t +" 평균 : "+val);
-
-                        deviceDataInfo = new HashMap<>();
-                        deviceDataInfo.put("deviceId", t);
-                        deviceDataInfo.put("deviceName", val);
-                        deviceData.add(deviceDataInfo);
-
-                    }
-                    data.put("chartName","test"); // 타입
-                    data.put("deviceData",deviceData);
-
-                    rs.close();
-                    stmt.close();
-                }
-                catch (SQLException e) {
-                    e.printStackTrace();
-                }
-
-
-//                // 파이썬 테스트
-//                log.info("AWS URL : "+awsPythonApiUrl);
-//                try {
-////                    https://vqdeoa9z35.execute-api.ap-northeast-2.amazonaws.com/echo/1?filter=test
-//                    URL url = new URL(awsPythonApiUrl+"echo/1?filter=Test");
-//                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 //
-//                    connection.setRequestMethod("GET");
-//                    connection.setRequestProperty("Content-Type", "application/json");
-//                    connection.setDoOutput(true);
-//
-//                    List<Object> objectList = new ArrayList<>();
-//                    objectList.add("test");
-//                    objectList.add(123);
-//                    objectList.add(1.5);
-//
-//                    connection.setRequestProperty("name","minkyu");
-//                    connection.setRequestProperty("birthday","0716");
-//                    connection.setRequestProperty("list", String.valueOf(objectList));
-//
-//                    String pythonSetData = "pythonTest";
-//                    DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
-//                    outputStream.writeBytes(pythonSetData);
-//                    outputStream.flush();
-//                    outputStream.close();
-//
-//                    int responseCode = connection.getResponseCode();
-//                    log.info("responseCode : "+responseCode);
-//
-//                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-//
-//                    StringBuilder stringBuffer = new StringBuilder();
-//                    String inputLine;
-//
-//                    while ((inputLine = bufferedReader.readLine()) != null)  {
-//                        stringBuffer.append(inputLine);
 //                    }
+//                    data.put("chartName","test"); // 타입
+//                    data.put("deviceData",deviceData);
 //
-//                    bufferedReader.close();
-//                    String response = stringBuffer.toString();
-//                    log.info("response : "+response);
-//
-//                } catch (IOException e) {
+//                    rs.close();
+//                    stmt.close();
+//                }
+//                catch (SQLException e) {
 //                    e.printStackTrace();
 //                }
+
+
+                // 파이썬 테스트
+                log.info("AWS URL : "+awsPythonApiUrl);
+                try {
+//                    https://vqdeoa9z35.execute-api.ap-northeast-2.amazonaws.com/echo/1?filter=test
+                    // 센서리스트 데이터 불러오기
+                    URL url = new URL("http://python.bmaps.kr:5000/conn");
+                    // 센서 데이터 불러오기
+//                    URL url = new URL("http://python.bmaps.kr:5000/sensorData?sensor=Ssmartcs:2:DNAGW2111&time1=2021-10-01%2000:00:00&time2=2022-05-01%2000:00:00");
+                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+                    connection.setRequestMethod("GET");
+                    connection.setRequestProperty("Content-Type", "application/json");
+                    connection.setDoOutput(true);
+
+                    DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
+                    outputStream.flush();
+                    outputStream.close();
+
+                    int responseCode = connection.getResponseCode();
+                    log.info("responseCode : "+responseCode);
+
+                    // 한글깨짐 이유 알수없음.
+                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
+
+                    StringBuilder stringBuffer = new StringBuilder();
+                    String inputLine;
+
+                    while ((inputLine = bufferedReader.readLine()) != null)  {
+                        stringBuffer.append(inputLine);
+                    }
+
+                    bufferedReader.close();
+                    String response = stringBuffer.toString();
+                    log.info("response : "+response);
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
             }else if(optionalLifeDetail.get().getLtDetailType().equals("2")){
                 // 탄산화깊이

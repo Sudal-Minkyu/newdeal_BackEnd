@@ -34,8 +34,8 @@ public class SaltPermeateRepositoryCustomImpl extends QuerydslRepositorySupport 
                         saltPermeate.stCoordinateX,
                         saltPermeate.stCoordinateY,
                         saltPermeate.stFreeze,
-                        saltPermeate.stSnow,
-                        saltPermeate.stSalt
+                        saltPermeate.stSnow
+//                        saltPermeate.stSalt
                 ));
 
         query.where(saltPermeate.stBridge.likeIgnoreCase("%"+stBridge+"%"));
