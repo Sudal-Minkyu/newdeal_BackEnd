@@ -56,6 +56,9 @@ public class LifeAllTime {
     @Column(name="lt_all_input_date")
     private String ltAllInputDate; // 평가기준 일자(NOTNULL)
 
+    @Column(name="lt_all_stage")
+    private Integer ltAllStage; // 평가단계 횟수, 기본값 : 25
+
     @Column(name="lt_all_volume")
     private Double ltAllVolume; // 전체물량(NOTNULL)
 

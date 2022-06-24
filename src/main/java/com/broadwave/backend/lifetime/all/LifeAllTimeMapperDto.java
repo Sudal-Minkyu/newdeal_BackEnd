@@ -28,6 +28,7 @@ public class LifeAllTimeMapperDto {
     private Double ltAllArea; // 폭(NOTNULL)
     private String ltAllCompletionDate; // 준공일자(NOTNULL)
     private String ltAllInputDate; // 평가기준 일자(NOTNULL)
+    private Integer ltAllStage; // 평가단계 횟수
 
     private Double ltAllVolume; // 전체물량(NOTNULL)
 

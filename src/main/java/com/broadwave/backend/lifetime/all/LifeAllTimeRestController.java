@@ -228,7 +228,7 @@ public class LifeAllTimeRestController {
 
             List<Double> discountAccumulateList = new ArrayList<>(); // 선행유지관리 할인율적용 자바스크립트 누적 보수보강비용 리스트
 
-            for(int stage=1; stage<26; stage++){ // 25바퀴 고정
+            for(int stage=1; stage<lifeAllTimeDto.getLtAllStage()+1; stage++){ // 25바퀴 고정 -> 6/24수정 ltAllStage 입력값의 따라 다름, 범위 : 1~25단계
 
                 List<Double> discountRateList = new ArrayList<>(); // 선행유지관리 할인율적용 누적 보수보강비용 리스트
                 List<Double> performYear = new ArrayList<>(); // 선행유지관리 보수보강수행시기(년) 리스트
@@ -237,8 +237,6 @@ public class LifeAllTimeRestController {
                 List<Double> discountRateList2 = new ArrayList<>(); // 현행유지관리 할인율적용 누적 보수보강비용 리스트
                 List<Double> performYear2 = new ArrayList<>(); // 현행유지관리 현행유지관리 보수보강수행시기(년) 리스트
                 List<Double> costYear2 = new ArrayList<>(); // 현행유지관리 원/년 리스트
-
-
 
                 if(stage==1){
                     ltDeterioration = absenceDto.getLtDeterioration();
@@ -518,6 +516,7 @@ public class LifeAllTimeRestController {
 
             // 차트데이터 값 for문 알고리즘 천번돌아야됨.
             for(double year=0; year<1001; year++){
+
                 // 공용연수 0.1년 단위
                 double publicYear = year/10;
 
@@ -527,77 +526,85 @@ public class LifeAllTimeRestController {
                     current = 1.0;
                 }else {
                     // 선제적 유지관리 값
-                    if(change==0){
-                        if (publicYear != startDamageRankYear) {
-                            preemptive = 1-startLtDeterioration * (Math.pow(publicYear, 2));
-                        }else{
-                            preemptive = 1-startLtDeterioration * (Math.pow(publicYear, 2));
-                            change++;
-                            startDamageRankYear = Math.floor(damageRankYearList.get(change)*10)/10.0; // 보수보강수행시기
-                            startLtDeterioration = ltDeteriorationList.get(change);
-                            startPointViewEarly = pointViewEarlyList.get(change);
-                            startPointViewList = pointViewList.get(change);
-                        }
-                    }else{
-                        if(state == 0){
-                            double publicPoint = Math.pow(publicYear-startPointViewList,2);
-                            double resultdi = publicPoint*startLtDeterioration+startPointViewEarly;
-                            preemptive = 1-resultdi;
-                            if (publicYear == startDamageRankYear) {
+                    if (change != lifeAllTimeDto.getLtAllStage()-1) {
+                        if (change == 0) {
+                            if (publicYear != startDamageRankYear) {
+                                preemptive = 1 - startLtDeterioration * (Math.pow(publicYear, 2));
+                            } else {
+                                preemptive = 1 - startLtDeterioration * (Math.pow(publicYear, 2));
                                 change++;
                                 startDamageRankYear = Math.floor(damageRankYearList.get(change) * 10) / 10.0; // 보수보강수행시기
                                 startLtDeterioration = ltDeteriorationList.get(change);
                                 startPointViewEarly = pointViewEarlyList.get(change);
                                 startPointViewList = pointViewList.get(change);
                             }
+                        } else {
+                            if (state == 0) {
+                                double publicPoint = Math.pow(publicYear - startPointViewList, 2);
+                                double resultdi = publicPoint * startLtDeterioration + startPointViewEarly;
+                                preemptive = 1 - resultdi;
+                                if (publicYear == startDamageRankYear) {
+                                    change++;
+                                    startDamageRankYear = Math.floor(damageRankYearList.get(change) * 10) / 10.0; // 보수보강수행시기
+                                    startLtDeterioration = ltDeteriorationList.get(change);
+                                    startPointViewEarly = pointViewEarlyList.get(change);
+                                    startPointViewList = pointViewList.get(change);
+                                }
 
-                            if(Math.floor(preemptive*100000)/100000.0 == 0.99999){
+                                if (Math.floor(preemptive * 100000) / 100000.0 == 0.99999) {
 //                                log.info("");
 //                                log.info("여기서부터 종료시점이다");
 //                                log.info("");
-                                state++;
+                                    state++;
+                                    preemptive = 0.0;
+                                }
+                            } else {
                                 preemptive = 0.0;
                             }
-                        }else{
-                            preemptive = 0.0;
                         }
+                    } else {
+                        preemptive = 0.0;
                     }
 
                     // 현행 유지관리 값
-                    if(change2==0){
-                        if (publicYear != startDamageRankYear2) {
-                            current = 1-startLtDeterioration2 * (Math.pow(publicYear, 2));
-                        }else{
-                            current = 1-startLtDeterioration2 * (Math.pow(publicYear, 2));
-                            change2++;
-                            startDamageRankYear2 = Math.floor(damageRankYearList2.get(change2)*10)/10.0; // 보수보강수행시기
-                            startLtDeterioration2 = ltDeteriorationList2.get(change2);
-                            startPointViewEarly2 = pointViewEarlyList2.get(change2);
-                            startPointViewList2 = pointViewList2.get(change2);
-                        }
-                    }else{
-                        if(state2 == 0){
-                            double publicPoint = Math.pow(publicYear-startPointViewList2,2);
-                            double resultdi = publicPoint*startLtDeterioration2+startPointViewEarly2;
-                            current = 1-resultdi;
-                            if (publicYear == startDamageRankYear2) {
+                    if(change2 != lifeAllTimeDto.getLtAllStage()-1){
+                        if (change2 == 0) {
+                            if (publicYear != startDamageRankYear2) {
+                                current = 1 - startLtDeterioration2 * (Math.pow(publicYear, 2));
+                            } else {
+                                current = 1 - startLtDeterioration2 * (Math.pow(publicYear, 2));
                                 change2++;
                                 startDamageRankYear2 = Math.floor(damageRankYearList2.get(change2) * 10) / 10.0; // 보수보강수행시기
                                 startLtDeterioration2 = ltDeteriorationList2.get(change2);
                                 startPointViewEarly2 = pointViewEarlyList2.get(change2);
                                 startPointViewList2 = pointViewList2.get(change2);
                             }
+                        } else {
+                            if (state2 == 0) {
+                                double publicPoint = Math.pow(publicYear - startPointViewList2, 2);
+                                double resultdi = publicPoint * startLtDeterioration2 + startPointViewEarly2;
+                                current = 1 - resultdi;
+                                if (publicYear == startDamageRankYear2) {
+                                    change2++;
+                                    startDamageRankYear2 = Math.floor(damageRankYearList2.get(change2) * 10) / 10.0; // 보수보강수행시기
+                                    startLtDeterioration2 = ltDeteriorationList2.get(change2);
+                                    startPointViewEarly2 = pointViewEarlyList2.get(change2);
+                                    startPointViewList2 = pointViewList2.get(change2);
+                                }
 
-                            if(Math.floor(current*100000)/100000.0 == 0.99999){
-//                                log.info("");
-//                                log.info("여기서부터 종료시점이다");
-//                                log.info("");
-                                state2++;
+                                if (Math.floor(current * 100000) / 100000.0 == 0.99999) {
+    //                                log.info("");
+    //                                log.info("여기서부터 종료시점이다");
+    //                                log.info("");
+                                    state2++;
+                                    current = 0.0;
+                                }
+                            } else {
                                 current = 0.0;
                             }
-                        }else{
-                            current = 0.0;
                         }
+                    }else{
+                        current = 0.0;
                     }
 
                 }
@@ -629,9 +636,9 @@ public class LifeAllTimeRestController {
 //                chartData.put("test2", 50);
 //                chartData.put("test3", 80);
 
-                if(year==1000){
-                    chartData.put("bulletDisabled",false);
-                }
+//                if(year==1000){
+//                    chartData.put("bulletDisabled",false);
+//                }
                 chartDataList.add(chartData);
             }
 
