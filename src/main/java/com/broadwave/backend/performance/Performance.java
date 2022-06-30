@@ -119,6 +119,9 @@ public class Performance {
     @Column(name="pi_input_skip")
     private String piInputSkip; // 스킵여부 0:적합, 1:부적합, 2: 스킵
 
+    @Column(name="pi_file_yn")
+    private String piFileYn; // 파일업로드여부 0: 웹등록, 1: 파일등록
+
     @Column(name="insert_date")
     private LocalDateTime insertDateTime;
 

@@ -27,7 +27,7 @@ public class LifeDetail {
     private Long id; // 고유ID값(NOTNULL)
 
     @Column(name="lt_detail_type")
-    private String ltDetailType; // 입력타입 : 1 반발경도, 2 탄산화깊이, 3 균열깊이, 4 열화물침투량
+    private String ltDetailType; // 입력 타입 : 1 반발경도, 2 탄산화깊이, 3 균열깊이, 4 열화물침투량, 5 탄산화깊이(바닥판3개), 6 탄산화깊이(바닥판4개)
 
     @Column(unique = true, name="lt_detail_auto_num")
     private String ltDetailAutoNum; // 고유코드

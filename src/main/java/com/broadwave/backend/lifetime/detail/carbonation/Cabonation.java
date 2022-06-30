@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Data
-@EqualsAndHashCode(of = "ltDetailAutonum")
+@EqualsAndHashCode(of = "ltCarbonationId")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -28,7 +28,6 @@ public class Cabonation {
 
     @Column(name="lt_detail_auto_num")
     private String ltDetailAutoNum; // 고유코드
-
 
     @Column(name="lt_td_average")
     private Double ltTdAverage; // 실측피복두께 평균값

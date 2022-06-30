@@ -1,8 +1,7 @@
-package com.broadwave.backend.lifetime.detail.carbonation;
+package com.broadwave.backend.lifetime.detail.cabonationThreePlate;
 
 import com.broadwave.backend.common.AjaxResponse;
 import com.broadwave.backend.keygenerate.KeyGenerateService;
-import com.broadwave.backend.lifetime.detail.cabonationThreePlate.CabonationThreePlateMapperDto;
 import com.broadwave.backend.lifetime.detail.main.LifeDetail;
 import com.broadwave.backend.lifetime.detail.main.LiftDetailRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -23,30 +22,29 @@ import java.util.Optional;
  * @author Minkyu
  * Date : 2022-05-24
  * Time :
- * Remark : NewDeal LifeAllTime CabonationService
+ * Remark : NewDeal LifeAllTime CabonationThreePlateService
 */
 @Slf4j
 @Service
-public class CabonationService {
+public class CabonationThreePlateService {
 
     private final KeyGenerateService keyGenerateService;
     private final ModelMapper modelMapper;
-    private final  LiftDetailRepository liftDetailRepository;
-    private final  CabonationRepository cabonationRepository;
+    private final LiftDetailRepository liftDetailRepository;
+    private final CabonationThreePlateRepository cabonationThreePlateRepository;
 
     @Autowired
-    public CabonationService(ModelMapper modelMapper, KeyGenerateService keyGenerateService, LiftDetailRepository liftDetailRepository,
-                             CabonationRepository cabonationRepository) {
+    public CabonationThreePlateService(ModelMapper modelMapper, KeyGenerateService keyGenerateService, LiftDetailRepository liftDetailRepository,
+                                       CabonationThreePlateRepository cabonationThreePlateRepository) {
         this.modelMapper = modelMapper;
         this.keyGenerateService = keyGenerateService;
         this.liftDetailRepository = liftDetailRepository;
-        this.cabonationRepository = cabonationRepository;
+        this.cabonationThreePlateRepository = cabonationThreePlateRepository;
     }
 
-    // NEWDEAL 생애주기 의사결정 지원 서비스 세부부분 - 탄산화깊이 저장
-    public ResponseEntity<Map<String,Object>> cabonationSave(CabonationMapperDto cabonationMapperDto, HttpServletRequest request){
-
-        log.info("cabonationSave 호출성공");
+    // NEWDEAL 생애주기 의사결정 지원 서비스 세부부분 - 탄산화깊이 바닥판3개 저장
+    public ResponseEntity<Map<String, Object>> cabonationThreePlateSave(CabonationThreePlateMapperDto cabonationThreePlateMapperDto, HttpServletRequest request) {
+        log.info("cabonationThreePlateSave 호출성공");
 
         AjaxResponse res = new AjaxResponse();
         HashMap<String, Object> data = new HashMap<>();
@@ -57,30 +55,30 @@ public class CabonationService {
         log.info("JWT_AccessToken : "+JWT_AccessToken);
         log.info("insert_id : "+insert_id);
 
-        Cabonation cabonation = modelMapper.map(cabonationMapperDto, Cabonation.class);
+        CabonationThreePlate cabonationThreePlate = modelMapper.map(cabonationThreePlateMapperDto, CabonationThreePlate.class);
 
         // 고유코드가 존재하지 않으면 생성후 셋팅
-        if(cabonationMapperDto.getLtDetailAutonum().equals("")){
+        if(cabonationThreePlateMapperDto.getLtDetailAutonum().equals("")){
             Date now = new Date();
             SimpleDateFormat yyMM = new SimpleDateFormat("yyMM");
             String autoNum = keyGenerateService.keyGenerate("nd_lt_detail", yyMM.format(now), insert_id);
 
             LifeDetail lifeDetail = new LifeDetail();
-            lifeDetail.setLtDetailType(cabonationMapperDto.getLtDetailType());
+            lifeDetail.setLtDetailType(cabonationThreePlateMapperDto.getLtDetailType());
             lifeDetail.setLtDetailAutoNum(autoNum);
             lifeDetail.setInsert_id(insert_id);
             lifeDetail.setInsertDateTime(LocalDateTime.now());
 
-            cabonation.setLtDetailAutoNum(autoNum);
-            cabonation.setInsert_id(insert_id);
-            cabonation.setInsertDateTime(LocalDateTime.now());
+            cabonationThreePlate.setLtDetailAutoNum(autoNum);
+            cabonationThreePlate.setInsert_id(insert_id);
+            cabonationThreePlate.setInsertDateTime(LocalDateTime.now());
 
             liftDetailRepository.save(lifeDetail);
-            cabonationRepository.save(cabonation);
+            cabonationThreePlateRepository.save(cabonationThreePlate);
             data.put("autoNum", autoNum);
         }else{
-            Optional<LifeDetail> optionalLifeDetail = liftDetailRepository.findByLtDetailAutoNum(cabonationMapperDto.getLtDetailAutonum());
-            Optional<Cabonation> optionalCabonation = cabonationRepository.findByLtDetailAutoNum(cabonationMapperDto.getLtDetailAutonum());
+            Optional<LifeDetail> optionalLifeDetail = liftDetailRepository.findByLtDetailAutoNum(cabonationThreePlateMapperDto.getLtDetailAutonum());
+            Optional<CabonationThreePlate> optionalCabonationThreePlate = cabonationThreePlateRepository.findByLtDetailAutoNum(cabonationThreePlateMapperDto.getLtDetailAutonum());
 
             if(optionalLifeDetail.isPresent()){
                 optionalLifeDetail.get().setModify_id(insert_id);
@@ -89,11 +87,11 @@ public class CabonationService {
                 liftDetailRepository.save(optionalLifeDetail.get());
             }
 
-            if(optionalCabonation.isPresent()){
-                cabonation.setLtCarbonationId(optionalCabonation.get().getLtCarbonationId());
-                cabonation.setModify_id(insert_id);
-                cabonation.setModifyDateTime(LocalDateTime.now());
-                cabonationRepository.save(cabonation);
+            if(optionalCabonationThreePlate.isPresent()){
+                cabonationThreePlate.setLtCarbonationThreePlateId(optionalCabonationThreePlate.get().getLtCarbonationThreePlateId());
+                cabonationThreePlate.setModify_id(insert_id);
+                cabonationThreePlate.setModifyDateTime(LocalDateTime.now());
+                cabonationThreePlateRepository.save(cabonationThreePlate);
             }
 
         }
