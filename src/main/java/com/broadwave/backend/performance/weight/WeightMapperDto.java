@@ -14,8 +14,9 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 @ToString
 @Data
-@Slf4j
 public class WeightMapperDto {
+
+    private String piAutoNum; // 대안 일려번호(NOTNULL)
 
     private String weightCategory;
     private String piInputSkip;

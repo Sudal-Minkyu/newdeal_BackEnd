@@ -32,6 +32,9 @@ public class LifeAllTime {
     @Column(name="lt_bridge_name")
     private String ltBridgeName; // 교량명(NULL)
 
+    @Column(name="lt_absence")
+    private String ltAbsence; // 교량형식(NOTNULL)
+
     @Column(name="lt_span_num")
     private String ltSpanNum; // 경간수(NOTNULL)
 
@@ -59,8 +62,8 @@ public class LifeAllTime {
     @Column(name="lt_all_stage")
     private Integer ltAllStage; // 평가단계 횟수, 기본값 : 25
 
-    @Column(name="lt_all_volume")
-    private Double ltAllVolume; // 전체물량(NOTNULL)
+    @Column(name="lt_all_rank")
+    private String ltAllRank; // 현재 상태등급(NOTNULL)
 
     @Column(name="lt_damage_b_rank")
     private Double ltDamageBRank; // B등급 손상지수(NOTNULL)
@@ -82,20 +85,31 @@ public class LifeAllTime {
     private Double ltIncrease; // 열화증가율(NOTNULL)
 
 
-    @Column(name="lt_periodic_frequency")
-    private Double ltPeriodicFrequency; // 정기점검 빈도수(NOTNULL)
+    @Column(name="lt_periodic_year")
+    private Double ltPeriodicYear; // 정기점검 년수(NOTNULL)
+
+    @Column(name="lt_periodic_num")
+    private Double ltPeriodicNum; // 정기점검 횟수(NOTNULL)
 
     @Column(name="lt_periodic_cost")
     private Double ltPeriodicCost; // 정기점검 바용(NOTNULL)
 
-    @Column(name="lt_close_frequency")
-    private Double ltCloseFrequency; // 정밀점검 빈도수(NOTNULL)
+
+    @Column(name="lt_close_year")
+    private Double ltCloseYear; // 정밀점검 년수(NOTNULL)
+
+    @Column(name="lt_close_num")
+    private Double ltCloseNum; // 정밀점검 횟수(NOTNULL)
 
     @Column(name="lt_close_cost")
     private Double ltCloseCost; // 정밀점검 비용(NOTNULL)
 
-    @Column(name="lt_safety_frequency")
-    private Double ltSafetyFrequency; // 정밀안전점검 빈도수(NOTNULL)
+
+    @Column(name="lt_safety_year")
+    private Double ltSafetyYear; // 정밀안전점검 년수(NOTNULL)
+
+    @Column(name="lt_safety_num")
+    private Double ltSafetyNum; // 정밀안전점검 횟수(NOTNULL)
 
     @Column(name="lt_safety_cost")
     private Double ltSafetyCost; // 정밀안전점검 비용(NOTNULL)

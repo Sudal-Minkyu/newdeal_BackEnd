@@ -58,6 +58,8 @@ public enum ResponseErrorCode {
     NDE031("NDE031", "새로고침이후 다시 시도해주세요."),
     NDE032("NDE032", "이미 존재하는 "),
     NDE033("NDE033", "다시 시도해주세요."),
+    NDE034("NDE034", "존재하지 않습니다."),
+    NDE035("NDE035", "권한이 없습니다."),
     ;
 
     private String code;

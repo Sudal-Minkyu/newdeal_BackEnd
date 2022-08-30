@@ -1,4 +1,4 @@
-package com.broadwave.backend.lifetime.detail;
+package com.broadwave.backend.lifetime.detail.delete;
 
 /**
  * @author Minkyu

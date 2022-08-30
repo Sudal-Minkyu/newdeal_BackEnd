@@ -58,7 +58,8 @@ public class PerformanceRepositoryCustomImpl extends QuerydslRepositorySupport i
                         performance.piRaterBelong,
                         performance.piRaterPhone,
                         performance.piInputCount,
-                        performance.piInputSkip
+                        performance.piInputSkip,
+                        performance.piFileYn
                 ));
 
         // 검색조건필터
@@ -193,6 +194,7 @@ public class PerformanceRepositoryCustomImpl extends QuerydslRepositorySupport i
                         performance.piInputGreat,
                         performance.piInputMiddleSave,
                         performance.piInputSkip,
+                        performance.piFileYn,
                         performance.insertDateTime,
                         performance.insert_id,
                         performance.modifyDateTime,

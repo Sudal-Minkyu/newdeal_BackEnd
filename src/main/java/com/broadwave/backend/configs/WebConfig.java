@@ -39,6 +39,8 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedHeaders("JWT_AccessToken","insert_id");
     }
 
+//      "/swagger*/**"
+//              registry.addResourceHandler("swagger-ui.html") .addResourceLocations("classpath:/META-INF/resources/");
     @Bean
     public BasicAWSCredentials AwsCredentianls(){
         return new BasicAWSCredentials(AWSS3ACCESSID,AWSS3ACCESSKEY);

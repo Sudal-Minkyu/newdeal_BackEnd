@@ -26,6 +26,8 @@ public class LifeAllTimeRepositoryCustomImpl extends QuerydslRepositorySupport i
                 .select(Projections.constructor(LifeAllTimeDto.class,
                         lifeAllTime.ltBridgeCode,
                         lifeAllTime.ltBridgeName,
+                        lifeAllTime.ltAbsence,
+
                         lifeAllTime.ltSpanNum,
                         lifeAllTime.ltAbsenceCode,
 
@@ -37,7 +39,7 @@ public class LifeAllTimeRepositoryCustomImpl extends QuerydslRepositorySupport i
                         lifeAllTime.ltAllInputDate,
                         lifeAllTime.ltAllStage,
 
-                        lifeAllTime.ltAllVolume,
+                        lifeAllTime.ltAllRank,
 
                         lifeAllTime.ltDamageBRank,
                         lifeAllTime.ltDamageCRank,
@@ -47,11 +49,16 @@ public class LifeAllTimeRepositoryCustomImpl extends QuerydslRepositorySupport i
                         lifeAllTime.ltDiscountRate,
                         lifeAllTime.ltIncrease,
 
-                        lifeAllTime.ltPeriodicFrequency,
+                        lifeAllTime.ltPeriodicYear,
+                        lifeAllTime.ltPeriodicNum,
                         lifeAllTime.ltPeriodicCost,
-                        lifeAllTime.ltCloseFrequency,
+
+                        lifeAllTime.ltCloseYear,
+                        lifeAllTime.ltCloseNum,
                         lifeAllTime.ltCloseCost,
-                        lifeAllTime.ltSafetyFrequency,
+
+                        lifeAllTime.ltCloseYear,
+                        lifeAllTime.ltCloseNum,
                         lifeAllTime.ltSafetyCost
                 ));
 

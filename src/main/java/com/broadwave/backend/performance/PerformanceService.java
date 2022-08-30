@@ -1,7 +1,9 @@
 package com.broadwave.backend.performance;
 
-import com.broadwave.backend.keygenerate.KeyGenerateService;
 import com.broadwave.backend.performance.performanceDtos.*;
+import com.broadwave.backend.performance.uploadFile.Uploadfile;
+import com.broadwave.backend.performance.uploadFile.UploadfileRepository;
+import com.broadwave.backend.python.PythonService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -21,14 +23,17 @@ import java.util.Optional;
 @Service
 public class PerformanceService {
 
-    @Autowired
-    PerformanceRepository performanceRepository;
+    private final PerformanceRepository performanceRepository;
+    private final PerformanceRepositoryCustom performanceRepositoryCustom;
+    private final UploadfileRepository uploadfileRepository;
 
     @Autowired
-    PerformanceRepositoryCustom performanceRepositoryCustom;
+    public PerformanceService(PerformanceRepository performanceRepository,  PerformanceRepositoryCustom performanceRepositoryCustom, UploadfileRepository uploadfileRepository) {
+        this.performanceRepository = performanceRepository;
+        this.performanceRepositoryCustom = performanceRepositoryCustom;
+        this.uploadfileRepository = uploadfileRepository;
+    }
 
-    @Autowired
-    KeyGenerateService keyGenerateService;
 
     public void save(Performance performance){
         performanceRepository.save(performance);
@@ -80,6 +85,23 @@ public class PerformanceService {
 
     public Page<PerformanceListDto> findByPerformanceList(String piFacilityType, String piKind, String piFacilityName, String insert_id, Pageable pageable) {
         return performanceRepositoryCustom.findByPerformanceList(piFacilityType, piKind, piFacilityName, insert_id, pageable);
+    }
+
+    public void findByPerformanceListDelete(List<Performance> performanceList) {
+        performanceRepository.deleteAll(performanceList);
+    }
+
+    public void saveUploadFile(Uploadfile uploadfile) {
+        uploadfileRepository.save(uploadfile);
+    }
+
+    public void deleteUploadFile(Uploadfile uploadfile) {
+        uploadfileRepository.delete(uploadfile);
+    }
+
+
+    public Optional<Uploadfile> findByUploadFile(String autoNum, String insert_id) {
+        return uploadfileRepository.findByUploadFile(autoNum,insert_id);
     }
 
 }

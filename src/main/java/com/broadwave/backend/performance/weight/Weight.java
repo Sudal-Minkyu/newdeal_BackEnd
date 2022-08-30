@@ -28,7 +28,7 @@ public class Weight {
     private Long id; // 고유ID값(NOTNULL)
 
     @Column(name="pi_auto_num")
-    private String piAutoNum; // 대안 일려번호(NOTNULL)
+    private String piAutoNum; // 대안 일련번호(NOTNULL)
 
     @Column(name="pi_weight_safe")
     private Double piWeightSafe; // 안정성 가중치(NOTNULL)

@@ -1,5 +1,6 @@
 package com.broadwave.backend.performance;
 
+import com.broadwave.backend.Aws.AWSS3Service;
 import com.broadwave.backend.account.AccountDtos.AccountBaseDto;
 import com.broadwave.backend.account.AccountService;
 import com.broadwave.backend.common.AjaxResponse;
@@ -14,6 +15,7 @@ import com.broadwave.backend.performance.reference.weightSetting.ReferenceWeight
 import com.broadwave.backend.performance.reference.weightSetting.weightSettingDtos.ReferenceWeightBaseDto;
 import com.broadwave.backend.performance.reference.weightSetting.weightSettingDtos.ReferenceWeightOldDto;
 import com.broadwave.backend.performance.reference.weightSetting.weightSettingDtos.ReferenceWeightUseDto;
+import com.broadwave.backend.performance.uploadFile.Uploadfile;
 import com.broadwave.backend.performance.weight.Weight;
 import com.broadwave.backend.performance.weight.WeightDto;
 import com.broadwave.backend.performance.weight.WeightMapperDto;
@@ -25,6 +27,7 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +35,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.transaction.Transactional;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
@@ -49,6 +53,9 @@ import java.util.*;
 @RequestMapping("/api/performance")
 public class PerformanceRestController {
 
+    @Value("${newdeal.aws.s3.bucket.url}")
+    private String AWSBUCKETURL;
+
     private final ModelMapper modelMapper;
     private final PerformanceService performanceService;
     private final AccountService accountService;
@@ -57,9 +64,11 @@ public class PerformanceRestController {
     private final KeyGenerateService keyGenerateService;
     private final ReferenceService referenceService;
 
+    private final AWSS3Service awss3Service;
+
     @Autowired
     public PerformanceRestController(ModelMapper modelMapper, PerformanceService performanceService, AccountService accountService,
-                                     WeightService weightService, PerformanceFunctionService performanceFunctionService, KeyGenerateService keyGenerateService, ReferenceService referenceService) {
+                                     WeightService weightService, PerformanceFunctionService performanceFunctionService, KeyGenerateService keyGenerateService, ReferenceService referenceService, AWSS3Service awss3Service) {
         this.modelMapper = modelMapper;
         this.performanceService = performanceService;
         this.accountService = accountService;
@@ -67,6 +76,7 @@ public class PerformanceRestController {
         this.performanceFunctionService = performanceFunctionService;
         this.keyGenerateService = keyGenerateService;
         this.referenceService = referenceService;
+        this.awss3Service = awss3Service;
     }
 
     // NEWDEAL 성능개선사업평가 Input 중간저장게시물이 있는지 조회하기
@@ -567,6 +577,7 @@ public class PerformanceRestController {
     }
 
     // NEWDEAL 성능개선사업평가 엑셀 업로드
+    @Transactional
     @PostMapping("/excelUpload")
     public ResponseEntity<Map<String,Object>> readExcel(@ModelAttribute WeightMapperDto weightMapperDto, @RequestParam("excelfile") MultipartFile excelfile, HttpServletRequest request) throws IOException {
 
@@ -638,17 +649,51 @@ public class PerformanceRestController {
         log.info("piBusiness : "+piBusiness);
 
         // 일련번호 카운트 생성
-        log.info("일련번호 생성");
-        Date now = new Date();
-        SimpleDateFormat yyMM = new SimpleDateFormat("yyMM");
-        String autoNum = keyGenerateService.keyGenerate("nd_pi_input", yyMM.format(now), currentuserid);
+        String autoNum;
+        if(weightMapperDto.getPiAutoNum() == null || weightMapperDto.getPiAutoNum().equals("")){
+            log.info("일련번호 생성");
+            Date now = new Date();
+            SimpleDateFormat yyMM = new SimpleDateFormat("yyMM");
+            autoNum = keyGenerateService.keyGenerate("nd_pi_input", yyMM.format(now), currentuserid);
+        }else{
+            autoNum = weightMapperDto.getPiAutoNum();
+            // 현재 일련번호의 글 삭제하기
+            List<Performance> performanceList = performanceService.findByPiAutoNumAndInsert_idDel(autoNum, currentuserid, 1);
+            if(performanceList.size() != 0){
+                // 기존 파일이 존재하면 파일삭제
+                if(performanceList.get(0).getPiFileYn().equals("Y")){
+                    Optional<Uploadfile> optionalUploadfile = performanceService.findByUploadFile(autoNum, currentuserid);
+                    Optional<Weight> optionalWeight = weightService.findByAutoNumAndInsertId(autoNum, currentuserid);
+                    if(optionalUploadfile.isPresent()){
+                        if(optionalUploadfile.get().getPiFilePath() != null && optionalUploadfile.get().getPiFileName() != null){
+                            String path = "/performance-upload-excelfiles/"+optionalUploadfile.get().getPiFileYyyymmdd();
+                            awss3Service.deleteObject(path, optionalUploadfile.get().getPiFileName());
+                            performanceService.deleteUploadFile(optionalUploadfile.get());
+                            performanceService.findByPerformanceListDelete(performanceList);
+                            if(optionalWeight.isPresent()){
+                                weightService.delete(optionalWeight.get());
+                            }else{
+                                log.info("가중치가 존재하지 않음");
+                            }
+                        }
+                    }else{
+                        log.info("파일이 존재하지 않음");
+                    }
+                }
+            }
+        }
 
         // 가중치 셋팅
         Weight weight = modelMapper.map(weightMapperDto, Weight.class);
         log.info("가중치 : "+weight);
 
+        SimpleDateFormat date = new SimpleDateFormat("yyyyMMdd");
+        String fileRealName;
+
         if(piBusiness.equals("노후") && piBusiness.equals(businessData.substring(0,2))){
             log.info("노후화 유형 엑셀파일입니다.");
+
+            fileRealName = "노후화대응_유형_양식_"+date+".xlsx";
 
             ArrayList<Object> excelList = new ArrayList<>();
             List<Performance> ListPerformance = new ArrayList<>();
@@ -809,7 +854,7 @@ public class PerformanceRestController {
                     performance.setPiInputCount(i - 2);  //대안카운트(NULL)
                     performance.setPiInputGreat(0);  //우수대안인지 0 or 1(NULL)
                     performance.setPiInputMiddleSave(1);  //작성완료된 글인지 0 or 1(NULL)
-
+                    performance.setPiFileYn("Y"); // 파일업로드 여부
                     performance.setInsertDateTime(LocalDateTime.now()); // 작성날짜
                     performance.setInsert_id(currentuserid); // 작성자
 
@@ -827,6 +872,8 @@ public class PerformanceRestController {
         }
         else if(piBusiness.equals("기준") && piBusiness.equals(businessData.substring(0,2))){
             log.info("기준변화 유형 엑셀파일입니다.");
+
+            fileRealName = "기준변화_유형_양식_"+date+".xlsx";
 
             ArrayList<Object> excelList = new ArrayList<>();
             List<Performance> ListPerformance = new ArrayList<>();
@@ -964,7 +1011,7 @@ public class PerformanceRestController {
                     performance.setPiInputCount(i - 2);  //대안카운트(NULL)
                     performance.setPiInputGreat(0);  //우수대안인지 0 or 1(NULL)
                     performance.setPiInputMiddleSave(1);  //작성완료된 글인지 0 or 1(NULL)
-
+                    performance.setPiFileYn("Y"); // 파일업로드 여부
                     performance.setInsertDateTime(LocalDateTime.now()); // 작성날짜
                     performance.setInsert_id(currentuserid); // 작성자
 
@@ -981,8 +1028,10 @@ public class PerformanceRestController {
 
         }
         else if(piBusiness.equals("사용") && piBusiness.equals(businessData.substring(0,2))){
-
             log.info("사용성변화 유형 엑셀파일입니다.");
+
+            fileRealName = "사용성변화_유형_양식_"+date+".xlsx";
+
             ArrayList<Object> excelList = new ArrayList<>();
             List<Performance> ListPerformance = new ArrayList<>();
             log.info("getPhysicalNumberOfRows : " + worksheet.getPhysicalNumberOfRows());
@@ -1114,6 +1163,7 @@ public class PerformanceRestController {
                     performance.setPiInputCount(i - 2);  //대안카운트(NULL)
                     performance.setPiInputGreat(0);  //우수대안인지 0 or 1(NULL)
                     performance.setPiInputMiddleSave(1);  //작성완료된 글인지 0 or 1(NULL)
+                    performance.setPiFileYn("Y"); // 파일업로드 여부
                     performance.setInsertDateTime(LocalDateTime.now()); // 작성날짜
                     performance.setInsert_id(currentuserid); // 작성자
 
@@ -1137,6 +1187,25 @@ public class PerformanceRestController {
         weight.setInsert_id(currentuserid);
         weight.setInsertDateTime(LocalDateTime.now());
         weightService.save(weight);
+
+        // 저장완료후 S3에 파일업로드 : 업데이트 무조건 삭제후 다시 등록
+        Uploadfile uploadfile = new Uploadfile();
+        uploadfile.setPiAutoNum(autoNum);
+        uploadfile.setPiFileRealname(fileRealName);
+        String ext = extension.substring(extension.lastIndexOf(".") + 1);
+        String fileName = UUID.randomUUID().toString().replace("-", "")+"."+ext;
+        uploadfile.setPiFileName(fileName);
+        uploadfile.setPiFileYyyymmdd(date.format(new Date()));
+        String filePath = "/performance-upload-excelfiles/" + date.format(new Date());
+        log.info("filePath : "+AWSBUCKETURL+filePath+"/");
+        log.info("excelfile : "+excelfile);
+        log.info("fileName : "+fileName);
+        log.info("fileRealName : "+fileRealName);
+        uploadfile.setPiFilePath(AWSBUCKETURL+filePath+"/");
+        uploadfile.setInsert_id(currentuserid);
+        uploadfile.setInsertDateTime(LocalDateTime.now());
+        performanceService.saveUploadFile(uploadfile);
+        awss3Service.nomalFileUpload(excelfile, fileName, filePath);
 
         data.put("autoNum",autoNum);
 
@@ -1173,6 +1242,7 @@ public class PerformanceRestController {
         log.info("대안리스트 : " + performance);
         log.info("대안사이즈 : " + performance.size());
         log.info("타입 : " + performance.get(0).getPiFacilityType());
+        log.info("파일업로드 여부 : " + performance.get(0).getPiFileYn());
         log.info("=========================");
 
         ReferenceTechnicality technicality = referenceService.techData("tech");
@@ -1388,6 +1458,7 @@ public class PerformanceRestController {
 
         data.put("piBusiness",piBusiness);
         data.put("typeName",performance.get(0).getPiFacilityType());
+        data.put("piFileYn",performance.get(0).getPiFileYn());
 
         // 가중치, 대안리스트, 대안갯수
         data.put("weightList",weight);
@@ -1576,7 +1647,8 @@ public class PerformanceRestController {
 
     // NEWDEAL 성능개선사업평가 가중치 가져오기(웹방식용)
     @PostMapping("/weightGet")
-    public ResponseEntity<Map<String,Object>> weightGet(@RequestParam("autoNum")String autoNum, @RequestParam("businessNum")String businessNum, HttpServletRequest request) {
+    public ResponseEntity<Map<String,Object>> weightGet(@RequestParam("autoNum")String autoNum, @RequestParam("businessNum")String businessNum,
+                                                        @RequestParam("uploadYn")String uploadYn, HttpServletRequest request) {
 
         log.info("weightGet 호출성공");
 
@@ -1598,18 +1670,20 @@ public class PerformanceRestController {
             data.put("weightDto", null);
         }
 
-        if (businessNum.equals("노후화대응")) {
-            log.info("노후화대응 가중치");
-            ReferenceWeightOldDto referenceWeightOldDto = referenceService.findByReferenceWeightOld();
-            data.put("weightSettingDto", referenceWeightOldDto);
-        }else if (businessNum.equals("기준변화")){
-            log.info("기준변화 가중치");
-            ReferenceWeightBaseDto referenceWeightBaseDto = referenceService.findByReferenceWeightBase();
-            data.put("weightSettingDto", referenceWeightBaseDto);
-        }else{
-            log.info("사용성변화 가중치");
-            ReferenceWeightUseDto referenceWeightUseDto = referenceService.findByReferenceWeightUse();
-            data.put("weightSettingDto", referenceWeightUseDto);
+        if(uploadYn.equals("N")) {
+            if (businessNum.equals("노후화대응")) {
+                log.info("노후화대응 가중치");
+                ReferenceWeightOldDto referenceWeightOldDto = referenceService.findByReferenceWeightOld();
+                data.put("weightSettingDto", referenceWeightOldDto);
+            }else if (businessNum.equals("기준변화")){
+                log.info("기준변화 가중치");
+                ReferenceWeightBaseDto referenceWeightBaseDto = referenceService.findByReferenceWeightBase();
+                data.put("weightSettingDto", referenceWeightBaseDto);
+            }else{
+                log.info("사용성변화 가중치");
+                ReferenceWeightUseDto referenceWeightUseDto = referenceService.findByReferenceWeightUse();
+                data.put("weightSettingDto", referenceWeightUseDto);
+            }
         }
 
         return ResponseEntity.ok(res.dataSendSuccess(data));

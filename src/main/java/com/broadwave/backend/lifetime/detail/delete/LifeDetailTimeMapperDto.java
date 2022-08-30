@@ -1,9 +1,6 @@
-package com.broadwave.backend.lifetime.detail;
+package com.broadwave.backend.lifetime.detail.delete;
 
 import lombok.*;
-import lombok.extern.slf4j.Slf4j;
-
-import javax.persistence.Column;
 
 /**
  * @author Minkyu
@@ -15,8 +12,7 @@ import javax.persistence.Column;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-@Setter
-@Slf4j
+@Data
 public class LifeDetailTimeMapperDto {
 
     private Double ltFyAverage; // 철근 항복강도 평균값(NOTNULL)
@@ -53,112 +49,20 @@ public class LifeDetailTimeMapperDto {
     private Double ltCostFive; // 보수보강 비용_5(NOTNULL)
     private Double ltCostSix; // 보수보강비용_6(NOTNULL)
 
-    public Double getLtRepairLength() {
-        return ltRepairLength;
-    }
-
-    public Double getLtFyAverage() {
-        return ltFyAverage;
-    }
-
-    public Double getLtFyStandard() {
-        return ltFyStandard;
-    }
-
     public Double getLtFyVariance() {
         return ltFyVariance/100;
-    }
-
-    public Double getLtFcAverage() {
-        return ltFcAverage;
-    }
-
-    public Double getLtFcStandard() {
-        return ltFcStandard;
     }
 
     public Double getLtFcVariance() {
         return ltFcVariance/100;
     }
 
-    public Double getLtSectionAverage() {
-        return ltSectionAverage;
-    }
-
-    public Double getLtSectionStandard() {
-        return ltSectionStandard;
-    }
-
     public Double getLtSectionVariance() {
         return ltSectionVariance/100;
     }
 
-    public Double getLtVehicleAverage() {
-        return ltVehicleAverage;
-    }
-
-    public Double getLtVehicleStandard() {
-        return ltVehicleStandard;
-    }
-
     public Double getLtVehicleVariance() {
         return ltVehicleVariance/100;
-    }
-
-    public Double getLtTargetValue() {
-        return ltTargetValue;
-    }
-
-    public Double getLtRecoveryPercent() {
-        return ltRecoveryPercent;
-    }
-
-    public Double getLtRecoveryOne() {
-        return ltRecoveryOne;
-    }
-
-    public Double getLtRecoveryTwo() {
-        return ltRecoveryTwo;
-    }
-
-    public Double getLtRecoveryThree() {
-        return ltRecoveryThree;
-    }
-
-    public Double getLtRecoveryFour() {
-        return ltRecoveryFour;
-    }
-
-    public Double getLtRecoveryFive() {
-        return ltRecoveryFive;
-    }
-
-    public Double getLtRecoverySix() {
-        return ltRecoverySix;
-    }
-
-    public Double getLtCostOne() {
-        return ltCostOne;
-    }
-
-    public Double getLtCostTwo() {
-        return ltCostTwo;
-    }
-
-    public Double getLtCostThree() {
-        return ltCostThree;
-    }
-
-    public Double getLtCostFour() {
-        return ltCostFour;
-    }
-
-    public Double getLtCostFive() {
-        return ltCostFive;
-    }
-
-    public Double getLtCostSix() {
-        return ltCostSix;
     }
 
 }

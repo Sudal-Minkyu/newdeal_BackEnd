@@ -1,4 +1,4 @@
-package com.broadwave.backend.lifetime.detail;
+package com.broadwave.backend.lifetime.detail.delete;
 
 import com.broadwave.backend.common.AjaxResponse;
 import com.broadwave.backend.common.NormMath;

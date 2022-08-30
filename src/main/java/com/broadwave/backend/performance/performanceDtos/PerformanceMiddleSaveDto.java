@@ -39,5 +39,6 @@ public class PerformanceMiddleSaveDto {
     private String piRaterPhone; // 평가자 연락처(NULL)
 
     private String piInputSkip; // 스킵여부
+    private String piFileYn; // 파일업로드여부 N: 웹등록, Y: 파일등록
 
 }

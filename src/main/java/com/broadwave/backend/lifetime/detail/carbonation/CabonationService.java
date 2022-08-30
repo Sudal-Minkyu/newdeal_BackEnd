@@ -31,8 +31,8 @@ public class CabonationService {
 
     private final KeyGenerateService keyGenerateService;
     private final ModelMapper modelMapper;
-    private final  LiftDetailRepository liftDetailRepository;
-    private final  CabonationRepository cabonationRepository;
+    private final LiftDetailRepository liftDetailRepository;
+    private final CabonationRepository cabonationRepository;
 
     @Autowired
     public CabonationService(ModelMapper modelMapper, KeyGenerateService keyGenerateService, LiftDetailRepository liftDetailRepository,
