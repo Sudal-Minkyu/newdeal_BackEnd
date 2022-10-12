@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**
@@ -56,19 +57,33 @@ public class LifeAllTimeService {
 //        log.info("insert_id : "+insert_id);
 
         LifeAllTime lifeAllTime = modelMapper.map(lifeAllTimeMapperDto, LifeAllTime.class);
+        if(lifeAllTimeMapperDto.getLtId() != 0L){
 
-//        log.info("일련번호 생성");
-        Date now = new Date();
-        SimpleDateFormat yyMM = new SimpleDateFormat("yyMM");
-        String newAutoNum = keyGenerateService.keyGenerate("nd_lt_all_input", yyMM.format(now), insert_id);
-        lifeAllTime.setLtBridgeCode(newAutoNum);
-        lifeAllTime.setInsertDateTime(LocalDateTime.now());
-        lifeAllTime.setInsert_id(insert_id);
-        log.info("lifeAllTime : "+lifeAllTime);
+            Optional<LifeAllTime> optionalLifeAllTime = liftAllTimeRepository.findById(lifeAllTimeMapperDto.getLtId());
+            if(optionalLifeAllTime.isPresent()){
+                lifeAllTime.setId(optionalLifeAllTime.get().getId());
+                lifeAllTime.setLtBridgeCode(optionalLifeAllTime.get().getLtBridgeCode());
+                lifeAllTime.setInsert_id(optionalLifeAllTime.get().getInsert_id());
+                lifeAllTime.setInsertDateTime(optionalLifeAllTime.get().getInsertDateTime());
+                lifeAllTime.setModify_id(insert_id);
+                lifeAllTime.setModifyDateTime(LocalDateTime.now());
+                liftAllTimeRepository.save(lifeAllTime);
+                data.put("getId", optionalLifeAllTime.get().getId());
+            }
+        }else{
+//            log.info("일련번호 생성");
+            Date now = new Date();
+            SimpleDateFormat yyMM = new SimpleDateFormat("yyMM");
+            String newAutoNum = keyGenerateService.keyGenerate("nd_lt_all_input", yyMM.format(now), insert_id);
+            lifeAllTime.setLtBridgeCode(newAutoNum);
+            lifeAllTime.setInsertDateTime(LocalDateTime.now());
+            lifeAllTime.setInsert_id(insert_id);
+            log.info("lifeAllTime : "+lifeAllTime);
 
-        LifeAllTime allTime = liftAllTimeRepository.save(lifeAllTime);
+            LifeAllTime allTime = liftAllTimeRepository.save(lifeAllTime);
 
-        data.put("getId", allTime.getId());
+            data.put("getId", allTime.getId());
+        }
 
         return ResponseEntity.ok(res.dataSendSuccess(data));
     }
@@ -584,7 +599,28 @@ public class LifeAllTimeService {
             double startPointViewEarly2 = pointViewEarlyList2.get(change2); // 시좀초기값
             double startPointViewList2 = pointViewList2.get(change2); // 시점
 
+            String ltAllRank = lifeAllTimeDto.getLtAllRank();
+            double aRank = Math.floor((1-0.1)*10)/10.0;
+//            double bRank = Math.floor((1-ltDamageBRank)*10)/10.0;
+//            double cRank = Math.floor((1-ltDamageCRank)*10)/10.0;
+//            double dRank = Math.floor((1-ltDamageDRank)*10)/10.0;
+            double bRank = 1-ltDamageBRank;
+            double cRank = 1-ltDamageCRank;
+            double dRank = 1-ltDamageDRank;
 
+            double graphRank;
+            if(ltAllRank.equals("A")){
+                graphRank = Math.round(aRank*10)/10.0;
+            }else if(ltAllRank.equals("B")){
+                graphRank = Math.round(bRank*10)/10.0;
+            }else if(ltAllRank.equals("C")){
+                graphRank = Math.round(cRank*10)/10.0;
+            }else{
+                graphRank = Math.round(dRank*10)/10.0;
+            }
+
+            int chartRankCheck = 0;
+            log.info("graphRank : "+graphRank);
             // 차트데이터 값 for문 알고리즘 천번돌아야됨.
             for(double year=0; year<1001; year++){
 
@@ -637,6 +673,10 @@ public class LifeAllTimeService {
                         preemptive = 0.0;
                     }
 
+                    if(preemptive > 1){
+                        preemptive = 0.0;
+                    }
+
                     // 현행 유지관리 값
                     if(change2 != lifeAllTimeDto.getLtAllStage()-1){
                         if (change2 == 0) {
@@ -664,9 +704,9 @@ public class LifeAllTimeService {
                                 }
 
                                 if (Math.floor(current * 100000) / 100000.0 == 0.99999) {
-                                    //                                log.info("");
-                                    //                                log.info("여기서부터 종료시점이다");
-                                    //                                log.info("");
+//                                    log.info("");
+//                                    log.info("여기서부터 종료시점이다");
+//                                    log.info("");
                                     state2++;
                                     current = 0.0;
                                 }
@@ -693,15 +733,29 @@ public class LifeAllTimeService {
                     noAction = 0.0;
                 }
 
+                if(year == 340){
+                    log.info("값1 : "+noAction);
+                    log.info("값2 : "+Math.round(noAction*10)/10.0);
+                    log.info("값3 : "+Math.round(noAction*100)/100.0);
+                    log.info("값4 : "+Math.round(noAction*1000)/1000.0);
+                }
+
+                // 현재 상태등급 표시 그리기
+                if( Math.round(noAction*100)/100.0 == graphRank && Math.round(noAction*10)/10.0 == graphRank && chartRankCheck == 0) {
+                    chartRankCheck++;
+                    chartData.put("graphRank", graphRank);
+                    chartData.put("bulletColor", "am4core.color('#ee6868')");
+                }
+
                 chartData.put("publicYear", publicYear);
                 chartData.put("preemptive", Math.floor(preemptive*1000)/1000.0);
                 chartData.put("noAction", Math.floor(noAction*1000)/1000.0);
                 chartData.put("current", Math.floor(current*1000)/1000.0);
 
-                chartData.put("aRank", Math.floor((1-0.1)*10)/10.0);
-                chartData.put("bRank", Math.floor((1-ltDamageBRank)*10)/10.0);
-                chartData.put("cRank", Math.floor((1-ltDamageCRank)*10)/10.0);
-                chartData.put("dRank", Math.floor((1-ltDamageDRank)*10)/10.0);
+                chartData.put("aRank", aRank);
+                chartData.put("bRank", bRank);
+                chartData.put("cRank", cRank);
+                chartData.put("dRank", dRank);
 
 //                chartData.put("test1", 1.5);
 //                chartData.put("test2", 50);
@@ -790,6 +844,33 @@ public class LifeAllTimeService {
 
         data.put("lifeAllTimeDto",lifeAllTimeDto);
 
+        // 금일 날짜 호출
+        String nowDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+//        log.info("금일날짜 : "+nowDate);
+        data.put("nowYear",nowDate.substring(0,4));
+        data.put("nowMonth",nowDate.substring(4,6));
+        data.put("nowDate",nowDate.substring(6,8));
+
         return ResponseEntity.ok(res.dataSendSuccess(data));
+    }
+
+    // NEWDEAL 생애주기 의사결정 지원 서비스 수정시 데이터 호출하기
+    public ResponseEntity<Map<String, Object>> info(Long ltId) {
+        log.info("info 호출성공");
+
+        log.info("ltId : "+ltId);
+
+        AjaxResponse res = new AjaxResponse();
+        HashMap<String, Object> data = new HashMap<>();
+
+        LifeAllTimeDto lifeAllTimeDto = lifeAllTimeRepositoryCustom.findById(ltId);
+        if(lifeAllTimeDto == null){
+            return ResponseEntity.ok(res.fail(ResponseErrorCode.NDE006.getCode(),ResponseErrorCode.NDE006.getDesc(),null,null));
+        }else{
+            data.put("lifeAllTimeDto",lifeAllTimeDto);
+        }
+
+        return ResponseEntity.ok(res.dataSendSuccess(data));
+
     }
 }

@@ -12,7 +12,6 @@ import com.broadwave.backend.lifetime.detail.crack.CrackInfoDto;
 import com.broadwave.backend.lifetime.detail.crack.CrackRepository;
 import com.broadwave.backend.lifetime.detail.hardness.HardnessInfoDto;
 import com.broadwave.backend.lifetime.detail.hardness.HardnessRepository;
-import com.broadwave.backend.python.PythonService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -138,17 +137,6 @@ public class LifeDetailService {
 
             }
 
-            else if(optionalLifeDetail.get().getLtDetailType().equals("3")){
-                // 균열깊이
-                log.info("균열깊이 아웃풋시작");
-
-            }
-
-            else if(optionalLifeDetail.get().getLtDetailType().equals("4")) {
-                // 열화침투량
-                log.info("균열깊이 아웃풋시작");
-            }
-
             else if(optionalLifeDetail.get().getLtDetailType().equals("5")) {
                 // 탄산화깊이 바닥판3개
                 log.info("탄산화깊이 바닥판3개 아웃풋시작");
@@ -204,10 +192,10 @@ public class LifeDetailService {
 
             }
 
-            else if(optionalLifeDetail.get().getLtDetailType().equals("6")) {
-                // 탄산화깊이(바닥판4개)
-                log.info("탄산화깊이(바닥판4개) 아웃풋시작");
-            }
+//            else if(optionalLifeDetail.get().getLtDetailType().equals("6")) {
+//                // 탄산화깊이(바닥판4개)
+//                log.info("탄산화깊이(바닥판4개) 아웃풋시작");
+//            }
 
             else{
                 return ResponseEntity.ok(res.fail("문자", "존재하지 않은 타입번호 입니다. ", "문자", "타입번호 : "+optionalLifeDetail.get().getLtDetailType()));
@@ -1025,9 +1013,11 @@ public class LifeDetailService {
             log.info("pf_List_zero_plate2 : "+pf_List_zero_plate2);
             log.info("pf_List_zero_plate3 : "+pf_List_zero_plate3);
             for(int i=0; i<pf_List_plate1.size(); i++){
+
                 double bPlate1;
                 double bPlate2;
                 double bPlate3;
+
                 if(i == pf_List_plate1.size()-1){
                     bPlate1 = -NormMath.sinv(pf_List_plate1.get(i));
                 }
@@ -1040,6 +1030,7 @@ public class LifeDetailService {
                 }
                 b_List_plate1.add(bPlate1);
                 pf_List_before_plate1.add(1-normalDistribution.cumulativeProbability(bPlate1));
+
                 if(i == pf_List_plate2.size()-1){
                     bPlate2 = -NormMath.sinv(pf_List_plate2.get(i));
                 }
@@ -1052,6 +1043,7 @@ public class LifeDetailService {
                 }
                 b_List_plate2.add(bPlate2);
                 pf_List_before_plate2.add(1-normalDistribution.cumulativeProbability(bPlate2));
+
                 if(i == pf_List_plate3.size()-1){
                     bPlate3 = -NormMath.sinv(pf_List_plate3.get(i));
                 }
@@ -1064,6 +1056,7 @@ public class LifeDetailService {
                 }
                 b_List_plate3.add(bPlate3);
                 pf_List_before_plate3.add(1-normalDistribution.cumulativeProbability(bPlate3));
+
                 noaction_pf_List.add(1-(1-pf_List_before_plate1.get(i)) * (1-pf_List_before_plate2.get(i)) * (1-pf_List_before_plate3.get(i)));
                 noaction_b_List.add(-NormMath.sinv(noaction_pf_List.get(i)));
                 if(noaction_b_List.get(i)<cabonationThreePlateInfoDto.getLtTargetValue()){
@@ -1076,6 +1069,7 @@ public class LifeDetailService {
                 }
                 publicYear ++;
             }
+
             // 공용연수 초기화
             publicYear = cabonationThreePlateInfoDto.getLtPublicYear();
             log.info("");
@@ -1213,6 +1207,8 @@ public class LifeDetailService {
                 }
                 log.info("손상확률 최대값 : "+pf_max);
                 log.info("신뢰성 지수 최소값 : "+b_min);
+                log.info("유지보수 무조치 가능한 최대년수 : "+maxYear);
+
                 // 공용연수 초기화
                 publicYear = cabonationThreePlateInfoDto.getLtPublicYear();
                 // 우측의 step2_list, step1_value 계산
@@ -1234,7 +1230,7 @@ public class LifeDetailService {
                 int x = publicYear;
                 for(int i=publicYear+1; i<publicYear+22; i++) {
                     step1_list.add(x+1);
-                    if (i % step1_value == 0) {
+                    if (step1_value == 0) {
                         x = publicYear;
                     }else{
                         x++;
@@ -1242,10 +1238,22 @@ public class LifeDetailService {
                 }
                 noaction_b_List.sort(Collections.reverseOrder()); // b_List 내림차순으로 정렬
                 int y = publicYear;
+                int referenceInt = 0;
                 for(int i=0; i<step1_list.size(); i++) {
                     int step = step1_list.get(i)-y;
                     double b_List_value = noaction_b_List.get(step-1);
-                    referenceTable_List.add(b_List_value*cabonationThreePlateInfoDto.getLtRecoveryPercent());
+                    double result = b_List_value*cabonationThreePlateInfoDto.getLtRecoveryPercent();
+
+                    if(result < b_target){
+                        referenceTable_List.add(referenceTable_List.get(referenceInt));
+                        referenceInt++;
+                        if(referenceInt == step1_value){
+                            referenceInt = 0;
+                        }
+                    }
+                    else{
+                        referenceTable_List.add(b_List_value*cabonationThreePlateInfoDto.getLtRecoveryPercent());
+                    }
                 }
                 // b2_list 계산
                 int z = 0;
@@ -1327,6 +1335,7 @@ public class LifeDetailService {
                 pf_min = -NormMath.sinv(pf_max);
                 b_max =  Collections.max(noaction_b_List);
                 double b_max2 = Collections.max(noaction_b_max_List);
+                log.info("무조치시 b_max2 : " + b_max2);
                 log.info("손상확률 최대값(PF 최댓값) : " + pf_max);
                 log.info("손상확률 최소값: " + pf_min);
                 log.info("신뢰성 지수 최대값 : " + b_max);

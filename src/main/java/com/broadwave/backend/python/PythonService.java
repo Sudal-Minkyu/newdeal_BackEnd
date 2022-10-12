@@ -306,7 +306,7 @@ public class PythonService {
     }
 
     // 센서 Step2 데이터 가져오는 메서드 -> EC2 파이썬 FastApi /sensorData 호출 -> param : 센서명, from날짜, to날짜, 예측 할 일수
-    public JSONObject sensorStepDataGet(String apiName, String sensor, String time1, String time2, String channelNumber) {
+    public JSONObject sensorStepDataGet(String apiName, String sensor, String time1, String time2, String channelNumber, String warningVal, String dangerVal) {
         HttpURLConnection connection;
         JSONObject responseJson;
 
@@ -317,14 +317,16 @@ public class PythonService {
         log.info("time1 : "+time1);
         log.info("time2 : "+time2);
         log.info("channelNumber : "+channelNumber);
+        log.info("warningVal : "+warningVal);
+        log.info("dangerVal : "+dangerVal);
 
         try {
 
             // 센서리스트 데이터 불러오기
-            URL url = new URL(awsPythonApiUrl+apiName+"/?sensor="+sensor+"&time1="+time1+"&time2="+time2+"&channelNumber="+channelNumber);
+            URL url = new URL(awsPythonApiUrl+apiName+"/?sensor="+sensor+"&time1="+time1+"&time2="+time2+"&channelNumber="+channelNumber+"&warningVal="+warningVal+"&dangerVal="+dangerVal);
 
             // 센서 데이터 불러오기
-//         URL url = new URL("http://python.bmaps.kr:8013/sensorStep?sensor=Ssmartcs:2:DNAGW2111&time1=2021-10-01&time2=2022-05-01&channelNumber=2
+//         URL url = new URL("http://python.bmaps.kr:8013/sensorStep?sensor=Ssmartcs:2:DNAGW2111&time1=2021-10-01&time2=2022-05-01&channelNumber=2&warningVal=0.94&warningVal=0.97
             connection = (HttpURLConnection)url.openConnection();
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Content-Type", "application/json");

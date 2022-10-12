@@ -256,6 +256,8 @@ public class PerformanceRepositoryCustomImpl extends QuerydslRepositorySupport i
                         performance.piInputGreat,
                         performance.piInputMiddleSave,
                         performance.piInputSkip,
+                        performance.piFileYn,
+
                         performance.insertDateTime,
                         performance.insert_id,
                         performance.modifyDateTime,

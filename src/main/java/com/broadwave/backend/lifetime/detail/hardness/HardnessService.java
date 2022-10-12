@@ -2,9 +2,6 @@ package com.broadwave.backend.lifetime.detail.hardness;
 
 import com.broadwave.backend.common.AjaxResponse;
 import com.broadwave.backend.keygenerate.KeyGenerateService;
-import com.broadwave.backend.lifetime.detail.carbonation.Cabonation;
-import com.broadwave.backend.lifetime.detail.carbonation.CabonationMapperDto;
-import com.broadwave.backend.lifetime.detail.carbonation.CabonationRepository;
 import com.broadwave.backend.lifetime.detail.main.LifeDetail;
 import com.broadwave.backend.lifetime.detail.main.LiftDetailRepository;
 import lombok.extern.slf4j.Slf4j;

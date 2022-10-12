@@ -29,17 +29,17 @@ import java.util.Map;
 public class LifeDetailRestController {
 
     private final LifeDetailService lifeDetailService;
-    private final HardnessService hardnessSave;
+    private final HardnessService hardnessService;
     private final CabonationService cabonationService;
     private final CrackService crackService;
     private final ChlorideService chlorideService;
     private final CabonationThreePlateService cabonationThreePlateService;
 
     @Autowired
-    public LifeDetailRestController(LifeDetailService lifeDetailService, HardnessService hardnessSave, CabonationService cabonationService,
+    public LifeDetailRestController(LifeDetailService lifeDetailService, HardnessService hardnessService, CabonationService cabonationService,
                                     CrackService crackService, ChlorideService chlorideService, CabonationThreePlateService cabonationThreePlateService) {
         this.lifeDetailService = lifeDetailService;
-        this.hardnessSave = hardnessSave;
+        this.hardnessService = hardnessService;
         this.cabonationService = cabonationService;
         this.crackService = crackService;
         this.chlorideService = chlorideService;
@@ -50,7 +50,7 @@ public class LifeDetailRestController {
     // NEWDEAL 생애주기 의사결정 지원 서비스 세부부분 - 반발경도 저장
     @PostMapping("/hardness/save")
     public ResponseEntity<Map<String,Object>> hardnessSave(@ModelAttribute HardnessMapperDto hardnessMapperDto, HttpServletRequest request) {
-        return hardnessSave.hardnessSave(hardnessMapperDto, request);
+        return hardnessService.hardnessSave(hardnessMapperDto, request);
     }
 
     // NEWDEAL 생애주기 의사결정 지원 서비스 세부부분 - 탄산화깊이 저장

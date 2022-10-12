@@ -19,7 +19,7 @@ import java.util.Optional;
 /**
  * @author Minkyu
  * Date : 2021-08-04
- * Remark : NEWDEAL 성능개선사업평가 컨트롤러
+ * Remark : NEWDEAL 부재별 평균열화율 컨트롤러
  */
 @Slf4j
 @RestController

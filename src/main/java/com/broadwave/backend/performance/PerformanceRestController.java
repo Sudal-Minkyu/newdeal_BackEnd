@@ -162,28 +162,28 @@ public class PerformanceRestController {
         return ResponseEntity.ok(res.dataSendSuccess(data));
     }
 
-    // NEWDEAL 성능개선사업평가 유형 가져오기
-    @PostMapping("/weightBusiness")
-    public ResponseEntity<Map<String,Object>> weightBusiness(@RequestParam("autoNum")String autoNum,HttpServletRequest request) {
-
-        log.info("weightBusiness 호출성공");
-
-        AjaxResponse res = new AjaxResponse();
-        HashMap<String, Object> data = new HashMap<>();
-
-        String JWT_AccessToken = request.getHeader("JWT_AccessToken");
-        String insert_id = request.getHeader("insert_id");
-        log.info("JWT_AccessToken : "+JWT_AccessToken);
-        log.info("insert_id : "+insert_id);
-
-        PerformancePiBusinessDto performance = performanceService.findByInsertIAndAutoNumAndCount(insert_id,autoNum);
-        log.info("성능개선 유형 : "+performance.getPiBusiness());
-
-        data.put("facilityType",performance.getPiFacilityType());
-        data.put("weightBusiness",performance.getPiBusiness());
-
-        return ResponseEntity.ok(res.dataSendSuccess(data));
-    }
+//    // NEWDEAL 성능개선사업평가 유형 가져오기
+//    @PostMapping("/weightBusiness")
+//    public ResponseEntity<Map<String,Object>> weightBusiness(@RequestParam("autoNum")String autoNum,HttpServletRequest request) {
+//
+//        log.info("weightBusiness 호출성공");
+//
+//        AjaxResponse res = new AjaxResponse();
+//        HashMap<String, Object> data = new HashMap<>();
+//
+//        String JWT_AccessToken = request.getHeader("JWT_AccessToken");
+//        String insert_id = request.getHeader("insert_id");
+//        log.info("JWT_AccessToken : "+JWT_AccessToken);
+//        log.info("insert_id : "+insert_id);
+//
+//        PerformancePiBusinessDto performance = performanceService.findByInsertIAndAutoNumAndCount(insert_id,autoNum);
+//        log.info("성능개선 유형 : "+performance.getPiBusiness());
+//
+//        data.put("facilityType",performance.getPiFacilityType());
+//        data.put("weightBusiness",performance.getPiBusiness());
+//
+//        return ResponseEntity.ok(res.dataSendSuccess(data));
+//    }
 
     // NEWDEAL 성능개선사업평가 Input 아니오를 누르면 중간저장된 게시물을 삭제 할 함수
     @PostMapping("/middleDataDel")
@@ -1300,16 +1300,16 @@ public class PerformanceRestController {
 
             // 노후화 대응, 기준변화, 사용성변화 - 안정성 환산점수 10/29 완료
             Map<String,String> safetyLevel;
-            log.info("");
-            log.info("@@@@@ 시작 @@@@@");
-            log.info("");
+//            log.info("");
+//            log.info("@@@@@ 시작 @@@@@");
+//            log.info("");
             if(piBusinessType.startsWith("유지")) {
-                log.info("유지보수임");
+//                log.info("유지보수임");
                 safetyLevel  = performanceFunctionService.safetyLevel(performance.get(i).getPiSafetyLevel(),technicality,safeValue);
                 technicality_scroeList.add(safetyLevel.get("score"));
                 technicality_rankList.add(safetyLevel.get("rank"));
             }else{
-                log.info("성능개선임");
+//                log.info("성능개선임");
                 safetyLevel  = performanceFunctionService.safetyLevel(performance.get(i).getPiSafetyLevel(),technicality,null);
                 safeValue = safetyLevel.get("score");
                 technicality_scroeList.add(safetyLevel.get("score"));
@@ -1408,6 +1408,7 @@ public class PerformanceRestController {
             Map<String, String> businessFeasibility = performanceFunctionService.BusinessFeasibility(policy, performance.get(i).getPiBusinessValidity());
             policy_scroeList.add(businessFeasibility.get("score"));
             policy_rankList.add(businessFeasibility.get("rank"));
+
             // 정책성 - 사업효과 범용성
             Map<String, String> businessEffect = performanceFunctionService.businessEffect(policy, performance.get(i).getPiAADT());
             policy_scroeList.add(businessEffect.get("score"));
@@ -1425,15 +1426,14 @@ public class PerformanceRestController {
             policy_scroeList.add(policyAllScoreRank.get("score"));
             policy_rankList.add(policyAllScoreRank.get("rank"));
 
-
-            log.info("기술성 technicality_scroeList : " + technicality_scroeList);
-            log.info("기술성 technicality_rankList : " + technicality_rankList);
-
-            log.info("경제성 economy_scroeList : " + economy_scroeList);
-            log.info("경제성 economy_rankList : " + economy_rankList);
-
-            log.info("정책성 policy_scroeList : " + policy_scroeList);
-            log.info("정책성 policy_rankList : " + policy_rankList);
+//            log.info("기술성 technicality_scroeList : " + technicality_scroeList);
+//            log.info("기술성 technicality_rankList : " + technicality_rankList);
+//
+//            log.info("경제성 economy_scroeList : " + economy_scroeList);
+//            log.info("경제성 economy_rankList : " + economy_rankList);
+//
+//            log.info("정책성 policy_scroeList : " + policy_scroeList);
+//            log.info("정책성 policy_rankList : " + policy_rankList);
 
             technicality_scroeMap.put(i,technicality_scroeList);
             technicality_rankMap.put(i,technicality_rankList);
@@ -1445,16 +1445,16 @@ public class PerformanceRestController {
             policy_rankMap.put(i,policy_rankList);
         }
 
-        log.info("");
-        log.info("기술성 환산점수 리스트 : " + technicality_scroeMap);
-        log.info("기술성 환산등급 리스트 : " + technicality_rankMap);
-
-        log.info("경제성 환산점수 리스트 : " + economy_scroeMap);
-        log.info("경제성 환산등급 리스트 : " + economy_rankMap);
-
-        log.info("정책성 환산점수 리스트 : " + policy_scroeMap);
-        log.info("정책성 환산등급 리스트 : " + policy_rankMap);
-        log.info("");
+//        log.info("");
+//        log.info("기술성 환산점수 리스트 : " + technicality_scroeMap);
+//        log.info("기술성 환산등급 리스트 : " + technicality_rankMap);
+//
+//        log.info("경제성 환산점수 리스트 : " + economy_scroeMap);
+//        log.info("경제성 환산등급 리스트 : " + economy_rankMap);
+//
+//        log.info("정책성 환산점수 리스트 : " + policy_scroeMap);
+//        log.info("정책성 환산등급 리스트 : " + policy_rankMap);
+//        log.info("");
 
         data.put("piBusiness",piBusiness);
         data.put("typeName",performance.get(0).getPiFacilityType());
@@ -1476,7 +1476,6 @@ public class PerformanceRestController {
         // 노후화_정책성
         data.put("policyScore",policy_scroeMap);
         data.put("policyRank",policy_rankMap);
-
 
 
 
@@ -1509,7 +1508,7 @@ public class PerformanceRestController {
             scoreList.add(economy_scroeMap.get(i).get(size-1));
             size = policy_scroeMap.get(i).size();
             scoreList.add(policy_scroeMap.get(i).get(size-1));
-            log.info(i+1+"번째 scoreList : "+scoreList);
+//            log.info(i+1+"번째 scoreList : "+scoreList);
 
             // 유형별/지표별 가중치는 바뀔수있음.
             Map<String, Object> all_ScoreRank = performanceFunctionService.all_ScoreRank(technicality, scoreList, weight.getPiWeightTechnicality(),weight.getPiWeightEconomy(),weight.getPiWeightPolicy(), weight.getPiWeightCriticalScore());
@@ -1522,7 +1521,7 @@ public class PerformanceRestController {
             all_rankMap.put(i,all_rankList);
             all_businessMap.put(i,all_businessList);
 
-            log.info("great_scroeList : "+great_scroeList);
+//            log.info("great_scroeList : "+great_scroeList);
             if(i+1==performance.size()){
                 Double maxVal = Collections.max(great_scroeList);
                 Long minCost = Collections.min(piBusinessExpensesList);
@@ -1543,7 +1542,7 @@ public class PerformanceRestController {
                         if(optionalPerformance.isPresent()) {
                             if (2 <= x) {
                                 if (piBusinessExpensesList.get(z).equals(minCost)) {
-                                    log.info("우수대안 업데이트하기 카운트 : "+maxCostVal.get(z));
+//                                    log.info("우수대안 업데이트하기 카운트 : "+maxCostVal.get(z));
                                     optionalPerformance.get().setPiInputGreat(1);
                                     optionalPerformance.get().setModify_id(insert_id);
                                     optionalPerformance.get().setModifyDateTime(LocalDateTime.now());
@@ -1559,7 +1558,7 @@ public class PerformanceRestController {
                                     all_greate.add("-");
                                 }
                             }else{
-                                log.info("우수대안 업데이트하기 카운트 : "+maxCostVal.get(z));
+//                                log.info("우수대안 업데이트하기 카운트 : "+maxCostVal.get(z));
                                 optionalPerformance.get().setPiInputGreat(1);
                                 optionalPerformance.get().setModify_id(insert_id);
                                 optionalPerformance.get().setModifyDateTime(LocalDateTime.now());
@@ -1584,10 +1583,10 @@ public class PerformanceRestController {
             }
         }
 
-        log.info("종합평가표 환산점수 리스트 : " + all_scroeMap);
-        log.info("종합평가표 환산등급 리스트 : " + all_rankMap);
-        log.info("종합평가표 사업성 : " + all_businessMap);
-        log.info("종합평가표 우수대안 : " + all_greate);
+//        log.info("종합평가표 환산점수 리스트 : " + all_scroeMap);
+//        log.info("종합평가표 환산등급 리스트 : " + all_rankMap);
+//        log.info("종합평가표 사업성 : " + all_businessMap);
+//        log.info("종합평가표 우수대안 : " + all_greate);
 
         data.put("allScroeMap",all_scroeMap);
         data.put("allRankMap",all_rankMap);

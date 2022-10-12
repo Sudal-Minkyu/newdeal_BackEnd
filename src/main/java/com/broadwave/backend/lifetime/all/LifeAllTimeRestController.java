@@ -29,13 +29,18 @@ public class LifeAllTimeRestController {
     @PostMapping("/save")
     public ResponseEntity<Map<String,Object>> save(@ModelAttribute LifeAllTimeMapperDto lifeAllTimeMapperDto,HttpServletRequest request) {
         return lifeAllTimeService.save(lifeAllTimeMapperDto, request);
-
     }
 
     // NEWDEAL 생애주기 의사결정 지원 서비스 전체부분 아웃풋
     @PostMapping("/output")
     public ResponseEntity<Map<String,Object>> output(@RequestParam(value="id", defaultValue="")Long id, HttpServletRequest request) {
         return lifeAllTimeService.output(id, request);
+    }
+
+    // NEWDEAL 생애주기 의사결정 지원 서비스 수정시 데이터 호출하기
+    @PostMapping("/info")
+    public ResponseEntity<Map<String,Object>> info(@RequestParam(value="ltId", defaultValue="")Long ltId) {
+        return lifeAllTimeService.info(ltId);
     }
 
 

@@ -19,6 +19,8 @@ import javax.persistence.Column;
 @AllArgsConstructor
 public class LifeAllTimeMapperDto {
 
+    private Long ltId; // 고유ID값(NOTNULL)
+
     private String ltBridgeName; // 교량명(NULL)
     private String ltAbsence; // 교량형식(NOTNULL)
 

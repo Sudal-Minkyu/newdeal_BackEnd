@@ -126,7 +126,7 @@ public class PredictService {
 
     // NEWDEAL 센서 전체데이터 호출
     public ResponseEntity<Map<String, Object>> sensorAllData(String sensor, String channelNumber) throws JSONException {
-        log.info("sensorList 호출성공");
+        log.info("sensorAllData 호출성공");
 
         AjaxResponse res = new AjaxResponse();
         HashMap<String, Object> data = new HashMap<>();
@@ -162,13 +162,13 @@ public class PredictService {
     }
 
     // NEWDEAL 센서 Step2 데이터 호출
-    public ResponseEntity<Map<String, Object>> sensorStepDataGet(String sensor, String time1, String time2, String channelNumber) throws JSONException {
+    public ResponseEntity<Map<String, Object>> sensorStepDataGet(String sensor, String time1, String time2, String channelNumber, String warningVal, String dangerVal) throws JSONException {
         log.info("sensorStepDataGet 호출성공");
 
         AjaxResponse res = new AjaxResponse();
         HashMap<String, Object> data = new HashMap<>();
 
-        JSONObject jsonObject = pythonService.sensorStepDataGet("sensorStep", sensor, time1, time2, channelNumber); // 센서리스트 호출
+        JSONObject jsonObject = pythonService.sensorStepDataGet("sensorStep", sensor, time1, time2, channelNumber, warningVal, dangerVal); // 센서리스트 호출
 
         if(jsonObject == null){
             data.put("jsonObject", null);
@@ -182,6 +182,23 @@ public class PredictService {
             data.put("dataset_x", jsonObject.get("dataset_x").toString());
             data.put("dataset_y", jsonObject.get("dataset_y").toString());
             data.put("state", jsonObject.get("state").toString());
+
+            data.put("predict_3month_time", jsonObject.get("predict_3month_time").toString());
+            data.put("predict_6month_time", jsonObject.get("predict_6month_time").toString());
+            data.put("predict_9month_time", jsonObject.get("predict_9month_time").toString());
+            data.put("predict_1year_time", jsonObject.get("predict_1year_time").toString());
+
+            data.put("predict_3month_data", jsonObject.get("predict_3month_data").toString());
+            data.put("predict_6month_data", jsonObject.get("predict_6month_data").toString());
+            data.put("predict_9month_data", jsonObject.get("predict_9month_data").toString());
+            data.put("predict_1year_data", jsonObject.get("predict_1year_data").toString());
+
+            data.put("predict_3month_dataVal", jsonObject.get("predict_3month_dataVal").toString());
+            data.put("predict_6month_dataVal", jsonObject.get("predict_6month_dataVal").toString());
+            data.put("predict_9month_dataVal", jsonObject.get("predict_9month_dataVal").toString());
+            data.put("predict_1year_dataVal", jsonObject.get("predict_1year_dataVal").toString());
+
+            data.put("predict_now_dataVal", jsonObject.get("predict_now_dataVal").toString());
         }
 
         return ResponseEntity.ok(res.dataSendSuccess(data));

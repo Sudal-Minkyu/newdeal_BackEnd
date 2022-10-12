@@ -24,6 +24,9 @@ public class LifeAllTimeRepositoryCustomImpl extends QuerydslRepositorySupport i
 
         JPQLQuery<LifeAllTimeDto> query = from(lifeAllTime)
                 .select(Projections.constructor(LifeAllTimeDto.class,
+
+                        lifeAllTime.id,
+
                         lifeAllTime.ltBridgeCode,
                         lifeAllTime.ltBridgeName,
                         lifeAllTime.ltAbsence,

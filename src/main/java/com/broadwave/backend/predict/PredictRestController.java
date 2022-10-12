@@ -68,8 +68,10 @@ public class PredictRestController {
     public ResponseEntity<Map<String,Object>> sensorStepDataGet(@RequestParam(value="sensor", defaultValue="")String sensor,
                                                                   @RequestParam(value="time1", defaultValue="")String time1,
                                                                   @RequestParam(value="time2", defaultValue="")String time2,
-                                                                @RequestParam(value="channelNumber", defaultValue="")String channelNumber) throws JSONException {
-        return predictService.sensorStepDataGet(sensor, time1, time2, channelNumber); // 채널넘버 수정하기
+                                                                @RequestParam(value="channelNumber", defaultValue="")String channelNumber,
+                                                                @RequestParam(value="warningVal", defaultValue="")String warningVal,
+                                                                @RequestParam(value="dangerVal", defaultValue="")String dangerVal) throws JSONException {
+        return predictService.sensorStepDataGet(sensor, time1, time2, channelNumber, warningVal, dangerVal); // 채널넘버 수정하기
     }
 
 }

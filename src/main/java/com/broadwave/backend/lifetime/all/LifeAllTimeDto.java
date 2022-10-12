@@ -17,6 +17,8 @@ import lombok.ToString;
 @Data
 public class LifeAllTimeDto {
 
+    private Long id;
+
     private String ltBridgeCode; // 교량코드(NULL)
     private String ltBridgeName; // 교량명(NULL)
     private String ltAbsence; // 교량형식(NOTNULL)

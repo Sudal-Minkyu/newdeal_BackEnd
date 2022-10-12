@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-@Table(name="nd_lt_detail_carbonation_three_plate")
+@Table(name="nd_lt_detail_cabonation_three_plate")
 public class CabonationThreePlate {
 
     @Id
